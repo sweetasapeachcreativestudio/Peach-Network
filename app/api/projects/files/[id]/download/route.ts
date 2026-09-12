@@ -1,39 +1,4 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Sign in required." }, { status: 401 });
-  }
-
-  // This query is intentionally made with the user's session.
-  // RLS permits only Peach admins and project participants.
-  const { data: file, error } = await supabase
-    .from("project_files")
-    .select("id,storage_path,original_name")
-    .eq("id", id)
-    .single();
-
-  if (error || !file) {
-    return NextResponse.json({ error: "File not found or access denied." }, { status: 404 });
-  }
-
-  const admin = createAdminClient();
-  const { data, error: signedError } = await admin.storage
-    .from("project-files")
-    .createSignedUrl(file.storage_path, 60, { download: file.original_name });
-
-  if (signedError || !data?.signedUrl) {
-    return NextResponse.json({ error: "Could not create secure download." }, { status: 500 });
-  }
-
-  return NextResponse.redirect(data.signedUrl);
-}
+export async function GET(_request:Request,{params}:{params:Promise<{id:string}>}){const{id}=await params;const supabase=await createClient();const{data:{user}}=await supabase.auth.getUser();if(!user)return NextResponse.json({error:"Sign in required."},{status:401});const admin=createAdminClient();const{data:file}=await admin.from("project_files").select("id,project_id,storage_path,original_name").eq("id",id).single();if(!file)return NextResponse.json({error:"File not found."},{status:404});const{data:p}=await admin.from("projects").select("business_id,assigned_creative_id").eq("id",file.project_id).single();const{data:profile}=await admin.from("profiles").select("role").eq("id",user.id).single();let allowed=profile?.role==="admin";if(!allowed&&p){const{data:b}=await admin.from("businesses").select("owner_user_id").eq("id",p.business_id).single();allowed=b?.owner_user_id===user.id;if(!allowed&&p.assigned_creative_id){const{data:c}=await admin.from("creatives").select("user_id").eq("id",p.assigned_creative_id).single();allowed=c?.user_id===user.id}}if(!allowed)return NextResponse.json({error:"Access denied."},{status:403});const{data,error}=await admin.storage.from("project-files").createSignedUrl(file.storage_path,90,{download:file.original_name});if(error||!data?.signedUrl)return NextResponse.json({error:"Could not create secure download."},{status:500});return NextResponse.redirect(data.signedUrl)}

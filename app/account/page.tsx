@@ -2,50 +2,22 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { AppHeader, BottomNav } from "../components/app-nav";
+import ProfileEditor from "./profile-editor";
 
-function prettyLevel(level?: string | null) {
-  if (!level) return "Not assigned yet";
-  return `Peach ${level[0].toUpperCase() + level.slice(1)}`;
-}
-
-export default async function AccountPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/auth?mode=signin");
-
-  const admin = createAdminClient();
-  const { data: profile } = await admin.from("profiles").select("full_name,email,role").eq("id", user.id).single();
-  if (!profile) redirect("/auth?mode=signin");
-  const role = profile.role === "creative" ? "creative" : "business";
-
-  const { data: business } = role === "business" ? await admin.from("businesses").select("name,industry").eq("owner_user_id",user.id).maybeSingle() : {data:null} as any;
-  const { data: creative } = role === "creative" ? await admin.from("creatives").select("primary_specialty,city,state,peach_level,application_status,reliability_score").eq("user_id",user.id).maybeSingle() : {data:null} as any;
-  const displayName = profile.full_name ?? (business as any)?.name ?? "Peach Member";
-
-  return <main className="app-shell">
-    <AppHeader name={profile.full_name} role={role}/>
-    <div className="section-row"><div><span className="eyebrow">PROFILE & ACCOUNT</span><h2>Your place in Peach Network.</h2><p>Profile details, role and account controls live here.</p></div></div>
-
-    <section className="profile-layout">
-      <aside className="profile-card-main">
-        <div className="profile-large-avatar">{displayName.trim()[0]?.toUpperCase() ?? "P"}</div>
-        <h1>{displayName}</h1>
-        <p>{role === "creative" ? prettyLevel((creative as any)?.peach_level) : (business as any)?.name ?? "Business Member"}</p>
-        {role === "creative" && <span className="pill" style={{background:"#fff",color:"var(--peach-green)",border:0}}>{(creative as any)?.primary_specialty ?? "Creative"}</span>}
-        {role === "business" && <span className="pill" style={{background:"#fff",color:"var(--peach-green)",border:0}}>Business Account</span>}
-      </aside>
-
-      <div className="profile-detail-card">
-        <h2 style={{marginTop:0}}>Profile details</h2>
-        <div className="profile-row"><small>NAME</small><strong>{profile.full_name ?? "—"}</strong></div>
-        <div className="profile-row"><small>EMAIL</small><strong>{profile.email ?? user.email ?? "—"}</strong></div>
-        <div className="profile-row"><small>ROLE</small><strong style={{textTransform:"capitalize"}}>{profile.role}</strong></div>
-        {role === "business" && <><div className="profile-row"><small>BUSINESS</small><strong>{(business as any)?.name ?? "—"}</strong></div><div className="profile-row"><small>INDUSTRY</small><strong>{(business as any)?.industry ?? "Not added yet"}</strong></div></>}
-        {role === "creative" && <><div className="profile-row"><small>PEACH LEVEL</small><strong>{prettyLevel((creative as any)?.peach_level)}</strong></div><div className="profile-row"><small>SPECIALTY</small><strong>{(creative as any)?.primary_specialty ?? "—"}</strong></div><div className="profile-row"><small>LOCATION</small><strong>{(creative as any)?.city ? `${(creative as any).city}${(creative as any).state ? `, ${(creative as any).state}` : ""}` : "Not added yet"}</strong></div><div className="profile-row"><small>APPLICATION</small><strong style={{textTransform:"capitalize"}}>{((creative as any)?.application_status ?? "—").replaceAll("_"," ")}</strong></div></>}
-        <form action="/auth/signout" method="post" style={{marginTop:22}}><button className="btn btn-outline" type="submit">Log Out</button></form>
-      </div>
-    </section>
-
-    <BottomNav role={role} active="profile"/>
-  </main>;
+export default async function AccountPage(){
+ const supabase=await createClient();const{data:{user}}=await supabase.auth.getUser();if(!user)redirect("/auth?mode=signin");
+ const admin=createAdminClient();const{data:profile}=await admin.from("profiles").select("full_name,email,role,phone,avatar_url").eq("id",user.id).single();if(!profile)redirect("/auth?mode=signin");
+ const role=profile.role==="creative"?"creative":"business";let initial:any={fullName:profile.full_name??"",phone:profile.phone??"",avatarUrl:profile.avatar_url??""};let certifications:any[]=[];let featured:any[]=[];
+ if(role==="business"){const{data:b}=await admin.from("businesses").select("name,industry,phone,website,description,address_line1,city,state,postal_code,logo_url,preferred_contact,common_needs").eq("owner_user_id",user.id).maybeSingle();initial={...initial,businessName:b?.name??"",industry:b?.industry??"",businessPhone:b?.phone??"",website:b?.website??"",description:b?.description??"",addressLine1:b?.address_line1??"",city:b?.city??"",state:b?.state??"",postalCode:b?.postal_code??"",logoUrl:b?.logo_url??"",preferredContact:b?.preferred_contact??"",commonNeeds:(b?.common_needs??[]).join(", ")};}
+ else{const{data:c}=await admin.from("creatives").select("id,primary_specialty,secondary_specialties,tools,industries,city,state,peach_level,bio,education_level,education_detail,portfolio_url,availability_text,remote_available,service_radius_miles,profile_image_url,mentor_name,mentorship_notes").eq("user_id",user.id).maybeSingle();initial={...initial,avatarUrl:c?.profile_image_url||initial.avatarUrl,creativeId:c?.id,primarySpecialty:c?.primary_specialty??"",secondarySpecialties:(c?.secondary_specialties??[]).join(", "),tools:(c?.tools??[]).join(", "),industries:(c?.industries??[]).join(", "),city:c?.city??"",state:c?.state??"",peachLevel:c?.peach_level??"",bio:c?.bio??"",educationLevel:c?.education_level??"",educationDetail:c?.education_detail??"",portfolioUrl:c?.portfolio_url??"",availabilityText:c?.availability_text??"",remoteAvailable:c?.remote_available??true,serviceRadiusMiles:c?.service_radius_miles??"",mentorName:c?.mentor_name??"",mentorshipNotes:c?.mentorship_notes??""};if(c?.id){const[{data:cert},{data:work}]=await Promise.all([admin.from("creative_certifications").select("id,title,issuer,completed_at").eq("creative_id",c.id).order("created_at",{ascending:false}),admin.from("creative_featured_work").select("id,title,description,project_url,image_url,tags").eq("creative_id",c.id).order("created_at",{ascending:false}).limit(6)]);certifications=cert??[];featured=work??[];}}
+ const commonNeeds=(initial.commonNeeds||"").split(",").map((s:string)=>s.trim()).filter(Boolean).slice(0,6);
+ return <main className="app-shell pn-app-shell"><AppHeader name={profile.full_name} role={role}/>
+  {role==="business"&&<section className="pn-business-profile-preview">
+    <div className="pn-profile-cover"><div className="pn-profile-logo"><img src={initial.logoUrl||initial.avatarUrl||"/brand/business-owner.jpg"} alt="Business profile example"/></div><div><span className="eyebrow">BUSINESS PROFILE</span><h1>{initial.businessName||"Your Business"}</h1><p>{initial.industry||"Add your industry"}</p></div><a href="#edit-profile" className="btn btn-outline btn-small">Edit Profile</a></div>
+    <div className="pn-profile-tabs"><span className="active">About</span><span>Needs</span><span>Activity</span></div>
+    <div className="pn-profile-about-grid"><div><h2>{initial.businessName||"Tell Peach about your business."}</h2><p>{initial.description||"Add a short business description so creatives understand your brand, audience and what kind of work matters most."}</p><div className="pn-contact-list">{initial.website&&<span>◎ {initial.website}</span>}<span>✉ {profile.email}</span>{(initial.businessPhone||initial.phone)&&<span>☎ {initial.businessPhone||initial.phone}</span>}{(initial.city||initial.state)&&<span>⌖ {[initial.city,initial.state].filter(Boolean).join(", ")}</span>}<span>Preferred contact · {initial.preferredContact||"Add preference"}</span></div></div><div className="pn-profile-needs"><small>COMMON CREATIVE NEEDS</small><div>{commonNeeds.length?commonNeeds.map((n:string)=><span key={n}>{n}</span>):<><span>Social Media</span><span>Graphic Design</span><span>Video</span><span>Website</span></>}</div><p className="pn-example-note">The example imagery stays visible until you upload your own business logo or profile photo.</p></div></div>
+  </section>}
+  <div id="edit-profile" className="profile-hero"><span className="eyebrow">{role==="business"?"EDIT YOUR PROFILE":"PROFILE + SETTINGS"}</span><h1>{role==="creative"?"Your creative passport.":"Keep Peach up to date."}</h1><p>{role==="creative"?"Your skills, portfolio, education, mentorship and Peach growth all help the matching system understand where you can shine.":"Update the details Peach uses to understand your business and recommend stronger creative matches."}</p></div>
+  <ProfileEditor role={role} initial={initial} certifications={certifications} featured={featured}/><form action="/auth/signout" method="post" className="logout-row"><button className="btn btn-outline">Log Out</button></form><BottomNav role={role} active="profile"/>
+ </main>
 }
