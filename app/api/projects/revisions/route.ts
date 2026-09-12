@@ -1,0 +1,35 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+export async function POST(request:Request){
+  const supabase=await createClient();
+  const {data:{user}}=await supabase.auth.getUser();
+  if(!user) return NextResponse.json({error:"Sign in required."},{status:401});
+  const {projectId,requestText}=await request.json();
+  if(!requestText?.trim()) return NextResponse.json({error:"Revision request cannot be empty."},{status:400});
+
+  const admin=createAdminClient();
+  const {data:project}=await admin.from("projects")
+    .select("id,business_id,revision_rounds,current_revision_round,status")
+    .eq("id",projectId).single();
+  if(!project) return NextResponse.json({error:"Project not found."},{status:404});
+
+  const {data:business}=await admin.from("businesses").select("owner_user_id").eq("id",project.business_id).single();
+  if(business?.owner_user_id!==user.id) return NextResponse.json({error:"Business owner required."},{status:403});
+
+  const next=(project.current_revision_round??0)+1;
+  if(next>(project.revision_rounds??0))
+    return NextResponse.json({error:"Included revision rounds have been used. Contact Peach for a scope change."},{status:400});
+
+  await admin.from("project_revision_requests").insert({
+    project_id:projectId,business_user_id:user.id,round_number:next,request_text:requestText.trim()
+  });
+  await admin.from("projects").update({status:"revisions",current_revision_round:next}).eq("id",projectId);
+  await admin.from("project_messages").insert({
+    project_id:projectId,sender_user_id:user.id,is_system_event:true,
+    body:`Revision round ${next} requested: ${requestText.trim()}`
+  });
+
+  return NextResponse.json({ok:true,round:next});
+}
