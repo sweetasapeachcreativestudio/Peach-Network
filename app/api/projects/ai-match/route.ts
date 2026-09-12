@@ -30,7 +30,14 @@ export async function POST(request:Request){
  const apiKey=process.env.OPENAI_API_KEY;
  if(!apiKey) return NextResponse.json({ok:true,mode:"smart-beta",matches:fallback});
  try{
-   const compact=fallback.concat(pool.filter(d=>!fallback.some(f=>f.id===d.id)).slice(0,5)).map(c=>({id:c.id,name:c.name,level:c.peach_level,headline:c.headline,specialties:c.specialties,industries:c.industries,portfolio:c.portfolio_highlights,certifications:c.certifications,reliability:c.reliability_score}));
+   // Build the AI candidate list as the shared base type first. `fallback` contains
+   // scored match objects, while `pool` contains DemoCreative objects; concatenating
+   // those arrays directly makes TypeScript require every pool item to have score/reason/hits.
+   const compactSource: DemoCreative[] = [
+     ...fallback,
+     ...pool.filter(d=>!fallback.some(f=>f.id===d.id)).slice(0,5),
+   ];
+   const compact=compactSource.map(c=>({id:c.id,name:c.name,level:c.peach_level,headline:c.headline,specialties:c.specialties,industries:c.industries,portfolio:c.portfolio_highlights,certifications:c.certifications,reliability:c.reliability_score}));
    const prompt=`You are Peach Match, a fair creative matching assistant. Rank the best 3 creatives for this project. Do not automatically favor seniority. Give emerging Seed/Sapling creatives a fair chance when their portfolio and specialty fit. Return ONLY valid JSON in the shape {"matches":[{"id":"uuid","score":92,"reason":"short explanation"}]}.\nPROJECT:${JSON.stringify(project)}\nCREATIVES:${JSON.stringify(compact)}`;
    const r=await fetch("https://api.openai.com/v1/responses",{method:"POST",headers:{"Authorization":`Bearer ${apiKey}`,"Content-Type":"application/json"},body:JSON.stringify({model:"gpt-5.6-luna",input:prompt,reasoning:{effort:"low"},max_output_tokens:600})});
    if(!r.ok) throw new Error(`AI response ${r.status}`);
