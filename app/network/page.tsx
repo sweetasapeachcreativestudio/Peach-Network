@@ -1,29 +1,14 @@
 import Link from "next/link";
-import { PeachBrand, PoweredBy } from "../components/brand";
-import PeachMascot from "../components/peach-mascot";
-import { ArrowIcon } from "../components/icons";
-import { NETWORK_UPDATES } from "@/lib/network-feed";
+import { PeachBrand } from "../components/brand";
 
-const events = [
-  { date: "SEP 18", title: "Peach Network Membership Opening", type: "Network", text: "A first look at Peach Coin plans, Peach Match and the new way businesses can work with the network." },
-  { date: "COMING", title: "Peach Creative Meetup", type: "Community", text: "A casual gathering for creatives and business owners to meet, talk shop and make useful connections." },
-  { date: "COMING", title: "Portfolio + Career Workshop", type: "Peach Academy", text: "Practical portfolio feedback, career guidance and a chance to learn from other creatives in the network." },
+const events=[
+ {month:'SEP',day:'20',title:'Peach Creative Mixer',type:'Community',text:'A night for creatives, founders and local businesses to meet, talk and make connections.'},
+ {month:'OCT',day:'05',title:'Portfolio Power Hour',type:'Peach Academy',text:'A practical session for creatives who want stronger portfolios and clearer positioning.'},
+ {month:'OCT',day:'18',title:'Business + Creative Workshop',type:'Workshop',text:'Learn how to brief creative work, manage revisions and build healthier collaborations.'},
 ];
-
-export default function NetworkPage() {
-  return <main className="v12-network-page">
-    <header className="v12-public-header"><PeachBrand full/><nav><Link href="/">Home</Link><Link href="/network">Events + News</Link><Link href="/auth?role=creative&mode=signup">For Creatives</Link></nav><div className="v12-header-actions"><Link href="/auth?mode=signin" className="v12-signin">Sign In</Link><Link href="/auth?role=business&mode=signup" className="btn btn-dark btn-small">Join Peach</Link></div></header>
-
-    <section className="v12-network-hero">
-      <div><span className="eyebrow">PEACH PULSE</span><h1>What’s happening around the Network.</h1><p>Events, education, new opportunities and member stories — without making the app feel noisy.</p></div>
-      <div className="v12-network-hero-photo"><img src="/people/network-hero.jpg" alt="Happy creative community members together"/><div>come for the work.<br/>stay for the people. ♡</div></div>
-    </section>
-
-    <section className="v12-events-section"><div className="v12-section-title"><span className="eyebrow">UPCOMING</span><h2>Events + learning</h2></div><div className="v12-event-grid">{events.map(event => <article key={event.title}><span>{event.date}</span><small>{event.type}</small><h3>{event.title}</h3><p>{event.text}</p><button className="text-link" type="button">Details coming soon</button></article>)}</div></section>
-
-    <section className="v12-news-section"><div className="v12-section-title"><span className="eyebrow">NETWORK NEWS</span><h2>The latest from Peach</h2></div><div className="v12-news-list">{NETWORK_UPDATES.map(item => <Link href={item.href} className="v12-news-row" key={item.title}><span>{item.date}</span><div><strong>{item.title}</strong><p>{item.body}</p></div><ArrowIcon/></Link>)}</div></section>
-
-    <section className="v12-network-cta"><div><span className="eyebrow">A LITTLE PEACH ENERGY</span><h2>Good ideas find good people.</h2><p>The network should help you find work — and also give you people worth knowing.</p></div><PeachMascot note="More people. More possibility. Less weird bidding. 🍑"/></section>
-    <footer className="public-footer"><PeachBrand full/><PoweredBy/><div className="footer-links"><Link href="/">Home</Link><Link href="/legal/privacy">Privacy</Link><Link href="/legal/terms">Terms</Link></div></footer>
-  </main>
-}
+const news=[
+ {title:'Peach Match AI is in beta',text:'Businesses can describe a project in plain language and Peach helps shape the brief before matching.'},
+ {title:'Creative applications are open',text:'Peach is reviewing new creatives by specialty, portfolio readiness and availability.'},
+ {title:'Peach Academy is growing',text:'New learning sessions, mentor touchpoints and portfolio-building resources are being added.'},
+];
+export default function NetworkPage(){return <main className="pn-network-page"><header className="pn-public-header"><PeachBrand full/><Link href="/auth?mode=signin" className="btn btn-dark btn-small">Sign In</Link></header><section className="pn-network-hero"><div><span className="eyebrow">AROUND THE NETWORK</span><h1>Where Peach comes alive.</h1><p>Events, workshops, creative spotlights, opportunities and the news that keeps the Network connected.</p></div><div className="pn-network-hero-photo"><img src="/brand/login-creative.jpg" alt="Creative community member"/><span>Good people create great things.</span></div></section><section className="pn-network-grid"><div><div className="pn-section-title compact"><span className="eyebrow">UPCOMING EVENTS</span><h2>Come meet your people.</h2></div><div className="pn-event-list">{events.map(e=><article key={e.title}><div className="pn-date-card"><span>{e.month}</span><strong>{e.day}</strong></div><div><small>{e.type}</small><h3>{e.title}</h3><p>{e.text}</p><button className="text-link">Save the date →</button></div></article>)}</div></div><div><div className="pn-section-title compact"><span className="eyebrow">PEACH PULSE</span><h2>Network news.</h2></div><div className="pn-news-list">{news.map((n,i)=><article key={n.title}><span>{i===0?'🍑':'✦'}</span><div><h3>{n.title}</h3><p>{n.text}</p></div></article>)}</div></div></section></main>}

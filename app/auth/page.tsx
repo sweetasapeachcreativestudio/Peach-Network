@@ -107,7 +107,7 @@ function AuthContent() {
           <h1>{mode === "signin" ? "Come back in." : "Creative work belongs in the right hands."}</h1>
           <p>{mode === "signin" ? "Your projects, matches, messages and Peach Coins are waiting." : "Businesses find vetted creative talent. Creatives find real work and room to grow."}</p>
         </div>
-        <div className="auth-side-note">Powered by Sweet As A Peach Creative Agency</div>
+        <img className="v12-auth-human" src="/brand/login-creative.jpg" alt="Creative professional at work"/><div className="auth-side-note">Powered by Sweet As A Peach Creative Agency</div>
       </section>
 
       <section className="auth-form-wrap">

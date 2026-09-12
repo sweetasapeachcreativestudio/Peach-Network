@@ -8,7 +8,7 @@ export function AppHeader({ name, role, coinCount }: { name?: string | null; rol
     <header className="app-header">
       <PeachBrand href={role === "business" ? "/business" : "/creative"} />
       <div className="app-header-actions">
-        <Link className="network-header-link" href="/network">Network</Link>
+        <Link className="pn-network-link" href="/network">Network</Link>
         {role === "business" && typeof coinCount === "number" && (
           <Link className="wallet-chip" href="/business/wallet"><span className="peach-dot" />{coinCount} Coins</Link>
         )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { SERVICE_GUIDE } from "@/lib/project-pricing";
 import { CameraIcon, GlobeIcon, PaletteIcon, PenIcon, SparkIcon, VideoIcon } from "../../components/icons";
 
@@ -18,8 +18,10 @@ const CATEGORY_META: Record<CategoryKey, { label: string; icon: ReactNode; keys:
   not_sure: { label: "Not Sure Yet", icon: <SparkIcon />, keys: [] },
 };
 
-export default function ProjectBuilder({ availableCoins, initialBrief = "" }: { availableCoins: number; initialBrief?: string }) {
+export default function ProjectBuilder({ availableCoins }: { availableCoins: number }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialBrief = searchParams.get("brief") ?? "";
   const [category, setCategory] = useState<CategoryKey>("design");
   const [serviceKey, setServiceKey] = useState<ServiceKey>("flyer");
   const [complexity, setComplexity] = useState<"standard"|"expanded">("standard");
