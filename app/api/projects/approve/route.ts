@@ -9,9 +9,9 @@ export async function POST(request:Request){
   if(!project)return NextResponse.json({error:"Project not found."},{status:404});
   const {data:business}=await admin.from("businesses").select("owner_user_id").eq("id",project.business_id).single();
   if(business?.owner_user_id!==user.id)return NextResponse.json({error:"Business owner required."},{status:403});
-  if(project.status!=="submitted")return NextResponse.json({error:"Final delivery has not been submitted yet."},{status:400});
+  if(!["proof_uploaded","submitted"].includes(project.status))return NextResponse.json({error:"There is not a proof or final delivery ready for approval yet."},{status:400});
   const {error}=await admin.from("projects").update({status:"approved"}).eq("id",projectId);
   if(error)return NextResponse.json({error:error.message},{status:400});
-  await admin.from("project_messages").insert({project_id:projectId,sender_user_id:user.id,message:"Final delivery approved by the business."});
+  await admin.from("project_messages").insert({project_id:projectId,sender_user_id:user.id,message:project.status==="proof_uploaded"?"Proof approved by the business. Creative can prepare final delivery.":"Final delivery approved by the business."});
   return NextResponse.json({ok:true});
 }

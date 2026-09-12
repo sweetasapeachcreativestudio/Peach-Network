@@ -5,6 +5,7 @@ import { redirect, notFound } from "next/navigation";
 import WorkspaceClient from "./workspace-client";
 import { AppHeader, BottomNav } from "../../components/app-nav";
 import { ProjectProgress, projectPercent } from "../../components/project-progress";
+import MatchShortlist from "./match-shortlist";
 
 export default async function ProjectWorkspace({ params, searchParams }: { params: Promise<{id:string}>; searchParams: Promise<{created?:string}> }) {
   const { id } = await params;
@@ -30,11 +31,13 @@ export default async function ProjectWorkspace({ params, searchParams }: { param
   if (!isBusiness && !isCreative && !isAdmin) notFound();
   const role: "business"|"creative"|"admin" = isAdmin ? "admin" : isBusiness ? "business" : "creative";
 
-  const [{ data: updates }, { data: messages }, { data: wallet }, { data: creativeProfile }] = await Promise.all([
+  const [{ data: updates }, { data: messages }, { data: wallet }, { data: creativeProfile }, { data: files }, { data: requests }] = await Promise.all([
     admin.from("project_updates").select("id,stage,progress_percent,note,evidence_path,created_at,creative_id").eq("project_id",id).order("created_at",{ascending:false}),
     admin.from("project_messages").select("id,message,created_at,sender_user_id").eq("project_id",id).order("created_at",{ascending:true}),
     isBusiness ? admin.from("coin_wallets").select("available_coins").eq("business_id",project.business_id).maybeSingle() : Promise.resolve({data:null}),
     assignedCreative ? admin.from("profiles").select("full_name").eq("id",assignedCreative.user_id).maybeSingle() : Promise.resolve({data:null}),
+    admin.from("project_files").select("id,file_kind,original_name,mime_type,size_bytes,note,created_at,uploaded_by").eq("project_id",id).order("created_at",{ascending:false}),
+    admin.from("project_client_requests").select("id,request_type,note,status,created_at").eq("project_id",id).eq("status","open").order("created_at",{ascending:false}),
   ]);
 
   const senderIds = [...new Set((messages ?? []).map((m:any)=>m.sender_user_id).filter(Boolean))];
@@ -67,7 +70,7 @@ export default async function ProjectWorkspace({ params, searchParams }: { param
       <div style={{display:"flex",justifyContent:"space-between",gap:15,flexWrap:"wrap",marginTop:14}}><span className={`status-label ${project.status}`}>{project.status.replaceAll("_"," ")}</span><strong>{projectPercent(project.status)}% through the Peach journey</strong></div>
     </section>
 
-    {!project.assigned_creative_id && ["matching","offer_sent","draft"].includes(project.status) && <section className="card" style={{marginBottom:18}}><span className="eyebrow">PEACH MATCH IS WORKING</span><h2 style={{fontSize:30,margin:"8px 0"}}>We’re finding the right creative.</h2><p className="muted">Your request is saved. Peach Match looks at specialty, fit and availability before a private opportunity is sent. This is not a public bidding board.</p><div className="match-bars" aria-hidden="true"><i/><i/><i/></div></section>}
+    {!project.assigned_creative_id && ["matching","offer_sent","draft"].includes(project.status) && isBusiness && <MatchShortlist projectId={id}/>}
 
     <div className="workspace-tabs"><a href="#overview">Overview</a><a href="#chat">Chat</a><a href="#progress">Progress</a><a href="#proofs">Proofs</a><a href="#timeline">Timeline</a></div>
 
@@ -81,12 +84,12 @@ export default async function ProjectWorkspace({ params, searchParams }: { param
           })}
           {(!messages || messages.length===0)&&<div className="muted">No messages yet. Start the project conversation here.</div>}
         </div>
-        <WorkspaceClient projectId={id} role={role} status={project.status}/>
+        <WorkspaceClient projectId={id} role={role} status={project.status} openRequests={requests ?? []}/>
       </div>
 
       <aside className="side-stack">
         <div className="action-card"><span className="eyebrow">SCOPE</span><h3>{project.coin_amount} Peach Coin{project.coin_amount===1?"":"s"}</h3><p>{project.revision_rounds} revision round{project.revision_rounds===1?"":"s"} included in the current scope.</p></div>
-        <div className="action-card" id="proofs"><span className="eyebrow">PROOFS & EVIDENCE</span><h3>{(updates ?? []).filter((u:any)=>u.evidence_path).length} attached</h3><p>Creative check-ins and proof evidence stay tied to the progress history. File previews are part of the next storage patch.</p></div>
+        <div className="action-card" id="proofs"><span className="eyebrow">FILES + DELIVERY</span><h3>{files?.length ?? 0} files attached</h3><p>Assets, proofs and final delivery stay with the project.</p><div className="file-list">{(files??[]).map((f:any)=><a key={f.id} href={`/api/projects/files/${f.id}/download`} className={`file-row ${f.file_kind}`}><div><strong>{f.original_name}</strong><span>{f.file_kind.replaceAll("_"," ")}{f.note?` · ${f.note}`:""}</span></div><b>Download</b></a>)}{(!files||files.length===0)&&<span className="muted">No files yet.</span>}</div></div>
         {project.status === "waiting_on_client" && <div className="action-card" style={{background:"#fff0de"}}><h3>Waiting on client</h3><p>The creative has marked this project as blocked while they wait for client information.</p></div>}
       </aside>
     </section>

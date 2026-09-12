@@ -1,35 +1,31 @@
 "use client";
-
 import { useEffect, useState } from "react";
 
 export default function BrandSplash() {
   const [show, setShow] = useState(false);
-
   useEffect(() => {
     try {
-      const seen = sessionStorage.getItem("peach-splash-seen");
-      if (!seen) {
+      if (!sessionStorage.getItem("peach-splash-seen-v112")) {
         setShow(true);
-        sessionStorage.setItem("peach-splash-seen", "1");
-        const timer = window.setTimeout(() => setShow(false), 1900);
-        return () => window.clearTimeout(timer);
+        sessionStorage.setItem("peach-splash-seen-v112", "1");
+        const t = setTimeout(() => setShow(false), 2850);
+        return () => clearTimeout(t);
       }
-    } catch {
-      // sessionStorage can be unavailable in strict browser modes.
-    }
+    } catch {}
   }, []);
-
   if (!show) return null;
 
   return (
-    <div className="brand-splash" aria-hidden="true">
-      <div className="brand-splash-inner">
-        <div className="splash-bars">
-          <span />
-          <span />
-          <span />
+    <div className="brand-splash v112" aria-hidden="true">
+      <div className="splash-stage">
+        <div className="splash-build">
+          <span className="splash-pe">PE</span>
+          <span className="splash-a-build"><i/><i/><i/></span>
+          <span className="splash-ch">CH</span>
         </div>
-        <img src="/brand/peach-network-logo.png" alt="" className="splash-logo" />
+        <div className="splash-network-word">NETWORK</div>
+        <div className="splash-tagline">Good ideas find good people.</div>
+        <img className="splash-real-logo" src="/brand/peach-network-logo.png" alt="" />
       </div>
     </div>
   );

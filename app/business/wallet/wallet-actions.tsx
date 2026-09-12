@@ -1,78 +1,17 @@
 "use client";
-
 import { useState } from "react";
-
-export default function WalletActions() {
-  const [busy, setBusy] = useState<string | null>(null);
-  const [message, setMessage] = useState("");
-
-  async function checkout(kind: "membership" | "pack", key: string) {
-    setBusy(`${kind}:${key}`);
-    setMessage("");
-
-    const response = await fetch("/api/stripe/create-checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ kind, key })
-    });
-
-    const body = await response.json();
-    setBusy(null);
-
-    if (!response.ok) {
-      setMessage(body.error ?? "Could not start checkout.");
-      return;
-    }
-
-    window.location.href = body.url;
-  }
-
-  return (
-    <>
-      <section className="card" style={{marginTop:18}}>
-        <p className="muted">MEMBERSHIPS</p>
-        <div className="grid grid-3">
-          <div className="card">
-            <h3>Essentials</h3>
-            <div className="big">$499</div>
-            <p>5 coins / month · cap 7</p>
-            <button className="btn btn-primary" onClick={() => checkout("membership","essentials")} disabled={!!busy}>
-              {busy === "membership:essentials" ? "Opening..." : "Choose Essentials"}
-            </button>
-          </div>
-          <div className="card">
-            <span className="pill">MOST POPULAR</span>
-            <h3>Growth</h3>
-            <div className="big">$1,099</div>
-            <p>10 coins / month · cap 14</p>
-            <button className="btn btn-primary" onClick={() => checkout("membership","growth")} disabled={!!busy}>
-              {busy === "membership:growth" ? "Opening..." : "Choose Growth"}
-            </button>
-          </div>
-          <div className="card">
-            <h3>Partner</h3>
-            <div className="big">$2,199</div>
-            <p>20 coins / month · cap 28</p>
-            <button className="btn btn-primary" onClick={() => checkout("membership","partner")} disabled={!!busy}>
-              {busy === "membership:partner" ? "Opening..." : "Choose Partner"}
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section className="card" style={{marginTop:18}}>
-        <p className="muted">PEACH PACKS · NO MEMBERSHIP REQUIRED</p>
-        <div className="grid grid-3">
-          <button className="btn btn-outline" onClick={() => checkout("pack","pack3")} disabled={!!busy}>3 Coins · $425</button>
-          <button className="btn btn-outline" onClick={() => checkout("pack","pack5")} disabled={!!busy}>5 Coins · $675</button>
-          <button className="btn btn-outline" onClick={() => checkout("pack","pack10")} disabled={!!busy}>10 Coins · $1,250</button>
-        </div>
-        <p className="muted" style={{fontSize:13,marginTop:12}}>
-          Tax, when applicable, is calculated separately at checkout. Peach Coins are service credits, not cash.
-        </p>
-      </section>
-
-      {message && <div className="card" style={{marginTop:18}}>{message}</div>}
-    </>
-  );
-}
+const examples=[{icon:"✦",name:"Social graphic",coins:"1 coin"},{icon:"▱",name:"Flyer / event graphic",coins:"1 coin"},{icon:"▶",name:"Simple reel",coins:"2–3 coins"},{icon:"⌘",name:"Website update",coins:"2 coins"},{icon:"◈",name:"Logo refresh",coins:"3–4 coins"},{icon:"◉",name:"Mini photo session",coins:"5–7 coins"}];
+export default function WalletActions(){const[busy,setBusy]=useState<string|null>(null);const[message,setMessage]=useState("");async function checkout(kind:"membership"|"pack",key:string){setBusy(`${kind}:${key}`);setMessage("");try{const response=await fetch("/api/stripe/create-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({kind,key})});const body=await response.json();if(!response.ok)throw new Error(body.error??"Could not start checkout.");window.location.href=body.url}catch(e){setMessage(e instanceof Error?e.message:"Could not start checkout.");setBusy(null)}}return <>
+<section className="wallet-story card"><span className="eyebrow">HOW PEACH COINS WORK</span><h2>Creative help is already in your wallet.</h2><p>Coins are service credits. Pick what you need, Peach helps scope it, then our matching system curates the right creatives instead of making you sort through a public bidding pile.</p><div className="wallet-flow"><div><b>1</b><strong>Choose coins</strong><span>Membership or one-time pack</span></div><div><b>2</b><strong>Request a project</strong><span>Tell Peach what you need</span></div><div><b>3</b><strong>Get matched</strong><span>Curated creative shortlist</span></div><div><b>4</b><strong>Track + approve</strong><span>Chat, proofs and delivery</span></div></div></section>
+<section className="wallet-section"><div className="wallet-section-head"><span className="eyebrow">FOR ONGOING CREATIVE SUPPORT</span><h2>Choose a monthly Peach membership.</h2><p>Your coins refill each month and can roll over up to your plan cap.</p></div><div className="membership-grid">
+{[
+["essentials","Essentials","$499","5 coins monthly","Cap 7","For businesses with a few creative needs each month.",["Social graphics + flyers","Smaller web edits","Ongoing access to Peach Match"]],
+["growth","Growth","$1,099","10 coins monthly","Cap 14","For businesses creating consistently across channels.",["Content + campaigns","Web + video work","Room for larger projects"]],
+["partner","Partner","$2,199","20 coins monthly","Cap 28","For businesses with a heavier creative workload.",["Multiple active needs","Brand, web + video","More rollover flexibility"]]
+].map((p:any,i)=><article className={`membership-card ${i===1?"featured":""}`} key={p[0]}>{i===1&&<span className="popular-ribbon">MOST POPULAR</span>}<h3>{p[1]}</h3><div className="price">{p[2]}<small>/month</small></div><strong>{p[3]} · {p[4]}</strong><p>{p[5]}</p><ul>{p[6].map((x:string)=><li key={x}>✓ {x}</li>)}</ul><button className="btn btn-primary" onClick={()=>checkout("membership",p[0])} disabled={!!busy}>{busy===`membership:${p[0]}`?"Opening checkout…":`Start ${p[1]}`}</button></article>)}
+</div></section>
+<section className="wallet-section pack-section"><div className="wallet-section-head"><span className="eyebrow">NO MEMBERSHIP REQUIRED</span><h2>Buy Peach Coins once.</h2><p>Pay once. Use them when you are ready. Need more later? Top up again as long as your pay-as-you-go wallet stays at or below the 10-coin limit.</p></div><div className="pack-grid">{[["pack3","3 Coins","$425","Try Peach on a smaller project"],["pack5","5 Coins","$675","Best starter pack"],["pack10","10 Coins","$1,250","Maximum one-time wallet balance"]].map((p:any,i)=><button className={`pack-card ${i===1?"best":""}`} key={p[0]} onClick={()=>checkout("pack",p[0])} disabled={!!busy}><span>{i===1?"★ BEST STARTER":"ONE-TIME"}</span><strong>{p[1]}</strong><b>{p[2]}</b><small>{p[3]}</small></button>)}</div><div className="coin-policy"><strong>Coins are made to be used, not hoarded.</strong><span>Membership balances stop rolling over once they reach the plan cap. One-time wallets are capped at 10 coins. Expiration reminders will be shown before any coins expire once the final expiration policy is activated.</span></div></section>
+<section className="wallet-section"><div className="wallet-section-head"><span className="eyebrow">WHAT CAN COINS DO?</span><h2>See the value before you buy.</h2></div><div className="coin-example-grid">{examples.map(e=><div className="coin-example" key={e.name}><span>{e.icon}</span><div><strong>{e.name}</strong><small>{e.coins}</small></div></div>)}</div></section>
+<section className="wallet-confidence"><div className="peach-orbit"><i/><i/><i/></div><div><span className="eyebrow">WHY PEACH</span><h2>Your project does not disappear into a freelancer marketplace.</h2><p>Peach helps scope the request, curates qualified creatives, shows the coin commitment before work begins, and keeps chat, proofs, revisions and delivery attached to one project.</p></div></section>
+{message&&<div className="auth-message" style={{marginTop:18}}><strong>Checkout needs attention.</strong> {message}</div>}
+</>}

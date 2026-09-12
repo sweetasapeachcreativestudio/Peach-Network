@@ -83,3 +83,6 @@ Launch-hardening foundation added: installable PWA shell, security headers, serv
 A database/code compatibility pass found and fixed several launch blockers in the accumulated MVP migrations, including project-status enum mismatches, message-column differences, dispute required fields, pack-cap charging risk, Stripe webhook retry behavior, and payout retry behavior.
 
 Run `supabase/milestone8_schema_stabilization.sql` after the earlier migrations before test deployment.
+
+## V11.2 Human Experience
+See `docs/V11_2_HUMAN_EXPERIENCE.md` for the human-centered visual redesign, Peach Match AI surfacing, Peach Pulse, Wallet refresh, Messages refresh and revised brand animation.

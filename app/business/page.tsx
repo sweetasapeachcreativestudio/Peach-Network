@@ -5,6 +5,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { AppHeader, BottomNav } from "../components/app-nav";
 import { ArrowIcon, MessageIcon, SparkIcon } from "../components/icons";
 import { ProjectProgress, projectPercent } from "../components/project-progress";
+import NetworkPulse from "../components/network-pulse";
+import PeachMascot from "../components/peach-mascot";
 
 function dueText(dueAt: string | null) {
   if (!dueAt) return "Deadline not set";
@@ -95,6 +97,24 @@ export default async function BusinessDashboard() {
           </div>
         )}
       </section>
+
+
+      <section className="dashboard-ai-banner">
+        <div className="dashboard-ai-copy">
+          <span className="eyebrow"><SparkIcon/> PEACH MATCH AI · BETA</span>
+          <h2>Describe the job. Peach looks for the right people.</h2>
+          <p>Our matching beta compares project needs against specialty, portfolio fit, availability and reliability, then gives you a small shortlist instead of a crowded marketplace.</p>
+          <Link href="/business/new-project" className="btn btn-dark">Start with Peach Match AI <ArrowIcon/></Link>
+        </div>
+        <div className="dashboard-ai-people">
+          <img src="/people/maya.jpg" alt="Smiling creative professional"/>
+          <img src="/people/elijah.jpg" alt="Smiling creative professional"/>
+          <img src="/people/sophie.jpg" alt="Smiling creative professional"/>
+          <PeachMascot compact note="I found a few good ones."/>
+        </div>
+      </section>
+
+      <NetworkPulse role="business" />
 
       <BottomNav role="business" active="home" />
     </main>
