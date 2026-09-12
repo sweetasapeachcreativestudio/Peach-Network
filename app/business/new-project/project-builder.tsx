@@ -18,13 +18,13 @@ const CATEGORY_META: Record<CategoryKey, { label: string; icon: ReactNode; keys:
   not_sure: { label: "Not Sure Yet", icon: <SparkIcon />, keys: [] },
 };
 
-export default function ProjectBuilder({ availableCoins }: { availableCoins: number }) {
+export default function ProjectBuilder({ availableCoins, initialBrief = "" }: { availableCoins: number; initialBrief?: string }) {
   const router = useRouter();
   const [category, setCategory] = useState<CategoryKey>("design");
   const [serviceKey, setServiceKey] = useState<ServiceKey>("flyer");
   const [complexity, setComplexity] = useState<"standard"|"expanded">("standard");
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState(initialBrief);
   const [deadline, setDeadline] = useState("");
   const [revisions, setRevisions] = useState(2);
   const [busy, setBusy] = useState(false);

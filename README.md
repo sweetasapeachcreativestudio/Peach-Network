@@ -86,3 +86,9 @@ Run `supabase/milestone8_schema_stabilization.sql` after the earlier migrations 
 
 ## V11.2 Human Experience
 See `docs/V11_2_HUMAN_EXPERIENCE.md` for the human-centered visual redesign, Peach Match AI surfacing, Peach Pulse, Wallet refresh, Messages refresh and revised brand animation.
+
+## V11.3 visual correction
+- Splash now plays on every homepage load and visibly flies all three peach bars into the A before NETWORK appears.
+- Public homepage is a new editorial, human-first composition rather than the prior V11/V11.2 card layout.
+- Peach Match AI is immediately visible with an example prompt and curated human shortlist.
+- Network activity, events/news, creative/community messaging, and human photography are moved above the fold and into the main story.
