@@ -27,7 +27,7 @@ export default function BrandSplash() {
     return () => clearInterval(textTimer);
   }, []);
 
-  // Hold for 3.6s, then fade out smoothly
+  // Hold for 3.6s, then fade out smoothly into the app
   useEffect(() => {
     const fadeTimer = setTimeout(() => setFading(true), 3600);
     const removeTimer = setTimeout(() => setShow(false), 4200);
@@ -53,7 +53,7 @@ export default function BrandSplash() {
           justify-content: center;
           background-color: #FAF6F0;
           background-image: 
-            radial-gradient(at 15% 15%, rgba(232, 139, 104, 0.14) 0px, transparent 55%),
+            radial-gradient(at 15% 15%, rgba(232, 139, 104, 0.16) 0px, transparent 55%),
             radial-gradient(at 85% 85%, rgba(24, 34, 29, 0.08) 0px, transparent 55%);
           padding: 24px;
           transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -70,14 +70,53 @@ export default function BrandSplash() {
           pointer-events: none;
         }
 
+        /* Floating Faded Peaches Background */
+        .pn-peach-bg {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        .pn-faded-shape {
+          position: absolute;
+          fill: none;
+          stroke: #E88B68;
+          stroke-width: 2.2;
+          opacity: 0.12;
+          filter: blur(1px);
+        }
+
+        .p-pos-1 { top: 10%; left: 8%; width: 130px; height: 130px; animation: floatAnim1 14s ease-in-out infinite alternate; }
+        .p-pos-2 { top: 68%; left: 10%; width: 90px; height: 90px; animation: floatAnim2 18s ease-in-out infinite alternate; }
+        .p-pos-3 { top: 14%; right: 9%; width: 150px; height: 150px; animation: floatAnim3 16s ease-in-out infinite alternate; }
+        .p-pos-4 { top: 72%; right: 12%; width: 105px; height: 105px; animation: floatAnim1 19s ease-in-out infinite alternate-reverse; }
+        .p-pos-5 { top: 45%; left: 46%; width: 210px; height: 210px; opacity: 0.05; filter: blur(2.5px); animation: floatAnim2 22s ease-in-out infinite alternate; }
+
+        @keyframes floatAnim1 {
+          0% { transform: translateY(0) rotate(0deg) scale(1); }
+          50% { transform: translateY(-26px) rotate(8deg) scale(1.04); }
+          100% { transform: translateY(14px) rotate(-6deg) scale(0.96); }
+        }
+        @keyframes floatAnim2 {
+          0% { transform: translateY(0) rotate(0deg) scale(0.95); }
+          50% { transform: translateY(22px) rotate(-10deg) scale(1.04); }
+          100% { transform: translateY(-18px) rotate(6deg) scale(1); }
+        }
+        @keyframes floatAnim3 {
+          0% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-35px) rotate(-12deg); }
+          100% { transform: translateY(18px) rotate(8deg); }
+        }
+
         /* Ambient soft lighting */
         .pn-glow {
           position: absolute;
-          width: 440px;
-          height: 440px;
-          background: radial-gradient(circle, rgba(232, 139, 104, 0.2) 0%, rgba(250, 246, 240, 0) 70%);
+          width: 480px;
+          height: 480px;
+          background: radial-gradient(circle, rgba(232, 139, 104, 0.22) 0%, rgba(250, 246, 240, 0) 70%);
           border-radius: 50%;
-          filter: blur(45px);
+          filter: blur(50px);
           pointer-events: none;
         }
 
@@ -90,107 +129,27 @@ export default function BrandSplash() {
           justify-content: center;
         }
 
-        /* The Main PEACH Wordmark */
-        .pn-wordmark {
-          display: flex;
-          align-items: baseline;
-          justify-content: center;
-          font-size: clamp(54px, 13vw, 76px);
-          font-weight: 900;
-          color: #18221D;
-          line-height: 1;
-          letter-spacing: -0.02em;
-          filter: drop-shadow(0 12px 24px rgba(24, 34, 29, 0.08));
-        }
-
-        /* PE and CH sliding in from opposite sides */
-        .pn-slide-pe {
-          display: inline-block;
-          animation: slidePeIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .pn-slide-ch {
-          display: inline-block;
-          animation: slideChIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes slidePeIn {
-          0% { transform: translateX(-60px); opacity: 0; }
-          100% { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes slideChIn {
-          0% { transform: translateX(60px); opacity: 0; }
-          100% { transform: translateX(0); opacity: 1; }
-        }
-
-        /* The Exact Stylized 'A' Glyph */
-        .pn-glyph-a {
-          display: inline-block;
-          height: 0.88em;
-          width: 0.88em;
-          vertical-align: -0.04em;
-          margin: 0 -0.02em;
+        /* The Exact Logo Image */
+        .pn-logo-container {
           position: relative;
+          display: inline-block;
+          opacity: 0;
+          transform: translateY(10px) scale(0.95);
+          animation: logoSmoothIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
+          filter: drop-shadow(0 14px 28px rgba(24, 34, 29, 0.08));
         }
 
-        .pn-a-svg {
-          width: 100%;
-          height: 100%;
+        .pn-logo-img {
           display: block;
-          overflow: visible;
+          max-width: min(520px, 88vw);
+          height: auto;
+          object-fit: contain;
         }
 
-        /* The Dark Pillar dropping down */
-        .pn-a-pillar {
-          animation: pillarDrop 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s;
-        }
-
-        @keyframes pillarDrop {
-          0% { transform: translateY(-25px); opacity: 0; }
-          100% { transform: translateY(0); opacity: 1; }
-        }
-
-        /* The 4 Peach Stepped Lines Whipping into the A */
-        .pn-bar {
-          opacity: 0;
-          animation: whipBar 0.6s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-        }
-
-        .pn-bar-1 { animation-delay: 0.45s; }
-        .pn-bar-2 { animation-delay: 0.58s; }
-        .pn-bar-3 { animation-delay: 0.71s; }
-        .pn-bar-4 { animation-delay: 0.84s; }
-
-        @keyframes whipBar {
-          0% {
-            transform: translateX(-50px) skewX(-20deg);
-            opacity: 0;
-          }
-          40% { opacity: 1; }
-          100% {
-            transform: translateX(0) skewX(0);
-            opacity: 1;
-          }
-        }
-
-        /* NETWORK Subtitle */
-        .pn-network {
-          margin-top: 10px;
-          font-size: clamp(14px, 3.2vw, 19px);
-          font-weight: 800;
-          letter-spacing: 0.52em;
-          margin-left: 0.52em;
-          color: #6B8576;
-          opacity: 0;
-          transform: translateY(6px);
-          animation: fadeNetwork 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.95s;
-        }
-
-        @keyframes fadeNetwork {
+        @keyframes logoSmoothIn {
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
           }
         }
 
@@ -203,7 +162,8 @@ export default function BrandSplash() {
           color: #2B3D33;
           opacity: 0;
           transform: translateY(8px);
-          animation: fadeTagline 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards 1.1s;
+          animation: fadeTagline 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.9s;
+          text-align: center;
         }
 
         @keyframes fadeTagline {
@@ -225,7 +185,7 @@ export default function BrandSplash() {
           border-radius: 99px;
           box-shadow: 0 4px 14px rgba(44, 36, 32, 0.04);
           opacity: 0;
-          animation: fadePill 0.75s ease forwards 1.25s;
+          animation: fadePill 0.75s ease forwards 1.1s;
         }
 
         @keyframes fadePill {
@@ -263,39 +223,42 @@ export default function BrandSplash() {
         }
       `}</style>
 
-      {/* Ambient warm glow */}
-      <div className="pn-glow" />
+      {/* Background Floating Faded Peaches */}
+      <div className="pn-peach-bg">
+        <svg className="pn-faded-shape p-pos-1" viewBox="0 0 100 100">
+          <path d="M50 20 C 35 20, 20 30, 20 50 C 20 70, 35 85, 50 85 C 65 85, 80 70, 80 50 C 80 30, 65 20, 50 20 Z" />
+          <path d="M50 20 C 50 35, 48 55, 40 65" strokeLinecap="round" />
+          <path d="M50 20 C 55 10, 70 8, 75 14 C 76 22, 65 28, 55 24 Z" fill="rgba(46, 75, 61, 0.18)" stroke="none" />
+        </svg>
+
+        <svg className="pn-faded-shape p-pos-2" viewBox="0 0 100 100">
+          <path d="M50 20 C 35 20, 20 30, 20 50 C 20 70, 35 85, 50 85 C 65 85, 80 70, 80 50 C 80 30, 65 20, 50 20 Z" />
+          <path d="M50 20 C 50 35, 48 55, 40 65" strokeLinecap="round" />
+        </svg>
+
+        <svg className="pn-faded-shape p-pos-3" viewBox="0 0 100 100">
+          <path d="M50 20 C 35 20, 20 30, 20 50 C 20 70, 35 85, 50 85 C 65 85, 80 70, 80 50 C 80 30, 65 20, 50 20 Z" />
+          <path d="M50 20 C 55 10, 70 8, 75 14 C 76 22, 65 28, 55 24 Z" fill="rgba(46, 75, 61, 0.18)" stroke="none" />
+        </svg>
+
+        <svg className="pn-faded-shape p-pos-4" viewBox="0 0 100 100">
+          <path d="M50 20 C 35 20, 20 30, 20 50 C 20 70, 35 85, 50 85 C 65 85, 80 70, 80 50 C 80 30, 65 20, 50 20 Z" />
+        </svg>
+
+        <svg className="pn-faded-shape p-pos-5" viewBox="0 0 100 100">
+          <path d="M50 20 C 35 20, 20 30, 20 50 C 20 70, 35 85, 50 85 C 65 85, 80 70, 80 50 C 80 30, 65 20, 50 20 Z" />
+        </svg>
+      </div>
 
       <div className="pn-lockup">
-        {/* Wordmark Assembly */}
-        <div className="pn-wordmark">
-          {/* PE slides in from left */}
-          <span className="pn-slide-pe">PE</span>
-
-          {/* Exact Logo A */}
-          <span className="pn-glyph-a">
-            <svg className="pn-a-svg" viewBox="0 0 100 100" fill="none">
-              {/* Dark Right Pillar & Top Cap */}
-              <path
-                className="pn-a-pillar"
-                d="M 12 0 L 100 0 L 100 100 L 64 100 L 52 35 L 12 35 Z"
-                fill="#18221D"
-              />
-
-              {/* The 4 Exact Horizontal Peach Bars from your logo */}
-              <rect className="pn-bar pn-bar-1" x="6" y="39" width="46" height="12" fill="#E88B68" />
-              <rect className="pn-bar pn-bar-2" x="4" y="54" width="60" height="12" fill="#E88B68" />
-              <rect className="pn-bar pn-bar-3" x="2" y="69" width="48" height="12" fill="#E88B68" />
-              <rect className="pn-bar pn-bar-4" x="0" y="84" width="36" height="14" fill="#E88B68" />
-            </svg>
-          </span>
-
-          {/* CH slides in from right */}
-          <span className="pn-slide-ch">CH</span>
+        {/* YOUR EXACT LOGO IMAGE FILE */}
+        <div className="pn-logo-container">
+          <img
+            src="/peach-app-logo.png"
+            alt="Peach Network"
+            className="pn-logo-img"
+          />
         </div>
-
-        {/* NETWORK in Sage Green */}
-        <div className="pn-network">NETWORK</div>
 
         {/* Editorial Tagline */}
         <div className="pn-tagline">Good ideas find good people.</div>
