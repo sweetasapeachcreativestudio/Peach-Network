@@ -19,22 +19,25 @@ export default function HomePage() {
             min-height: 100vh;
             background-color: #F7E7DE;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Plus Jakarta Sans", sans-serif;
+            color: #1E3A2B;
+            position: relative;
+            overflow-x: hidden;
           }
 
           .pn-hero-container {
             position: relative;
             min-height: 100vh;
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            /* Uses your uploaded background image or fallback color */
             background-color: #F7E7DE;
-            background-image: url('/hero-bg.png');
+            background-image: url('/hero-bg.png'), url('/home-hero-bg.jpg');
             background-size: cover;
             background-position: center top;
             background-repeat: no-repeat;
-            overflow: hidden;
-            padding: 24px 20px 40px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 20px 36px 20px;
             box-sizing: border-box;
           }
 
@@ -43,10 +46,10 @@ export default function HomePage() {
             position: absolute;
             inset: 0;
             background: linear-gradient(
-              180deg, 
-              rgba(255, 255, 255, 0.1) 0%, 
-              rgba(250, 237, 229, 0.15) 35%, 
-              rgba(247, 229, 219, 0.9) 68%, 
+              180deg,
+              rgba(255, 255, 255, 0.05) 0%,
+              rgba(250, 237, 229, 0.15) 35%,
+              rgba(247, 229, 219, 0.92) 68%,
               #F7E5DB 96%
             );
             pointer-events: none;
@@ -72,7 +75,7 @@ export default function HomePage() {
           }
 
           .pn-menu-btn {
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(232, 139, 104, 0.25);
             width: 44px;
@@ -118,14 +121,14 @@ export default function HomePage() {
             align-items: center;
             gap: 6px;
             background: rgba(255, 255, 255, 0.88);
-            border: 1px solid rgba(232, 139, 104, 0.38);
             backdrop-filter: blur(8px);
-            color: #E85D3F;
+            border: 1px solid rgba(232, 139, 104, 0.38);
+            border-radius: 100px;
+            padding: 6px 14px;
             font-size: 12px;
             font-weight: 700;
+            color: #E85D3F;
             letter-spacing: 0.04em;
-            padding: 6px 14px;
-            border-radius: 99px;
             margin-bottom: 14px;
             box-shadow: 0 4px 12px rgba(232, 139, 104, 0.12);
           }
@@ -150,7 +153,7 @@ export default function HomePage() {
             max-width: 440px;
           }
 
-          /* Button Stack */
+          /* Action Buttons Stack */
           .pn-btn-group {
             display: flex;
             flex-direction: column;
@@ -210,7 +213,7 @@ export default function HomePage() {
             box-shadow: 0 8px 18px rgba(232, 139, 104, 0.15);
           }
 
-          /* Sign In link */
+          /* Small Sign In Link */
           .pn-signin-wrap {
             margin-top: 18px;
             width: 100%;
@@ -230,6 +233,72 @@ export default function HomePage() {
           }
           .pn-signin-link:hover {
             color: #E85D3F;
+          }
+
+          /* Mobile Navigation Drawer Overlay */
+          .pn-nav-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26, 51, 36, 0.4);
+            backdrop-filter: blur(6px);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+          }
+
+          .pn-nav-overlay.is-open {
+            opacity: 1;
+            pointer-events: auto;
+          }
+
+          .pn-nav-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 300px;
+            background-color: #F7E7DE;
+            z-index: 101;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+          }
+
+          .pn-nav-drawer.is-open {
+            transform: translateX(0);
+          }
+
+          .pn-drawer-close {
+            align-self: flex-end;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #1E3A2B;
+            cursor: pointer;
+            margin-bottom: 40px;
+            padding: 4px;
+          }
+
+          .pn-drawer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+          }
+
+          .pn-drawer-link {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1E3A2B;
+            text-decoration: none;
+            transition: color 0.2s ease;
+          }
+
+          .pn-drawer-link:hover {
+            color: #E88B68;
           }
 
           /* Desktop View */
@@ -257,7 +326,7 @@ export default function HomePage() {
           }
         `}</style>
 
-        {/* Contrast Overlay */}
+        {/* Ambient Gradient Overlay */}
         <div className="pn-hero-overlay" />
 
         {/* Top Header */}
@@ -269,10 +338,11 @@ export default function HomePage() {
               className="pn-header-logo"
             />
           </Link>
-          <button 
-            className="pn-menu-btn" 
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle navigation menu"
+
+          <button
+            className="pn-menu-btn"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open Navigation Menu"
           >
             <span className="pn-menu-bar" />
             <span className="pn-menu-bar" />
@@ -280,7 +350,7 @@ export default function HomePage() {
           </button>
         </header>
 
-        {/* Hero Copy & CTA Buttons */}
+        {/* Hero Copy & Call To Action */}
         <div className="pn-hero-content">
           <div className="pn-eyebrow-badge">
             <span>✦</span> Birmingham's Creative Marketplace
@@ -292,7 +362,7 @@ export default function HomePage() {
           </h1>
 
           <p className="pn-hero-subhead">
-            Vetted creatives. Quality work for fair prices. Connecting Southern businesses with top-tier local design talent.
+            Vetted creatives. Quality work for fair prices. We connect creatives and businesses in the South.
           </p>
 
           <div className="pn-btn-group">
@@ -311,9 +381,41 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Balance Spacer */}
+        {/* Bottom Spacer */}
         <div style={{ position: "relative", zIndex: 10, height: 1 }} />
       </section>
+
+      {/* Navigation Drawer */}
+      <div
+        className={`pn-nav-overlay ${menuOpen ? "is-open" : ""}` }
+        onClick={() => setMenuOpen(false)}
+      />
+      <aside className={`pn-nav-drawer ${menuOpen ? "is-open" : ""}`}>
+        <button
+          className="pn-drawer-close"
+          onClick={() => setMenuOpen(false)}
+          aria-label="Close Navigation"
+        >
+          ✕
+        </button>
+        <nav className="pn-drawer-links">
+          <Link href="/" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
+            Home
+          </Link>
+          <Link href="/match" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
+            Find a Creative
+          </Link>
+          <Link href="/apply" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
+            Join the Network
+          </Link>
+          <Link href="/about" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
+            About Us
+          </Link>
+          <Link href="/signin" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
+            Sign In
+          </Link>
+        </nav>
+      </aside>
     </main>
   );
 }
