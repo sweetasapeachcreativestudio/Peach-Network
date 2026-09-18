@@ -6,6 +6,7 @@ const SCROLLING_TEXTS = [
   "Grabbing our MacBooks...",
   "Cleaning our iPads...",
   "Feeding our creatives...",
+  "Brewing the sweet tea...",
 ];
 
 export default function BrandSplash() {
@@ -14,23 +15,23 @@ export default function BrandSplash() {
   const [textIndex, setTextIndex] = useState(0);
   const [textFade, setTextFade] = useState(false);
 
-  // Cycle the 3 exact phrases every 1.4s
+  // Cycle the scrolling words every 1.5s
   useEffect(() => {
     const textTimer = setInterval(() => {
       setTextFade(true);
       setTimeout(() => {
         setTextIndex((prev) => (prev + 1) % SCROLLING_TEXTS.length);
         setTextFade(false);
-      }, 200);
-    }, 1400);
+      }, 250);
+    }, 1500);
 
     return () => clearInterval(textTimer);
   }, []);
 
-  // Hold for 3.6s, then fade out smoothly into the app
+  // Hold for 3.8s, then smooth fade exit into the app
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setFading(true), 3600);
-    const removeTimer = setTimeout(() => setShow(false), 4200);
+    const fadeTimer = setTimeout(() => setFading(true), 3800);
+    const removeTimer = setTimeout(() => setShow(false), 4500);
 
     return () => {
       clearTimeout(fadeTimer);
@@ -41,109 +42,66 @@ export default function BrandSplash() {
   if (!show) return null;
 
   return (
-    <div className={`pn-splash-root ${fading ? "pn-splash-exit" : ""}`} aria-hidden="true">
+    <div className={`pn-screen-1-root ${fading ? "pn-screen-1-exit" : ""}`} aria-hidden="true">
       <style>{`
-        .pn-splash-root {
+        .pn-screen-1-root {
           position: fixed;
           inset: 0;
           z-index: 99999;
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: center;
+          justify-content: space-between;
           background-color: #FAF6F0;
           background-image: 
-            radial-gradient(at 15% 15%, rgba(232, 139, 104, 0.16) 0px, transparent 55%),
-            radial-gradient(at 85% 85%, rgba(24, 34, 29, 0.08) 0px, transparent 55%);
-          padding: 24px;
-          transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            radial-gradient(at 20% 20%, rgba(232, 139, 104, 0.12) 0px, transparent 50%),
+            radial-gradient(at 80% 80%, rgba(24, 34, 29, 0.06) 0px, transparent 50%);
+          padding: 48px 24px;
+          transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
           opacity: 1;
           transform: scale(1);
           pointer-events: auto;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Plus Jakarta Sans", sans-serif;
           overflow: hidden;
         }
 
-        .pn-splash-exit {
+        .pn-screen-1-exit {
           opacity: 0;
           transform: scale(1.02);
           pointer-events: none;
         }
 
-        /* Floating Faded Peaches Background */
-        .pn-peach-bg {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          z-index: 1;
+        .pn-top-spacer {
+          height: 20px;
         }
 
-        .pn-faded-shape {
-          position: absolute;
-          fill: none;
-          stroke: #E88B68;
-          stroke-width: 2.2;
-          opacity: 0.12;
-          filter: blur(1px);
-        }
-
-        .p-pos-1 { top: 10%; left: 8%; width: 130px; height: 130px; animation: floatAnim1 14s ease-in-out infinite alternate; }
-        .p-pos-2 { top: 68%; left: 10%; width: 90px; height: 90px; animation: floatAnim2 18s ease-in-out infinite alternate; }
-        .p-pos-3 { top: 14%; right: 9%; width: 150px; height: 150px; animation: floatAnim3 16s ease-in-out infinite alternate; }
-        .p-pos-4 { top: 72%; right: 12%; width: 105px; height: 105px; animation: floatAnim1 19s ease-in-out infinite alternate-reverse; }
-        .p-pos-5 { top: 45%; left: 46%; width: 210px; height: 210px; opacity: 0.05; filter: blur(2.5px); animation: floatAnim2 22s ease-in-out infinite alternate; }
-
-        @keyframes floatAnim1 {
-          0% { transform: translateY(0) rotate(0deg) scale(1); }
-          50% { transform: translateY(-26px) rotate(8deg) scale(1.04); }
-          100% { transform: translateY(14px) rotate(-6deg) scale(0.96); }
-        }
-        @keyframes floatAnim2 {
-          0% { transform: translateY(0) rotate(0deg) scale(0.95); }
-          50% { transform: translateY(22px) rotate(-10deg) scale(1.04); }
-          100% { transform: translateY(-18px) rotate(6deg) scale(1); }
-        }
-        @keyframes floatAnim3 {
-          0% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-35px) rotate(-12deg); }
-          100% { transform: translateY(18px) rotate(8deg); }
-        }
-
-        /* Ambient soft lighting */
-        .pn-glow {
-          position: absolute;
-          width: 480px;
-          height: 480px;
-          background: radial-gradient(circle, rgba(232, 139, 104, 0.22) 0%, rgba(250, 246, 240, 0) 70%);
-          border-radius: 50%;
-          filter: blur(50px);
-          pointer-events: none;
-        }
-
-        .pn-lockup {
-          position: relative;
-          z-index: 10;
+        .pn-screen-1-center {
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
+          width: 100%;
+          max-width: 620px;
+          text-align: center;
         }
 
-        /* The Exact Logo Image */
-        .pn-logo-container {
-          position: relative;
-          display: inline-block;
+        /* The Exact Logo */
+        .pn-mockup-logo-wrap {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
           opacity: 0;
-          transform: translateY(10px) scale(0.95);
-          animation: logoSmoothIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
-          filter: drop-shadow(0 14px 28px rgba(24, 34, 29, 0.08));
+          transform: translateY(15px) scale(0.95);
+          animation: logoSmoothIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
         }
 
-        .pn-logo-img {
+        .pn-mockup-logo {
           display: block;
-          max-width: min(520px, 88vw);
+          width: min(540px, 86vw);
           height: auto;
           object-fit: contain;
+          filter: drop-shadow(0 12px 24px rgba(24, 34, 29, 0.07));
         }
 
         @keyframes logoSmoothIn {
@@ -153,123 +111,130 @@ export default function BrandSplash() {
           }
         }
 
-        /* Editorial Tagline */
-        .pn-tagline {
-          margin-top: 24px;
-          font-family: Georgia, serif;
+        /* The Two-Line Tagline from Screen 1 */
+        .pn-screen-1-tagline {
+          margin-top: 36px;
+          font-family: Georgia, "Playfair Display", serif;
           font-style: italic;
-          font-size: 18px;
-          color: #2B3D33;
+          font-size: clamp(22px, 4.5vw, 32px);
+          line-height: 1.35;
+          color: #24352C;
           opacity: 0;
-          transform: translateY(8px);
-          animation: fadeTagline 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.9s;
-          text-align: center;
+          transform: translateY(12px);
+          animation: taglineFadeIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.85s;
         }
 
-        @keyframes fadeTagline {
+        @keyframes taglineFadeIn {
           to {
             opacity: 0.95;
             transform: translateY(0);
           }
         }
 
-        /* Quirky Scrolling Text Area */
-        .pn-scroller-wrap {
-          margin-top: 32px;
+        /* Scrolling Phrases */
+        .pn-screen-1-loading-area {
+          margin-top: 40px;
           display: flex;
           align-items: center;
           gap: 10px;
-          padding: 8px 22px;
-          background: rgba(253, 251, 247, 0.9);
-          border: 1px solid rgba(232, 139, 104, 0.28);
+          padding: 10px 24px;
+          background: rgba(253, 251, 247, 0.92);
+          border: 1px solid rgba(232, 139, 104, 0.25);
           border-radius: 99px;
-          box-shadow: 0 4px 14px rgba(44, 36, 32, 0.04);
+          box-shadow: 0 4px 16px rgba(44, 36, 32, 0.04);
           opacity: 0;
-          animation: fadePill 0.75s ease forwards 1.1s;
+          transform: translateY(10px);
+          animation: loaderAreaFade 0.8s ease forwards 1.1s;
         }
 
-        @keyframes fadePill {
-          to { opacity: 1; }
+        @keyframes loaderAreaFade {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
-        .pn-scroller-dot {
-          width: 7px;
-          height: 7px;
-          background-color: #E88B68;
+        .pn-screen-1-pip {
+          width: 8px;
+          height: 8px;
           border-radius: 50%;
-          animation: dotBlink 1.4s ease-in-out infinite;
+          background-color: #E88B68;
+          animation: pipBlink 1.4s ease-in-out infinite;
         }
 
-        @keyframes dotBlink {
+        @keyframes pipBlink {
           0%, 100% { transform: scale(0.85); opacity: 0.4; }
           50% { transform: scale(1.3); opacity: 1; }
         }
 
-        .pn-scroller-text {
-          font-size: 13px;
+        .pn-screen-1-phrase {
+          font-size: clamp(14px, 2.8vw, 16px);
           font-weight: 600;
           color: #4A3E38;
           letter-spacing: 0.02em;
-          min-width: 210px;
+          min-width: 240px;
           text-align: center;
-          transition: opacity 0.2s ease, transform 0.2s ease;
+          transition: opacity 0.25s ease, transform 0.25s ease;
           opacity: 1;
           transform: translateY(0);
         }
 
-        .pn-scroller-text.pn-hide {
+        .pn-screen-1-phrase.pn-phrase-hidden {
           opacity: 0;
-          transform: translateY(-5px);
+          transform: translateY(-6px);
+        }
+
+        /* Bottom Footer */
+        .pn-screen-1-footer {
+          font-size: clamp(10px, 2vw, 12px);
+          font-weight: 700;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: #6B8576;
+          opacity: 0;
+          animation: footerFadeIn 0.8s ease forwards 1.3s;
+          text-align: center;
+        }
+
+        @keyframes footerFadeIn {
+          to {
+            opacity: 0.8;
+          }
         }
       `}</style>
 
-      {/* Background Floating Faded Peaches */}
-      <div className="pn-peach-bg">
-        <svg className="pn-faded-shape p-pos-1" viewBox="0 0 100 100">
-          <path d="M50 20 C 35 20, 20 30, 20 50 C 20 70, 35 85, 50 85 C 65 85, 80 70, 80 50 C 80 30, 65 20, 50 20 Z" />
-          <path d="M50 20 C 50 35, 48 55, 40 65" strokeLinecap="round" />
-          <path d="M50 20 C 55 10, 70 8, 75 14 C 76 22, 65 28, 55 24 Z" fill="rgba(46, 75, 61, 0.18)" stroke="none" />
-        </svg>
+      {/* Top spacer */}
+      <div className="pn-top-spacer" />
 
-        <svg className="pn-faded-shape p-pos-2" viewBox="0 0 100 100">
-          <path d="M50 20 C 35 20, 20 30, 20 50 C 20 70, 35 85, 50 85 C 65 85, 80 70, 80 50 C 80 30, 65 20, 50 20 Z" />
-          <path d="M50 20 C 50 35, 48 55, 40 65" strokeLinecap="round" />
-        </svg>
-
-        <svg className="pn-faded-shape p-pos-3" viewBox="0 0 100 100">
-          <path d="M50 20 C 35 20, 20 30, 20 50 C 20 70, 35 85, 50 85 C 65 85, 80 70, 80 50 C 80 30, 65 20, 50 20 Z" />
-          <path d="M50 20 C 55 10, 70 8, 75 14 C 76 22, 65 28, 55 24 Z" fill="rgba(46, 75, 61, 0.18)" stroke="none" />
-        </svg>
-
-        <svg className="pn-faded-shape p-pos-4" viewBox="0 0 100 100">
-          <path d="M50 20 C 35 20, 20 30, 20 50 C 20 70, 35 85, 50 85 C 65 85, 80 70, 80 50 C 80 30, 65 20, 50 20 Z" />
-        </svg>
-
-        <svg className="pn-faded-shape p-pos-5" viewBox="0 0 100 100">
-          <path d="M50 20 C 35 20, 20 30, 20 50 C 20 70, 35 85, 50 85 C 65 85, 80 70, 80 50 C 80 30, 65 20, 50 20 Z" />
-        </svg>
-      </div>
-
-      <div className="pn-lockup">
-        {/* YOUR EXACT LOGO IMAGE FILE */}
-        <div className="pn-logo-container">
+      {/* Screen 1 Center Stage */}
+      <div className="pn-screen-1-center">
+        {/* Exact Logo File */}
+        <div className="pn-mockup-logo-wrap">
           <img
             src="/peach-app-logo.png"
             alt="Peach Network"
-            className="pn-logo-img"
+            className="pn-mockup-logo"
           />
         </div>
 
-        {/* Editorial Tagline */}
-        <div className="pn-tagline">Good ideas find good people.</div>
+        {/* The Two-Line Tagline from Screen 1 */}
+        <div className="pn-screen-1-tagline">
+          Good ideas<br />
+          find good people.
+        </div>
 
-        {/* Scrolling Quirky Creative Lines */}
-        <div className="pn-scroller-wrap">
-          <span className="pn-scroller-dot" />
-          <span className={`pn-scroller-text ${textFade ? "pn-hide" : ""}`}>
+        {/* The Scrolling Creative Words */}
+        <div className="pn-screen-1-loading-area">
+          <span className="pn-screen-1-pip" />
+          <span className={`pn-screen-1-phrase ${textFade ? "pn-phrase-hidden" : ""}`}>
             {SCROLLING_TEXTS[textIndex]}
           </span>
         </div>
+      </div>
+
+      {/* Bottom: Powered by Sweet As A Peach Creative Agency */}
+      <div className="pn-screen-1-footer">
+        Powered by Sweet As A Peach Creative Agency
       </div>
     </div>
   );
