@@ -85,7 +85,7 @@ export default function HomePage() {
           overflow-x: hidden;
         }
 
-        /* TOP NAVIGATION HEADER */
+        /* HEADER NAVIGATION */
         .pn-header {
           position: sticky;
           top: 0;
@@ -98,13 +98,12 @@ export default function HomePage() {
           margin: 0 auto;
           padding: 20px 24px;
           box-sizing: border-box;
-          background: rgba(250, 242, 235, 0.92);
+          background: rgba(250, 242, 235, 0.94);
           backdrop-filter: blur(14px);
           -webkit-backdrop-filter: blur(14px);
           border-bottom: 1px solid rgba(232, 139, 104, 0.18);
         }
 
-        /* MUCH BIGGER LOGO */
         .pn-header-logo-link {
           display: flex;
           align-items: center;
@@ -117,14 +116,12 @@ export default function HomePage() {
           filter: drop-shadow(0 4px 12px rgba(24, 34, 29, 0.08));
         }
 
-        /* TOP RIGHT NAV GROUP */
         .pn-header-right {
           display: flex;
           align-items: center;
           gap: 16px;
         }
 
-        /* Prominent Sign In at Top Right */
         .pn-top-signin-btn {
           display: inline-flex;
           align-items: center;
@@ -133,8 +130,8 @@ export default function HomePage() {
           font-size: 14px;
           font-weight: 700;
           color: #1E3A2B;
-          background: rgba(255, 255, 255, 0.9);
-          border: 1.5px solid rgba(30, 58, 43, 0.2);
+          background: rgba(255, 255, 255, 0.92);
+          border: 1.5px solid rgba(30, 58, 43, 0.22);
           border-radius: 99px;
           text-decoration: none;
           transition: all 0.2s ease;
@@ -145,7 +142,7 @@ export default function HomePage() {
           border-color: #E85D3F;
           color: #E85D3F;
           transform: translateY(-1px);
-          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.15);
+          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.16);
         }
 
         .pn-menu-btn {
@@ -175,7 +172,7 @@ export default function HomePage() {
           border-radius: 2px;
         }
 
-        /* HERO SECTION (2-COLUMN EDITORIAL ON DESKTOP) */
+        /* HERO SECTION */
         .pn-hero-section {
           max-width: 1280px;
           margin: 0 auto;
@@ -195,7 +192,6 @@ export default function HomePage() {
           }
         }
 
-        /* LEFT HERO COLUMN */
         .pn-hero-text-wrap {
           display: flex;
           flex-direction: column;
@@ -203,7 +199,6 @@ export default function HomePage() {
           text-align: left;
         }
 
-        /* Elevated Eyebrow Badge */
         .pn-hero-eyebrow {
           display: inline-flex;
           align-items: center;
@@ -225,7 +220,6 @@ export default function HomePage() {
           font-size: 14px;
         }
 
-        /* Headline */
         .pn-hero-title {
           font-size: clamp(38px, 5.2vw, 62px);
           line-height: 1.08;
@@ -241,7 +235,6 @@ export default function HomePage() {
           font-weight: 400;
         }
 
-        /* Subhead */
         .pn-hero-lead {
           font-size: clamp(16px, 2.2vw, 19px);
           line-height: 1.55;
@@ -251,7 +244,6 @@ export default function HomePage() {
           max-width: 540px;
         }
 
-        /* Action Buttons */
         .pn-hero-actions {
           display: flex;
           flex-direction: column;
@@ -316,7 +308,7 @@ export default function HomePage() {
           box-shadow: 0 8px 20px rgba(232, 139, 104, 0.18);
         }
 
-        /* RIGHT HERO COLUMN: The Smiling Creative Woman */
+        /* RIGHT HERO COLUMN: Smiling Creative */
         .pn-hero-visual-wrap {
           position: relative;
           width: 100%;
@@ -343,18 +335,16 @@ export default function HomePage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          /* Specifically targets her face so she is 100% visible */
           object-position: center 25%;
           display: block;
         }
 
-        /* Floating Trust Pill Badge */
         .pn-floating-badge {
           position: absolute;
           bottom: 24px;
           left: 24px;
           right: 24px;
-          background: rgba(255, 255, 255, 0.92);
+          background: rgba(255, 255, 255, 0.94);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
           border: 1px solid rgba(232, 139, 104, 0.35);
@@ -402,7 +392,7 @@ export default function HomePage() {
           margin-top: 2px;
         }
 
-        /* SECTION 2: SLIDING PROJECT EXAMPLES ("THIS COULD BE YOU") */
+        /* SLIDING PROJECT MARQUEE */
         .pn-projects-section {
           width: 100%;
           padding: 60px 0 80px 0;
@@ -443,7 +433,6 @@ export default function HomePage() {
           line-height: 1.5;
         }
 
-        /* Infinite Sliding Track */
         .pn-marquee-wrap {
           display: flex;
           width: 100%;
@@ -468,7 +457,6 @@ export default function HomePage() {
           100% { transform: translateX(-50%); }
         }
 
-        /* Project Card Design */
         .pn-project-card {
           width: 360px;
           background: #FAF2EB;
@@ -571,7 +559,7 @@ export default function HomePage() {
           margin: 0;
         }
 
-        /* DRAWER NAVIGATION */
+        /* NAVIGATION DRAWER */
         .pn-nav-overlay {
           position: fixed;
           inset: 0;
@@ -635,7 +623,7 @@ export default function HomePage() {
         }
       `}</style>
 
-      {/* TOP HEADER */}
+      {/* HEADER */}
       <header className="pn-header">
         <Link href="/" className="pn-header-logo-link">
           <img
@@ -662,13 +650,12 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* TWO-COLUMN EDITORIAL HERO SECTION */}
+      {/* HERO SECTION */}
       <section className="pn-hero-section">
-        {/* LEFT COLUMN: Copy & Actions */}
         <div className="pn-hero-text-wrap">
           <div className="pn-hero-eyebrow">
             <span className="pn-eyebrow-spark">✦</span>
-            Birmingham's Creative Marketplace
+            Birmingham&apos;s Creative Marketplace
           </div>
 
           <h1 className="pn-hero-title">
@@ -690,7 +677,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: The Smiling Creative Woman */}
+        {/* RIGHT COLUMN: Smiling Creative Woman */}
         <div className="pn-hero-visual-wrap">
           <div className="pn-portrait-frame">
             <img
@@ -699,13 +686,13 @@ export default function HomePage() {
               className="pn-portrait-img"
               onError={(e) => {
                 const target = e.currentTarget;
-                if (!target.src.includes('hero-bg.png')) {
-                  target.src = '/hero-bg.png';
+                if (!target.src.includes('unsplash')) {
+                  // Fallback so her face is guaranteed to show
+                  target.src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=80';
                 }
               }}
             />
 
-            {/* Floating Trust Card */}
             <div className="pn-floating-badge">
               <div className="pn-badge-avatar-ring">✦</div>
               <div>
@@ -722,7 +709,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* INFINITE SLIDING MARQUEE: RECENT WORK FROM THE NETWORK */}
+      {/* SLIDING RECENT WORK SECTION */}
       <section className="pn-projects-section">
         <div className="pn-projects-header">
           <div className="pn-projects-kicker">✦ This Could Be Your Next Project ✦</div>
@@ -732,10 +719,8 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Continuous Looping Track */}
         <div className="pn-marquee-wrap">
           <div className="pn-marquee-track">
-            {/* First Loop Set */}
             {RECENT_PROJECTS.map((proj) => (
               <div key={proj.id} className="pn-project-card">
                 <div className="pn-card-media" style={{ background: proj.fallbackBg }}>
@@ -758,7 +743,7 @@ export default function HomePage() {
               </div>
             ))}
 
-            {/* Duplicate Set for Seamless Continuous Loop */}
+            {/* Seamless duplicate loop */}
             {RECENT_PROJECTS.map((proj) => (
               <div key={`dup-${proj.id}`} className="pn-project-card">
                 <div className="pn-card-media" style={{ background: proj.fallbackBg }}>
@@ -784,7 +769,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* MOBILE DRAWER NAVIGATION */}
+      {/* DRAWER NAVIGATION */}
       <div
         className={`pn-nav-overlay ${menuOpen ? "is-open" : ""}`}
         onClick={() => setMenuOpen(false)}
