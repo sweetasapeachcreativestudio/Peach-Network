@@ -10,7 +10,8 @@ const RECENT_PROJECTS = [
     title: "Lawson State Community College",
     category: "Social Media Campaign & Templates",
     deliverable: "Social 4-Pack • 3 Coins",
-    image: "/projects/project-lawson-state.png",
+    image: "/Project 1.png",
+    altImages: ["/project-1.png", "/projects/Project 1.png", "/projects/project-lawson-state.png"],
     accent: "#F3C64F",
     bgGradient: "linear-gradient(135deg, #0A2E50 0%, #031526 100%)",
     icon: "🎓",
@@ -20,10 +21,25 @@ const RECENT_PROJECTS = [
   },
   {
     id: 2,
+    title: "New Joy Fellowship BBQ Fundraiser",
+    category: "Fundraiser Menu Board & Signage",
+    deliverable: "Print Signage • 2 Coins",
+    image: "/Project 2.png",
+    altImages: ["/project-2.png", "/projects/Project 2.png", "/projects/project-church-menu.png"],
+    accent: "#FB923C",
+    bgGradient: "linear-gradient(135deg, #7C2D12 0%, #391104 100%)",
+    icon: "🍗",
+    tag: "Event & Food",
+    headline: "Food • Faith • Community",
+    desc: "Woodgrain outdoor event signage, combo menu displays, and on-site sponsor banners.",
+  },
+  {
+    id: 3,
     title: "Bessemer Area Chamber of Commerce",
     category: "Full Brand Identity & Merch Kit",
     deliverable: "Mini Brand Kit • 6 Coins",
-    image: "/projects/project-bessemer-brand.png",
+    image: "/Project 3.png",
+    altImages: ["/project-3.png", "/projects/Project 3.png", "/projects/project-bessemer-brand.png"],
     accent: "#60A5FA",
     bgGradient: "linear-gradient(135deg, #133E8D 0%, #091B42 100%)",
     icon: "🏛️",
@@ -32,56 +48,18 @@ const RECENT_PROJECTS = [
     desc: "Official municipal seal, reception dimensional signage, business stationery, and member merchandise.",
   },
   {
-    id: 3,
-    title: "Reignbows Children's Boutique",
-    category: "E-Commerce Storefront & Mobile UI",
-    deliverable: "Web Platform • 10 Coins",
-    image: "/projects/project-reignbows.png",
-    accent: "#FBBF24",
-    bgGradient: "linear-gradient(135deg, #D9531E 0%, #872800 100%)",
-    icon: "👶",
-    tag: "Retail & E-Comm",
-    headline: "Cozy Never Goes Out of Style",
-    desc: "Custom Shopify store, mobile-optimized checkout, and autumn lookbook product bundles.",
-  },
-  {
     id: 4,
-    title: "Bessemer Chamber of Commerce",
-    category: "Official Website & Member Portal",
-    deliverable: "Web Experience • 10 Coins",
-    image: "/projects/project-bessemer-web.png",
-    accent: "#38BDF8",
-    bgGradient: "linear-gradient(135deg, #0369A1 0%, #082F49 100%)",
-    icon: "🌐",
-    tag: "Web Experience",
-    headline: "Empowering Local Businesses",
-    desc: "Member portal with directory listings, event ticketing, and community sponsorship hubs.",
-  },
-  {
-    id: 5,
     title: "New Joy Fellowship Baptist Church",
     category: "Event Program & Editorial Print Kit",
     deliverable: "Editorial Print • 4 Coins",
-    image: "/projects/project-church-program.png",
+    image: "/Project 4.png",
+    altImages: ["/project-4.png", "/projects/Project 4.png", "/projects/project-church-program.png"],
     accent: "#E879F9",
     bgGradient: "linear-gradient(135deg, #6B21A8 0%, #3B0764 100%)",
     icon: "⛪",
     tag: "Faith & Community",
     headline: "Friends & Family Day 2026",
     desc: "Commemorative service booklets, floral announcements, and community invitations.",
-  },
-  {
-    id: 6,
-    title: "New Joy Fellowship BBQ Fundraiser",
-    category: "Fundraiser Menu Board & Signage",
-    deliverable: "Print Signage • 2 Coins",
-    image: "/projects/project-church-menu.png",
-    accent: "#FB923C",
-    bgGradient: "linear-gradient(135deg, #7C2D12 0%, #391104 100%)",
-    icon: "🍗",
-    tag: "Event & Food",
-    headline: "Food • Faith • Community",
-    desc: "Woodgrain outdoor event signage, combo menu displays, and sponsor banners.",
   },
 ];
 
@@ -104,7 +82,7 @@ export default function HomePage() {
           overflow-x: hidden;
         }
 
-        /* SOUTHERN CREATIVE STUDIO TEXTURE & LIGHTING */
+        /* SOUTHERN CREATIVE STUDIO LIGHTING */
         .pn-studio-lighting {
           position: absolute;
           inset: 0;
@@ -117,7 +95,7 @@ export default function HomePage() {
           z-index: 1;
         }
 
-        /* Subtle grid background for architectural creative design flavor */
+        /* Architectural grid texture */
         .pn-grid-texture {
           position: absolute;
           inset: 0;
@@ -279,7 +257,6 @@ export default function HomePage() {
           font-style: italic;
           font-family: Georgia, "Playfair Display", serif;
           font-weight: 400;
-          position: relative;
         }
 
         .pn-hero-lead {
@@ -291,7 +268,6 @@ export default function HomePage() {
           max-width: 540px;
         }
 
-        /* Creative Pricing Pill Badge */
         .pn-value-pill {
           display: inline-flex;
           align-items: center;
@@ -397,7 +373,6 @@ export default function HomePage() {
           justify-content: flex-end;
         }
 
-        /* Jose's Photo with multi-name auto-fallback */
         .pn-spotlight-img {
           position: absolute;
           inset: 0;
@@ -409,7 +384,6 @@ export default function HomePage() {
           z-index: 1;
         }
 
-        /* Stylish fallback portrait artwork if photo is still uploading */
         .pn-spotlight-placeholder-artwork {
           position: absolute;
           inset: 0;
@@ -448,7 +422,6 @@ export default function HomePage() {
           margin-top: 4px;
         }
 
-        /* Top Pill Kicker on Card */
         .pn-spotlight-top-tag {
           position: absolute;
           top: 18px;
@@ -470,7 +443,6 @@ export default function HomePage() {
           z-index: 5;
         }
 
-        /* Floating Trust Plate at bottom of Jose's Card */
         .pn-spotlight-plate {
           position: relative;
           z-index: 5;
@@ -569,7 +541,7 @@ export default function HomePage() {
           margin-top: 2px;
         }
 
-        /* THREE-STEP HOW IT WORKS STRIP */
+        /* THREE-STEP PROCESS STRIP */
         .pn-how-it-works-strip {
           max-width: 1280px;
           margin: 0 auto 50px auto;
@@ -681,7 +653,7 @@ export default function HomePage() {
           display: flex;
           gap: 24px;
           width: max-content;
-          animation: pnMarquee 44s linear infinite;
+          animation: pnMarquee 40s linear infinite;
         }
         .pn-marquee-track:hover {
           animation-play-state: paused;
@@ -694,7 +666,7 @@ export default function HomePage() {
 
         /* STYLED EDITORIAL PROJECT CARDS */
         .pn-project-card {
-          width: 360px;
+          width: 380px;
           background: #FAF2EB;
           border-radius: 24px;
           overflow: hidden;
@@ -713,10 +685,9 @@ export default function HomePage() {
           border-color: #E85D3F;
         }
 
-        /* Mockup Header that looks like a finished agency artifact */
         .pn-card-media {
           width: 100%;
-          height: 230px;
+          height: 250px;
           position: relative;
           overflow: hidden;
           display: flex;
@@ -742,7 +713,6 @@ export default function HomePage() {
           transform: scale(1.04);
         }
 
-        /* Rich Editorial Mockup Fallback Graphics */
         .pn-editorial-artwork {
           position: relative;
           z-index: 0;
@@ -951,7 +921,7 @@ export default function HomePage() {
             Vetted creatives. Quality work for fair prices. Connecting Southern businesses with top-tier local design, branding, and web talent.
           </p>
 
-          {/* Tangible Value Proposition Pill */}
+          {/* Value Proposition Pill */}
           <div className="pn-value-pill">
             <span>🪙</span>
             <span><strong>1 Coin = 1 Finished Deliverable</strong> • No Retainers • No Hourly Creep</span>
@@ -970,12 +940,11 @@ export default function HomePage() {
         {/* RIGHT COLUMN: CREATIVE SPOTLIGHT (JOSE) */}
         <div className="pn-hero-visual-wrap">
           <div className="pn-spotlight-card">
-            {/* Top Tag */}
             <div className="pn-spotlight-top-tag">
               <span>✦</span> Creative Spotlight
             </div>
 
-            {/* Stylized fallback if photo file is still uploading */}
+            {/* Stylized fallback if photo is still uploading */}
             <div className="pn-spotlight-placeholder-artwork">
               <div className="pn-placeholder-avatar">JM</div>
               <div className="pn-placeholder-title">Jose M.</div>
@@ -990,11 +959,12 @@ export default function HomePage() {
                 className="pn-spotlight-img"
                 onError={(e) => {
                   const target = e.currentTarget;
-                  // Try alternative names if the user uploaded with different names
-                  if (!target.src.includes('jose.jpg') && !target.src.includes('Brown')) {
+                  if (!target.src.includes('jose.jpg') && !target.src.includes('Brown') && !target.src.includes('Jose')) {
                     target.src = '/jose.jpg';
-                  } else if (!target.src.includes('Brown')) {
+                  } else if (!target.src.includes('Brown') && !target.src.includes('Jose')) {
                     target.src = '/Brown and White Minimalist Packaging Mockup Instagram Post.jpg';
+                  } else if (!target.src.includes('Jose')) {
+                    target.src = '/Jose.jpg';
                   } else {
                     setImageError(true);
                   }
@@ -1002,7 +972,6 @@ export default function HomePage() {
               />
             )}
 
-            {/* Floating Trust Plate at bottom of Jose's Card */}
             <div className="pn-spotlight-plate">
               <div className="pn-plate-header">
                 <div className="pn-plate-name">
@@ -1085,7 +1054,13 @@ export default function HomePage() {
                     alt={proj.title}
                     className="pn-card-img"
                     onError={(e) => {
-                      (e.currentTarget as HTMLElement).style.display = 'none';
+                      const target = e.currentTarget;
+                      const next = proj.altImages.find((src) => !target.src.includes(src));
+                      if (next) {
+                        target.src = next;
+                      } else {
+                        target.style.display = 'none';
+                      }
                     }}
                   />
                   <div className="pn-editorial-artwork">
@@ -1104,7 +1079,7 @@ export default function HomePage() {
               </div>
             ))}
 
-            {/* Loop Set 2 (for seamless infinite loop) */}
+            {/* Loop Set 2 (for seamless loop) */}
             {RECENT_PROJECTS.map((proj) => (
               <div key={`dup-${proj.id}`} className="pn-project-card">
                 <div className="pn-card-media" style={{ background: proj.bgGradient }}>
@@ -1113,7 +1088,13 @@ export default function HomePage() {
                     alt={proj.title}
                     className="pn-card-img"
                     onError={(e) => {
-                      (e.currentTarget as HTMLElement).style.display = 'none';
+                      const target = e.currentTarget;
+                      const next = proj.altImages.find((src) => !target.src.includes(src));
+                      if (next) {
+                        target.src = next;
+                      } else {
+                        target.style.display = 'none';
+                      }
                     }}
                   />
                   <div className="pn-editorial-artwork">
