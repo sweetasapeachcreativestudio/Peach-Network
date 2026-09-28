@@ -11,7 +11,7 @@ const RECENT_PROJECTS = [
     category: "Social Media Campaign & Templates",
     deliverable: "Social Media 4-Pack • 3 Coins",
     image: "/projects/project-lawson-state.png",
-    fallbackBg: "linear-gradient(135deg, #0D3B66 0%, #001E3D 100%)",
+    fallbackBg: "linear-gradient(135deg, #092B48 0%, #001529 100%)",
     tag: "Higher Education",
     desc: "Branded student success spotlights, culinary program features, and event social templates.",
   },
@@ -21,7 +21,7 @@ const RECENT_PROJECTS = [
     category: "Full Brand Identity & Merch System",
     deliverable: "Mini Brand Kit • 6 Coins",
     image: "/projects/project-bessemer-brand.png",
-    fallbackBg: "linear-gradient(135deg, #1E40AF 0%, #0F172A 100%)",
+    fallbackBg: "linear-gradient(135deg, #123B88 0%, #081B44 100%)",
     tag: "Civic & Chamber",
     desc: "Official seal, reception signage, business stationery, apparel embroidery, and member merchandise.",
   },
@@ -31,7 +31,7 @@ const RECENT_PROJECTS = [
     category: "E-Commerce Storefront & Mobile UI",
     deliverable: "Web Experience • 10 Coins",
     image: "/projects/project-reignbows.png",
-    fallbackBg: "linear-gradient(135deg, #E65C00 0%, #F9D423 100%)",
+    fallbackBg: "linear-gradient(135deg, #CC5200 0%, #E68A00 100%)",
     tag: "Retail & E-Commerce",
     desc: "Responsive Shopify desktop & mobile store with seasonal lookbooks and product bundle carts.",
   },
@@ -41,7 +41,7 @@ const RECENT_PROJECTS = [
     category: "Official Website & Member Portal",
     deliverable: "Web Platform • 10 Coins",
     image: "/projects/project-bessemer-web.png",
-    fallbackBg: "linear-gradient(135deg, #0284C7 0%, #0369A1 100%)",
+    fallbackBg: "linear-gradient(135deg, #026AA2 0%, #013A5E 100%)",
     tag: "Web & Portal",
     desc: "'Building Connections That Matter' responsive portal with membership onboarding and event calendar.",
   },
@@ -51,7 +51,7 @@ const RECENT_PROJECTS = [
     category: "Event Program & Editorial Print Kit",
     deliverable: "Print Collateral • 4 Coins",
     image: "/projects/project-church-program.png",
-    fallbackBg: "linear-gradient(135deg, #8B5CF6 0%, #4C1D95 100%)",
+    fallbackBg: "linear-gradient(135deg, #6B3FB8 0%, #36146B 100%)",
     tag: "Faith & Community",
     desc: "Friends & Family Day 2026 commemorative order of service, program booklet, and social invitations.",
   },
@@ -61,7 +61,7 @@ const RECENT_PROJECTS = [
     category: "Fundraiser Menu Board & Signage",
     deliverable: "Event Signage • 2 Coins",
     image: "/projects/project-church-menu.png",
-    fallbackBg: "linear-gradient(135deg, #78350F 0%, #451A03 100%)",
+    fallbackBg: "linear-gradient(135deg, #632604 0%, #301001 100%)",
     tag: "Community Event",
     desc: "High-contrast woodgrain event menu board, combo meal pricing, and on-site sponsorship signage.",
   },
@@ -85,7 +85,35 @@ export default function HomePage() {
           overflow-x: hidden;
         }
 
-        /* HEADER NAVIGATION */
+        /* Ambient sunlight and organic glow for design spark */
+        .pn-ambient-spark {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 700px;
+          background: 
+            radial-gradient(circle at 18% 18%, rgba(255, 235, 222, 0.75) 0%, transparent 45%),
+            radial-gradient(circle at 82% 28%, rgba(247, 212, 192, 0.5) 0%, transparent 50%),
+            radial-gradient(circle at 50% 60%, rgba(255, 255, 255, 0.4) 0%, transparent 60%);
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        /* Leaf silhouette shadows */
+        .pn-leaf-shadows {
+          position: absolute;
+          top: -20px;
+          right: 0;
+          width: 520px;
+          height: 520px;
+          opacity: 0.12;
+          pointer-events: none;
+          z-index: 1;
+          filter: blur(28px);
+        }
+
+        /* TOP NAVIGATION HEADER */
         .pn-header {
           position: sticky;
           top: 0;
@@ -98,7 +126,7 @@ export default function HomePage() {
           margin: 0 auto;
           padding: 20px 24px;
           box-sizing: border-box;
-          background: rgba(250, 242, 235, 0.94);
+          background: rgba(250, 242, 235, 0.92);
           backdrop-filter: blur(14px);
           -webkit-backdrop-filter: blur(14px);
           border-bottom: 1px solid rgba(232, 139, 104, 0.18);
@@ -130,8 +158,8 @@ export default function HomePage() {
           font-size: 14px;
           font-weight: 700;
           color: #1E3A2B;
-          background: rgba(255, 255, 255, 0.92);
-          border: 1.5px solid rgba(30, 58, 43, 0.22);
+          background: rgba(255, 255, 255, 0.95);
+          border: 1.5px solid rgba(30, 58, 43, 0.2);
           border-radius: 99px;
           text-decoration: none;
           transition: all 0.2s ease;
@@ -142,11 +170,11 @@ export default function HomePage() {
           border-color: #E85D3F;
           color: #E85D3F;
           transform: translateY(-1px);
-          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.16);
+          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.15);
         }
 
         .pn-menu-btn {
-          background: rgba(255, 255, 255, 0.9);
+          background: rgba(255, 255, 255, 0.95);
           border: 1.5px solid rgba(232, 139, 104, 0.28);
           width: 44px;
           height: 44px;
@@ -174,9 +202,11 @@ export default function HomePage() {
 
         /* HERO SECTION */
         .pn-hero-section {
+          position: relative;
+          z-index: 10;
           max-width: 1280px;
           margin: 0 auto;
-          padding: 32px 24px 64px 24px;
+          padding: 36px 24px 64px 24px;
           display: grid;
           grid-template-columns: 1fr;
           gap: 40px;
@@ -187,11 +217,12 @@ export default function HomePage() {
         @media (min-width: 960px) {
           .pn-hero-section {
             grid-template-columns: 1.08fr 0.92fr;
-            gap: 64px;
+            gap: 60px;
             padding: 48px 24px 80px 24px;
           }
         }
 
+        /* LEFT HERO COLUMN */
         .pn-hero-text-wrap {
           display: flex;
           flex-direction: column;
@@ -308,7 +339,7 @@ export default function HomePage() {
           box-shadow: 0 8px 20px rgba(232, 139, 104, 0.18);
         }
 
-        /* RIGHT HERO COLUMN: Smiling Creative */
+        /* RIGHT HERO COLUMN: CREATIVE SPOTLIGHT (JOSE) */
         .pn-hero-visual-wrap {
           position: relative;
           width: 100%;
@@ -317,82 +348,150 @@ export default function HomePage() {
           align-items: center;
         }
 
-        .pn-portrait-frame {
+        .pn-spotlight-card {
           position: relative;
           width: 100%;
           max-width: 480px;
-          aspect-ratio: 4 / 5;
+          aspect-ratio: 4 / 5.2;
           border-radius: 32px;
           overflow: hidden;
           box-shadow: 
-            0 24px 60px rgba(30, 58, 43, 0.18),
-            0 4px 16px rgba(232, 139, 104, 0.2);
+            0 28px 65px rgba(24, 45, 33, 0.2),
+            0 8px 22px rgba(232, 139, 104, 0.22);
           border: 4px solid #FFFFFF;
-          background: #EED7CA;
+          background: #1B2B23;
         }
 
-        .pn-portrait-img {
+        .pn-spotlight-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center 25%;
+          object-position: center 20%;
           display: block;
         }
 
-        .pn-floating-badge {
+        .pn-spotlight-top-tag {
           position: absolute;
-          bottom: 24px;
-          left: 24px;
-          right: 24px;
-          background: rgba(255, 255, 255, 0.94);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(232, 139, 104, 0.35);
-          border-radius: 20px;
-          padding: 14px 18px;
-          display: flex;
+          top: 18px;
+          left: 18px;
+          display: inline-flex;
           align-items: center;
-          gap: 14px;
-          box-shadow: 0 12px 30px rgba(24, 34, 29, 0.12);
-        }
-
-        .pn-badge-avatar-ring {
-          width: 42px;
-          height: 42px;
-          border-radius: 50%;
-          background: #E85D3F;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          gap: 6px;
+          background: rgba(24, 51, 36, 0.88);
+          backdrop-filter: blur(10px);
           color: #FFFFFF;
+          border: 1px solid rgba(255, 255, 255, 0.25);
+          padding: 6px 14px;
+          border-radius: 99px;
+          font-size: 11px;
           font-weight: 800;
-          font-size: 16px;
-          flex-shrink: 0;
-          box-shadow: 0 4px 12px rgba(232, 93, 63, 0.3);
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+          z-index: 5;
         }
 
-        .pn-badge-text-title {
-          font-size: 13px;
-          font-weight: 800;
+        .pn-spotlight-plate {
+          position: absolute;
+          bottom: 18px;
+          left: 18px;
+          right: 18px;
+          background: rgba(255, 255, 255, 0.94);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border: 1px solid rgba(232, 139, 104, 0.35);
+          border-radius: 22px;
+          padding: 16px 18px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          box-shadow: 0 12px 32px rgba(24, 34, 29, 0.16);
+          z-index: 5;
+        }
+
+        .pn-plate-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .pn-plate-name {
+          font-size: 17px;
+          font-weight: 850;
           color: #1A2821;
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
         }
-        .pn-badge-online-dot {
-          width: 7px;
-          height: 7px;
-          background: #10B981;
-          border-radius: 50%;
-          display: inline-block;
-        }
-        .pn-badge-text-sub {
+
+        .pn-status-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          background: #E8F5E9;
+          color: #15803D;
           font-size: 11px;
-          color: #5F7368;
+          font-weight: 800;
+          padding: 3px 9px;
+          border-radius: 99px;
+          letter-spacing: 0.02em;
+        }
+        .pn-green-dot {
+          width: 6px;
+          height: 6px;
+          background: #16A34A;
+          border-radius: 50%;
+        }
+
+        .pn-plate-role {
+          font-size: 12px;
+          font-weight: 700;
+          color: #E85D3F;
+          letter-spacing: 0.02em;
+        }
+
+        .pn-plate-badges {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
           margin-top: 2px;
         }
 
-        /* SLIDING PROJECT MARQUEE */
+        .pn-award-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: #FFF8E1;
+          color: #B45309;
+          font-size: 11px;
+          font-weight: 700;
+          padding: 3px 8px;
+          border-radius: 6px;
+          border: 1px solid #FDE68A;
+        }
+
+        .pn-stat-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: #F1F5F9;
+          color: #334155;
+          font-size: 11px;
+          font-weight: 700;
+          padding: 3px 8px;
+          border-radius: 6px;
+        }
+
+        .pn-plate-location {
+          font-size: 11px;
+          color: #5F7368;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          margin-top: 2px;
+        }
+
+        /* SECTION 2: SLIDING PROJECT EXAMPLES */
         .pn-projects-section {
           width: 100%;
           padding: 60px 0 80px 0;
@@ -433,6 +532,7 @@ export default function HomePage() {
           line-height: 1.5;
         }
 
+        /* Infinite Sliding Track */
         .pn-marquee-wrap {
           display: flex;
           width: 100%;
@@ -499,6 +599,26 @@ export default function HomePage() {
           transform: scale(1.05);
         }
 
+        /* Fallback Typography Card when image is loading */
+        .pn-card-fallback-content {
+          padding: 24px;
+          text-align: center;
+          color: #FFFFFF;
+        }
+        .pn-card-fallback-title {
+          font-size: 20px;
+          font-weight: 850;
+          letter-spacing: -0.01em;
+          margin-bottom: 6px;
+        }
+        .pn-card-fallback-badge {
+          font-size: 11px;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          opacity: 0.8;
+          font-weight: 700;
+        }
+
         .pn-card-coin-badge {
           position: absolute;
           top: 14px;
@@ -513,6 +633,7 @@ export default function HomePage() {
           border-radius: 99px;
           border: 1px solid rgba(255, 255, 255, 0.2);
           box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+          z-index: 2;
         }
 
         .pn-card-tag-badge {
@@ -528,6 +649,7 @@ export default function HomePage() {
           padding: 5px 12px;
           border-radius: 99px;
           box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          z-index: 2;
         }
 
         .pn-card-body {
@@ -559,7 +681,7 @@ export default function HomePage() {
           margin: 0;
         }
 
-        /* NAVIGATION DRAWER */
+        /* DRAWER NAVIGATION */
         .pn-nav-overlay {
           position: fixed;
           inset: 0;
@@ -623,7 +745,15 @@ export default function HomePage() {
         }
       `}</style>
 
-      {/* HEADER */}
+      {/* Ambient Lighting & Shadows for Design Spark */}
+      <div className="pn-ambient-spark" />
+      <svg className="pn-leaf-shadows" viewBox="0 0 500 500" fill="none">
+        <path d="M 120 50 C 180 80, 240 180, 200 280 C 150 200, 100 120, 120 50 Z" fill="#E88B68" />
+        <path d="M 280 120 C 350 160, 420 280, 360 380 C 300 280, 240 180, 280 120 Z" fill="#183324" />
+        <path d="M 50 220 C 140 260, 180 380, 120 460 C 80 380, 30 300, 50 220 Z" fill="#E85D3F" />
+      </svg>
+
+      {/* TOP HEADER */}
       <header className="pn-header">
         <Link href="/" className="pn-header-logo-link">
           <img
@@ -650,12 +780,13 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* HERO SECTION */}
+      {/* TWO-COLUMN EDITORIAL HERO SECTION */}
       <section className="pn-hero-section">
+        {/* LEFT COLUMN: Copy & Actions */}
         <div className="pn-hero-text-wrap">
           <div className="pn-hero-eyebrow">
             <span className="pn-eyebrow-spark">✦</span>
-            Birmingham&apos;s Creative Marketplace
+            Birmingham's Creative Marketplace
           </div>
 
           <h1 className="pn-hero-title">
@@ -677,39 +808,56 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Smiling Creative Woman */}
+        {/* RIGHT COLUMN: CREATIVE SPOTLIGHT (JOSE) */}
         <div className="pn-hero-visual-wrap">
-          <div className="pn-portrait-frame">
+          <div className="pn-spotlight-card">
+            <div className="pn-spotlight-top-tag">
+              <span>✦</span> Creative Spotlight
+            </div>
+
             <img
-              src="/hero-creative.jpg"
-              alt="Vetted Birmingham Creative smiling at laptop"
-              className="pn-portrait-img"
+              src="/jose-creative.jpg"
+              alt="Jose - Video Editor, Illustrator & Graphic Designer in Birmingham & Troy AL"
+              className="pn-spotlight-img"
               onError={(e) => {
                 const target = e.currentTarget;
-                if (!target.src.includes('unsplash')) {
-                  // Fallback so her face is guaranteed to show
-                  target.src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=80';
+                if (!target.src.includes('hero-creative.jpg')) {
+                  target.src = '/hero-creative.jpg';
                 }
               }}
             />
 
-            <div className="pn-floating-badge">
-              <div className="pn-badge-avatar-ring">✦</div>
-              <div>
-                <div className="pn-badge-text-title">
-                  <span className="pn-badge-online-dot" />
-                  Birmingham Talent Network
+            <div className="pn-spotlight-plate">
+              <div className="pn-plate-header">
+                <div className="pn-plate-name">Jose M.</div>
+                <div className="pn-status-pill">
+                  <span className="pn-green-dot" />
+                  Available Now
                 </div>
-                <div className="pn-badge-text-sub">
-                  Vetted Designers • 24–48h Turnaround • 75% Payout
-                </div>
+              </div>
+
+              <div className="pn-plate-role">
+                Video Editor • Illustrator • Graphic Designer
+              </div>
+
+              <div className="pn-plate-badges">
+                <span className="pn-award-badge">
+                  🏆 2026 American Advertising Award (ADDY) Winner
+                </span>
+                <span className="pn-stat-badge">
+                  ⭐ 5.0 (5 Projects Completed)
+                </span>
+              </div>
+
+              <div className="pn-plate-location">
+                📍 Birmingham & Troy, AL Area
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* SLIDING RECENT WORK SECTION */}
+      {/* INFINITE SLIDING MARQUEE: RECENT WORK FROM THE NETWORK */}
       <section className="pn-projects-section">
         <div className="pn-projects-header">
           <div className="pn-projects-kicker">✦ This Could Be Your Next Project ✦</div>
@@ -719,8 +867,10 @@ export default function HomePage() {
           </p>
         </div>
 
+        {/* Continuous Looping Track */}
         <div className="pn-marquee-wrap">
           <div className="pn-marquee-track">
+            {/* First Loop Set */}
             {RECENT_PROJECTS.map((proj) => (
               <div key={proj.id} className="pn-project-card">
                 <div className="pn-card-media" style={{ background: proj.fallbackBg }}>
@@ -732,6 +882,10 @@ export default function HomePage() {
                       (e.currentTarget as HTMLElement).style.display = 'none';
                     }}
                   />
+                  <div className="pn-card-fallback-content">
+                    <div className="pn-card-fallback-badge">{proj.tag}</div>
+                    <div className="pn-card-fallback-title">{proj.title}</div>
+                  </div>
                   <div className="pn-card-coin-badge">{proj.deliverable}</div>
                   <div className="pn-card-tag-badge">{proj.tag}</div>
                 </div>
@@ -743,7 +897,7 @@ export default function HomePage() {
               </div>
             ))}
 
-            {/* Seamless duplicate loop */}
+            {/* Duplicate Set for Seamless Continuous Loop */}
             {RECENT_PROJECTS.map((proj) => (
               <div key={`dup-${proj.id}`} className="pn-project-card">
                 <div className="pn-card-media" style={{ background: proj.fallbackBg }}>
@@ -755,6 +909,10 @@ export default function HomePage() {
                       (e.currentTarget as HTMLElement).style.display = 'none';
                     }}
                   />
+                  <div className="pn-card-fallback-content">
+                    <div className="pn-card-fallback-badge">{proj.tag}</div>
+                    <div className="pn-card-fallback-title">{proj.title}</div>
+                  </div>
                   <div className="pn-card-coin-badge">{proj.deliverable}</div>
                   <div className="pn-card-tag-badge">{proj.tag}</div>
                 </div>
@@ -769,7 +927,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* DRAWER NAVIGATION */}
+      {/* MOBILE DRAWER NAVIGATION */}
       <div
         className={`pn-nav-overlay ${menuOpen ? "is-open" : ""}`}
         onClick={() => setMenuOpen(false)}
