@@ -232,9 +232,9 @@ export default function HomePage() {
           inset: 0;
           height: 850px;
           background: 
-            radial-gradient(circle at 12% 14%, rgba(254, 237, 226, 0.8) 0%, transparent 45%),
-            radial-gradient(circle at 86% 22%, rgba(247, 209, 188, 0.55) 0%, transparent 50%),
-            radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.5) 0%, transparent 65%);
+            radial-gradient(circle at 12% 14%, rgba(254, 237, 226, 0.85) 0%, transparent 45%),
+            radial-gradient(circle at 86% 22%, rgba(247, 209, 188, 0.6) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.55) 0%, transparent 65%);
           pointer-events: none;
           z-index: 1;
         }
@@ -245,15 +245,15 @@ export default function HomePage() {
           height: 850px;
           background-size: 32px 32px;
           background-image: 
-            linear-gradient(to right, rgba(232, 139, 104, 0.06) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(232, 139, 104, 0.06) 1px, transparent 1px);
+            linear-gradient(to right, rgba(232, 139, 104, 0.08) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(232, 139, 104, 0.08) 1px, transparent 1px);
           mask-image: linear-gradient(180deg, black 0%, black 70%, transparent 100%);
           -webkit-mask-image: linear-gradient(180deg, black 0%, black 70%, transparent 100%);
           pointer-events: none;
           z-index: 1;
         }
 
-        /* TOP NAVIGATION HEADER */
+        /* TOP NAVIGATION HEADER - BIGGER LOGO */
         .pn-header {
           position: sticky;
           top: 0;
@@ -264,12 +264,12 @@ export default function HomePage() {
           width: 100%;
           max-width: 1280px;
           margin: 0 auto;
-          padding: 20px 24px;
+          padding: 18px 24px;
           box-sizing: border-box;
-          background: rgba(250, 242, 235, 0.92);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-          border-bottom: 1.5px solid rgba(232, 139, 104, 0.18);
+          background: rgba(250, 242, 235, 0.94);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border-bottom: 1.5px solid rgba(232, 139, 104, 0.2);
         }
 
         .pn-header-logo-link {
@@ -278,10 +278,14 @@ export default function HomePage() {
           text-decoration: none;
         }
         .pn-header-logo {
-          height: clamp(44px, 5.2vw, 56px);
+          height: clamp(52px, 6vw, 68px);
           width: auto;
           display: block;
-          filter: drop-shadow(0 4px 12px rgba(24, 34, 29, 0.08));
+          filter: drop-shadow(0 4px 14px rgba(24, 34, 29, 0.12));
+          transition: transform 0.2s ease;
+        }
+        .pn-header-logo:hover {
+          transform: scale(1.02);
         }
 
         .pn-header-right {
@@ -294,31 +298,31 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 10px 22px;
+          padding: 11px 24px;
           font-size: 14px;
-          font-weight: 700;
+          font-weight: 750;
           color: #1E3A2B;
           background: rgba(255, 255, 255, 0.95);
-          border: 1.5px solid rgba(30, 58, 43, 0.2);
+          border: 1.5px solid rgba(30, 58, 43, 0.22);
           border-radius: 99px;
           text-decoration: none;
           transition: all 0.2s ease;
-          box-shadow: 0 2px 8px rgba(30, 58, 43, 0.04);
+          box-shadow: 0 2px 10px rgba(30, 58, 43, 0.05);
         }
         .pn-top-signin-btn:hover {
           background: #FFFFFF;
           border-color: #E85D3F;
           color: #E85D3F;
           transform: translateY(-1px);
-          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.15);
+          box-shadow: 0 4px 16px rgba(232, 93, 63, 0.18);
         }
 
         .pn-menu-btn {
           background: rgba(255, 255, 255, 0.95);
           border: 1.5px solid rgba(232, 139, 104, 0.28);
-          width: 44px;
-          height: 44px;
-          border-radius: 12px;
+          width: 46px;
+          height: 46px;
+          border-radius: 14px;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -334,7 +338,7 @@ export default function HomePage() {
           transform: scale(1.04);
         }
         .pn-menu-bar {
-          width: 20px;
+          width: 22px;
           height: 2.2px;
           background-color: #1E3A2B;
           border-radius: 2px;
@@ -346,7 +350,7 @@ export default function HomePage() {
           z-index: 10;
           max-width: 1280px;
           margin: 0 auto;
-          padding: 32px 24px 64px 24px;
+          padding: 36px 24px 64px 24px;
           display: grid;
           grid-template-columns: 1fr;
           gap: 40px;
@@ -356,9 +360,9 @@ export default function HomePage() {
 
         @media (min-width: 960px) {
           .pn-hero-section {
-            grid-template-columns: 1.1fr 0.9fr;
+            grid-template-columns: 1.15fr 0.85fr;
             gap: 60px;
-            padding: 44px 24px 76px 24px;
+            padding: 48px 24px 80px 24px;
           }
         }
 
@@ -376,23 +380,23 @@ export default function HomePage() {
           background: #FFFFFF;
           border: 1.5px solid #E88B68;
           border-radius: 100px;
-          padding: 8px 18px;
+          padding: 8px 20px;
           font-size: 13px;
-          font-weight: 800;
+          font-weight: 850;
           color: #E85D3F;
           letter-spacing: 0.05em;
           text-transform: uppercase;
           margin-bottom: 20px;
-          box-shadow: 0 4px 16px rgba(232, 93, 63, 0.12);
+          box-shadow: 0 4px 16px rgba(232, 93, 63, 0.14);
         }
 
         .pn-hero-title {
-          font-size: clamp(38px, 5.2vw, 62px);
-          line-height: 1.08;
+          font-size: clamp(38px, 5.2vw, 64px);
+          line-height: 1.06;
           font-weight: 850;
           letter-spacing: -0.03em;
           color: #162B20;
-          margin: 0 0 20px 0;
+          margin: 0 0 18px 0;
         }
         .pn-hero-title span.pn-accent {
           color: #E85D3F;
@@ -402,11 +406,18 @@ export default function HomePage() {
         }
 
         .pn-hero-lead {
-          font-size: clamp(16px, 2.2vw, 19px);
+          font-size: clamp(17px, 2.2vw, 20px);
+          line-height: 1.5;
+          color: #2D4236;
+          font-weight: 700;
+          margin: 0 0 10px 0;
+          max-width: 580px;
+        }
+        .pn-hero-lead-sub {
+          font-size: 15px;
           line-height: 1.55;
-          color: #3F5448;
-          font-weight: 500;
-          margin: 0 0 28px 0;
+          color: #556B60;
+          margin: 0 0 26px 0;
           max-width: 540px;
         }
 
@@ -414,12 +425,12 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          background: rgba(255, 255, 255, 0.9);
+          background: rgba(255, 255, 255, 0.95);
           border: 1.5px dashed #E88B68;
-          padding: 8px 18px;
+          padding: 10px 20px;
           border-radius: 99px;
           font-size: 13px;
-          font-weight: 700;
+          font-weight: 750;
           color: #9C3D15;
           margin-bottom: 30px;
           box-shadow: 0 4px 14px rgba(232, 139, 104, 0.12);
@@ -448,7 +459,7 @@ export default function HomePage() {
           background-color: #183324;
           color: #FFFFFF;
           font-size: 16px;
-          font-weight: 700;
+          font-weight: 750;
           letter-spacing: 0.01em;
           border-radius: 99px;
           text-decoration: none;
@@ -472,7 +483,7 @@ export default function HomePage() {
           background: #FFFFFF;
           color: #183324;
           font-size: 16px;
-          font-weight: 700;
+          font-weight: 750;
           letter-spacing: 0.01em;
           border-radius: 99px;
           text-decoration: none;
@@ -501,12 +512,12 @@ export default function HomePage() {
         .pn-spotlight-card {
           position: relative;
           width: 100%;
-          max-width: 460px;
+          max-width: 450px;
           aspect-ratio: 4 / 5.2;
           border-radius: 32px;
           overflow: hidden;
           box-shadow: 
-            0 28px 65px rgba(24, 45, 33, 0.2),
+            0 28px 65px rgba(24, 45, 33, 0.22),
             0 8px 24px rgba(232, 139, 104, 0.25);
           border: 4px solid #FFFFFF;
           background: linear-gradient(145deg, #2D4236 0%, #15241C 100%);
@@ -521,7 +532,8 @@ export default function HomePage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center 20%;
+          object-position: center 12%;
+          transform: scale(1.08);
           display: block;
           z-index: 1;
         }
@@ -571,7 +583,7 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          background: rgba(24, 51, 36, 0.88);
+          background: rgba(24, 51, 36, 0.9);
           backdrop-filter: blur(10px);
           color: #FFFFFF;
           border: 1px solid rgba(255, 255, 255, 0.25);
@@ -683,11 +695,247 @@ export default function HomePage() {
           margin-top: 2px;
         }
 
+        /* SECTION: PEACH MATCH AI SHOWCASE */
+        .pn-ai-section {
+          width: 100%;
+          padding: 80px 24px;
+          background: linear-gradient(180deg, #FAF2EB 0%, #FFFFFF 100%);
+          position: relative;
+        }
+
+        .pn-ai-container {
+          max-width: 1240px;
+          margin: 0 auto;
+        }
+
+        .pn-ai-header {
+          text-align: center;
+          max-width: 780px;
+          margin: 0 auto 50px auto;
+        }
+
+        .pn-ai-kicker {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: #183324;
+          color: #FFA585;
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          padding: 6px 18px;
+          border-radius: 99px;
+          margin-bottom: 16px;
+          box-shadow: 0 4px 14px rgba(24, 51, 36, 0.2);
+        }
+
+        .pn-ai-title {
+          font-size: clamp(32px, 4.5vw, 50px);
+          font-weight: 850;
+          line-height: 1.15;
+          letter-spacing: -0.02em;
+          color: #1A2821;
+          margin: 0 0 16px 0;
+        }
+        .pn-ai-title span {
+          color: #E85D3F;
+          font-style: italic;
+          font-family: Georgia, "Playfair Display", serif;
+        }
+
+        .pn-ai-subtitle {
+          font-size: clamp(16px, 2vw, 18px);
+          line-height: 1.6;
+          color: #4A5E53;
+          margin: 0;
+        }
+
+        /* Interactive Matching Flow Card */
+        .pn-ai-flow-card {
+          background: #FAF2EB;
+          border: 2px solid rgba(232, 139, 104, 0.35);
+          border-radius: 36px;
+          padding: 40px 32px;
+          box-shadow: 0 20px 50px rgba(24, 34, 29, 0.08);
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 24px;
+          align-items: center;
+          position: relative;
+        }
+
+        @media (min-width: 992px) {
+          .pn-ai-flow-card {
+            grid-template-columns: 1fr auto 1fr;
+            gap: 36px;
+            padding: 50px 48px;
+          }
+        }
+
+        .pn-mock-brief-card {
+          background: #FFFFFF;
+          border: 1.5px solid rgba(232, 139, 104, 0.25);
+          border-radius: 24px;
+          padding: 26px;
+          box-shadow: 0 8px 24px rgba(24, 34, 29, 0.05);
+        }
+        .pn-brief-header-pill {
+          display: inline-block;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: #E85D3F;
+          background: #FDF0E7;
+          padding: 4px 12px;
+          border-radius: 99px;
+          margin-bottom: 12px;
+        }
+        .pn-brief-title {
+          font-size: 18px;
+          font-weight: 850;
+          color: #1A2821;
+          margin: 0 0 10px 0;
+        }
+        .pn-brief-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 12px;
+        }
+        .pn-b-tag {
+          font-size: 12px;
+          background: #F1F5F9;
+          color: #334155;
+          padding: 4px 10px;
+          border-radius: 8px;
+          font-weight: 600;
+        }
+
+        .pn-ai-connector {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+        }
+        .pn-ai-pulse-orb {
+          width: 68px;
+          height: 68px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #183324 0%, #E85D3F 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #FFFFFF;
+          font-size: 26px;
+          box-shadow: 0 0 30px rgba(232, 93, 63, 0.45);
+          animation: pnOrbPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pnOrbPulse {
+          0%, 100% { transform: scale(0.95); box-shadow: 0 0 20px rgba(232, 93, 63, 0.3); }
+          50% { transform: scale(1.08); box-shadow: 0 0 36px rgba(232, 93, 63, 0.6); }
+        }
+
+        .pn-ai-engine-label {
+          font-size: 12px;
+          font-weight: 850;
+          color: #183324;
+          letter-spacing: 0.05em;
+          text-align: center;
+        }
+
+        .pn-mock-match-card {
+          background: #FFFFFF;
+          border: 2px solid #16A34A;
+          border-radius: 24px;
+          padding: 26px;
+          box-shadow: 0 12px 30px rgba(22, 163, 74, 0.12);
+          position: relative;
+        }
+        .pn-match-score-badge {
+          position: absolute;
+          top: -12px;
+          right: 20px;
+          background: #16A34A;
+          color: #FFFFFF;
+          font-size: 11px;
+          font-weight: 850;
+          padding: 4px 12px;
+          border-radius: 99px;
+          box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+        }
+        .pn-match-creative-row {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          margin-bottom: 12px;
+        }
+        .pn-match-avatar {
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          background: #E85D3F;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #FFFFFF;
+          font-weight: 850;
+          font-size: 18px;
+        }
+        .pn-match-creative-name {
+          font-size: 17px;
+          font-weight: 850;
+          color: #1A2821;
+        }
+        .pn-match-creative-skills {
+          font-size: 12px;
+          color: #E85D3F;
+          font-weight: 700;
+        }
+
+        .pn-ai-pillars-row {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 24px;
+          margin-top: 40px;
+        }
+        @media (min-width: 768px) {
+          .pn-ai-pillars-row {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+        .pn-ai-pillar {
+          background: #FFFFFF;
+          border: 1px solid rgba(232, 139, 104, 0.25);
+          border-radius: 20px;
+          padding: 24px;
+          box-shadow: 0 6px 18px rgba(24, 34, 29, 0.04);
+        }
+        .pn-pillar-icon {
+          font-size: 26px;
+          margin-bottom: 12px;
+        }
+        .pn-pillar-title {
+          font-size: 16px;
+          font-weight: 850;
+          color: #1A2821;
+          margin-bottom: 6px;
+        }
+        .pn-pillar-desc {
+          font-size: 13px;
+          color: #556B60;
+          line-height: 1.5;
+          margin: 0;
+        }
+
         /* SECTION 2: SLIDING PROJECT EXAMPLES */
         .pn-projects-section {
           width: 100%;
           padding: 60px 0 80px 0;
-          background: linear-gradient(180deg, rgba(250, 242, 235, 0) 0%, #FFFFFF 40%, #FFFFFF 100%);
+          background: linear-gradient(180deg, #FFFFFF 0%, #FAF2EB 100%);
           position: relative;
           overflow: hidden;
         }
@@ -891,7 +1139,7 @@ export default function HomePage() {
           margin: 0;
         }
 
-        /* SECTION 3: COMMERCIAL ADVERTISEMENT & PRICING ARCHITECTURE */
+        /* SECTION 4: PRICING ARCHITECTURE & ADVERTISEMENT */
         .pn-pricing-section {
           width: 100%;
           padding: 80px 24px 110px 24px;
@@ -905,7 +1153,6 @@ export default function HomePage() {
           margin: 0 auto;
         }
 
-        /* ADVERTISEMENT CALLOUT HERO BOX */
         .pn-ad-callout-card {
           background: linear-gradient(135deg, #183324 0%, #0F2318 100%);
           color: #FFFFFF;
@@ -994,7 +1241,6 @@ export default function HomePage() {
           letter-spacing: 0.04em;
         }
 
-        /* SECTION HEADER & TOGGLE */
         .pn-pricing-header {
           text-align: center;
           max-width: 780px;
@@ -1039,7 +1285,6 @@ export default function HomePage() {
           margin: 0;
         }
 
-        /* INTERACTIVE TOGGLE PILL: À LA CARTE vs MEMBERSHIP */
         .pn-toggle-container {
           display: flex;
           justify-content: center;
@@ -1073,7 +1318,6 @@ export default function HomePage() {
           box-shadow: 0 4px 14px rgba(24, 51, 36, 0.22);
         }
 
-        /* 5-Card À La Carte Grid */
         .pn-alacarte-grid {
           display: grid;
           grid-template-columns: 1fr;
@@ -1260,7 +1504,6 @@ export default function HomePage() {
           box-shadow: 0 12px 28px rgba(232, 93, 63, 0.38);
         }
 
-        /* 3-Card Membership Tiers Grid */
         .pn-membership-grid {
           display: grid;
           grid-template-columns: 1fr;
@@ -1397,63 +1640,6 @@ export default function HomePage() {
           transform: translateY(-2px);
         }
 
-        /* THREE-STEP PROCESS STRIP */
-        .pn-how-it-works-strip {
-          max-width: 1280px;
-          margin: 0 auto 60px auto;
-          padding: 0 24px;
-        }
-
-        .pn-strip-card {
-          background: #FFFFFF;
-          border: 1.5px solid rgba(232, 139, 104, 0.28);
-          border-radius: 24px;
-          padding: 24px 32px;
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 20px;
-          box-shadow: 0 10px 30px rgba(24, 34, 29, 0.05);
-        }
-
-        @media (min-width: 768px) {
-          .pn-strip-card {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 32px;
-          }
-        }
-
-        .pn-step-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 14px;
-        }
-        .pn-step-num {
-          width: 38px;
-          height: 38px;
-          border-radius: 12px;
-          background: #FDF0E7;
-          border: 1px solid #E88B68;
-          color: #E85D3F;
-          font-size: 16px;
-          font-weight: 850;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-        .pn-step-title {
-          font-size: 15px;
-          font-weight: 800;
-          color: #1A2821;
-          margin-bottom: 4px;
-        }
-        .pn-step-desc {
-          font-size: 13px;
-          line-height: 1.45;
-          color: #5F7368;
-          margin: 0;
-        }
-
         /* DRAWER NAVIGATION */
         .pn-nav-overlay {
           position: fixed;
@@ -1522,7 +1708,7 @@ export default function HomePage() {
       <div className="pn-studio-lighting" />
       <div className="pn-grid-texture" />
 
-      {/* TOP HEADER */}
+      {/* TOP HEADER - BIGGER COMMANDING LOGO */}
       <header className="pn-header">
         <Link href="/" className="pn-header-logo-link">
           <img
@@ -1563,8 +1749,12 @@ export default function HomePage() {
             Right when you <span className="pn-accent">need them.</span>
           </h1>
 
+          {/* User Requested: "Vetted Creatives You Can Trust at Affordable Prices" */}
           <p className="pn-hero-lead">
-            Vetted creatives. Quality work for fair prices. Connecting Southern businesses with top-tier local design, branding, and web talent.
+            Vetted Creatives You Can Trust at Affordable Prices.
+          </p>
+          <p className="pn-hero-lead-sub">
+            Connecting Southern businesses with top-tier local design, branding, and web talent. No agency markups, zero bidding wars.
           </p>
 
           <div className="pn-value-pill">
@@ -1582,7 +1772,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: CREATIVE SPOTLIGHT (JOSE) */}
+        {/* RIGHT COLUMN: CREATIVE SPOTLIGHT (JOSE - TIGHTER PRO CROP) */}
         <div className="pn-hero-visual-wrap">
           <div className="pn-spotlight-card">
             <div className="pn-spotlight-top-tag">
@@ -1648,28 +1838,88 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* THREE-STEP PROCESS STRIP */}
-      <section className="pn-how-it-works-strip">
-        <div className="pn-strip-card">
-          <div className="pn-step-item">
-            <div className="pn-step-num">1</div>
-            <div>
-              <div className="pn-step-title">Choose Your Deliverable</div>
-              <p className="pn-step-desc">Pick fixed-price Coin packages from simple flyers to full websites.</p>
+      {/* SECTION: PEACH MATCH AI (FLASHY INTERACTIVE SHOWCASE) */}
+      <section className="pn-ai-section">
+        <div className="pn-ai-container">
+          <div className="pn-ai-header">
+            <div className="pn-ai-kicker">✦ Proprietary Zero-Bidding AI ✦</div>
+            <h2 className="pn-ai-title">
+              How Peach Match AI <span>Pairs Your Project</span>
+            </h2>
+            <p className="pn-ai-subtitle">
+              Say goodbye to 50 spam bids and endless negotiations. Describe your vision in 60 seconds, and our intelligent matching engine pairs you directly with the right local creator for your budget and timeline.
+            </p>
+          </div>
+
+          {/* Interactive Flow Diagram Card */}
+          <div className="pn-ai-flow-card">
+            {/* Step 1: Client Request */}
+            <div className="pn-mock-brief-card">
+              <span className="pn-brief-header-pill">1. Your 60-Second Brief</span>
+              <h4 className="pn-brief-title">"Need a custom brand kit & event flyer for our Birmingham boutique launch."</h4>
+              <div className="pn-brief-tags">
+                <span className="pn-b-tag">🎨 Branding & Print</span>
+                <span className="pn-b-tag">⚡ 48h Turnaround</span>
+                <span className="pn-b-tag">🪙 2 Coins ($100)</span>
+                <span className="pn-b-tag">📍 Birmingham, AL</span>
+              </div>
+            </div>
+
+            {/* Step 2: The AI Matching Hub */}
+            <div className="pn-ai-connector">
+              <div className="pn-ai-pulse-orb">🍑</div>
+              <div className="pn-ai-engine-label">
+                Peach Match AI™<br />
+                <span style={{ color: "#E85D3F", fontWeight: 700 }}>Skill & Style Match</span>
+              </div>
+            </div>
+
+            {/* Step 3: Verified Creator Pair */}
+            <div className="pn-mock-match-card">
+              <div className="pn-match-score-badge">99% Best Match</div>
+              <div className="pn-match-creative-row">
+                <div className="pn-match-avatar">JM</div>
+                <div>
+                  <div className="pn-match-creative-name">Jose M.</div>
+                  <div className="pn-match-creative-skills">Brand Identity & Event Print Specialist</div>
+                </div>
+              </div>
+              <p style={{ fontSize: "13px", color: "#556B60", margin: "0 0 10px 0" }}>
+                Vetted portfolio verified • 2026 ADDY® Winner • Available to start today.
+              </p>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <span style={{ fontSize: "11px", background: "#E8F5E9", color: "#166534", padding: "3px 8px", borderRadius: "6px", fontWeight: "750" }}>
+                  ✓ Instant Handover
+                </span>
+                <span style={{ fontSize: "11px", background: "#FDF0E7", color: "#C2410C", padding: "3px 8px", borderRadius: "6px", fontWeight: "750" }}>
+                  ✓ 75% Creator Payout
+                </span>
+              </div>
             </div>
           </div>
-          <div className="pn-step-item">
-            <div className="pn-step-num">2</div>
-            <div>
-              <div className="pn-step-title">Matched in 24 Hours</div>
-              <p className="pn-step-desc">Pair with vetted talent like Jose tailored specifically to your project.</p>
+
+          {/* 3 Core Match Pillars */}
+          <div className="pn-ai-pillars-row">
+            <div className="pn-ai-pillar">
+              <div className="pn-pillar-icon">🎯</div>
+              <h4 className="pn-pillar-title">Zero-Bidding Clarity</h4>
+              <p className="pn-pillar-desc">
+                Never waste hours reading through dozens of unqualified proposals. Peach Match AI matches you with the top vetted choice upfront.
+              </p>
             </div>
-          </div>
-          <div className="pn-step-item">
-            <div className="pn-step-num">3</div>
-            <div>
-              <div className="pn-step-title">75% Payout to Creators</div>
-              <p className="pn-step-desc">Your investment directly fuels Alabama's local creative economy.</p>
+            <div className="pn-ai-pillar">
+              <div className="pn-pillar-icon">📍</div>
+              <h4 className="pn-pillar-title">Deep Southern Context</h4>
+              <p className="pn-pillar-desc">
+                Matched creatives understand the culture, churches, chambers, and businesses of Birmingham and Alabama.
+              </p>
+            </div>
+            <div className="pn-ai-pillar">
+              <div className="pn-pillar-icon">🛡️</div>
+              <h4 className="pn-pillar-title">Human QA Art Direction</h4>
+              <p className="pn-pillar-desc">
+                Senior agency mentors review all final files for 300 DPI print bleeds, typography hierarchy, and brand consistency.
+              </p>
             </div>
           </div>
         </div>
@@ -1756,7 +2006,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 3: COMMERCIAL ADVERTISEMENT & PRICING ARCHITECTURE */}
+      {/* SECTION 4: PRICING ARCHITECTURE & ADVERTISEMENT */}
       <section className="pn-pricing-section">
         <div className="pn-pricing-container">
           
