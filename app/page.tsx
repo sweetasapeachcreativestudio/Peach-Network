@@ -7,9 +7,70 @@ import BrandSplash from "./components/brand-splash";
 const RECENT_PROJECTS = [
   {
     id: 1,
+    title: "Runa Cultural Brand & Moon Iconography",
+    category: "Brand Identity & Custom Iconography",
+    deliverable: "Mini Brand Kit • 6 Coins",
+    creator: "Crafted by Jose M.",
+    image: "/project 7.jpg",
+    altImages: ["/project-7.jpg", "/project7.jpg", "/projects/project 7.jpg"],
+    accent: "#0284C7",
+    bgGradient: "linear-gradient(135deg, #0C4A6E 0%, #032338 100%)",
+    icon: "🌙",
+    tag: "Identity & Apparel",
+    headline: "Ancient Heritage • Modern Minimalist Seal",
+    desc: "Handcrafted crescent moon emblem with intricate indigenous motifs and custom typography for streetwear.",
+  },
+  {
+    id: 2,
+    title: "The Guardian's Portal Concept Art",
+    category: "Original Editorial & Concept Illustration",
+    deliverable: "Editorial Illustration • 4 Coins",
+    creator: "Crafted by Jose M.",
+    image: "/Project 6.jpg",
+    altImages: ["/project-6.jpg", "/project6.jpg", "/projects/Project 6.jpg"],
+    accent: "#8B5CF6",
+    bgGradient: "linear-gradient(135deg, #3B0764 0%, #150226 100%)",
+    icon: "⚔️",
+    tag: "Concept Illustration",
+    headline: "Atmospheric Visual Storytelling",
+    desc: "Cinematic vector keyframe depicting a cloaked knight facing a luminous spectral rift with custom lighting.",
+  },
+  {
+    id: 3,
+    title: "Bessemer Chamber of Commerce Web Portal",
+    category: "Web UI Design & Civic Platform",
+    deliverable: "Web Experience • 10 Coins",
+    creator: "Peach Web Studio",
+    image: "/project 8.jpg",
+    altImages: ["/project-8.jpg", "/project8.jpg", "/projects/project 8.jpg"],
+    accent: "#06B6D4",
+    bgGradient: "linear-gradient(135deg, #164E63 0%, #082733 100%)",
+    icon: "💻",
+    tag: "Civic & Web",
+    headline: "Building Connections That Matter",
+    desc: "Full responsive municipal digital experience presented live to civic leadership in Bessemer, AL.",
+  },
+  {
+    id: 4,
+    title: "Remy Event Center Luxury Wedding Stationery",
+    category: "Editorial Print & Event Suite",
+    deliverable: "Editorial Print • 4 Coins",
+    creator: "Peach Print Lab",
+    image: "/project 9.jpg",
+    altImages: ["/project-9.jpg", "/project9.jpg", "/projects/project 9.jpg"],
+    accent: "#F59E0B",
+    bgGradient: "linear-gradient(135deg, #78350F 0%, #361704 100%)",
+    icon: "💌",
+    tag: "Luxury Print & Event",
+    headline: "Lewis / Lee Wedding • Birmingham, AL",
+    desc: "Luxury foiled reception detail cards, hotel accommodation inserts, and gift registry stationery printed locally.",
+  },
+  {
+    id: 5,
     title: "Lawson State Community College",
     category: "Social Media Campaign & Templates",
     deliverable: "Social 4-Pack • 3 Coins",
+    creator: "Peach Creative Network",
     image: "/Project 1.png",
     altImages: ["/project-1.png", "/projects/Project 1.png", "/projects/project-lawson-state.png"],
     accent: "#F3C64F",
@@ -20,10 +81,11 @@ const RECENT_PROJECTS = [
     desc: "Branded student spotlights, culinary program announcements, and high-engagement Instagram templates.",
   },
   {
-    id: 2,
+    id: 6,
     title: "New Joy Fellowship BBQ Fundraiser",
     category: "Fundraiser Menu Board & Signage",
     deliverable: "Print Signage • 2 Coins",
+    creator: "Peach Creative Network",
     image: "/Project 2.png",
     altImages: ["/project-2.png", "/projects/Project 2.png", "/projects/project-church-menu.png"],
     accent: "#FB923C",
@@ -34,24 +96,26 @@ const RECENT_PROJECTS = [
     desc: "Woodgrain outdoor event signage, combo menu displays, and on-site sponsor banners.",
   },
   {
-    id: 3,
-    title: "Bessemer Area Chamber of Commerce",
+    id: 7,
+    title: "Bessemer Area Chamber of Commerce Brand Kit",
     category: "Full Brand Identity & Merch Kit",
     deliverable: "Mini Brand Kit • 6 Coins",
+    creator: "Peach Creative Network",
     image: "/Project 3.png",
     altImages: ["/project-3.png", "/projects/Project 3.png", "/projects/project-bessemer-brand.png"],
     accent: "#60A5FA",
     bgGradient: "linear-gradient(135deg, #133E8D 0%, #091B42 100%)",
-    icon: "🏛️️",
+    icon: "🏛️",
     tag: "Civic & Chamber",
-    headline: "Building Connections That Matter",
+    headline: "Official Municipal Brand Seal",
     desc: "Official municipal seal, reception dimensional signage, business stationery, and member merchandise.",
   },
   {
-    id: 4,
+    id: 8,
     title: "New Joy Fellowship Baptist Church",
     category: "Event Program & Editorial Print Kit",
     deliverable: "Editorial Print • 4 Coins",
+    creator: "Peach Creative Network",
     image: "/Project 4.png",
     altImages: ["/project-4.png", "/projects/Project 4.png", "/projects/project-church-program.png"],
     accent: "#E879F9",
@@ -60,6 +124,57 @@ const RECENT_PROJECTS = [
     tag: "Faith & Community",
     headline: "Friends & Family Day 2026",
     desc: "Commemorative service booklets, floral announcements, and community invitations.",
+  },
+];
+
+const CREATIVE_SNAPS = [
+  {
+    image: "/Creative1.jpg",
+    altImages: ["/creative1.jpg", "/Creative 1.jpg"],
+    caption: "Sweet As A Peach Team & Brand Ambassadors at Local Event",
+    role: "Studio Community & Pop-Up Merch",
+    accent: "#E85D3F",
+    icon: "🍑",
+  },
+  {
+    image: "/Creative2.jpg",
+    altImages: ["/creative2.jpg", "/Creative 2.jpg"],
+    caption: "UI/UX & Web Pro in the Zone on Turquoise Setup",
+    role: "Digital Design & Storefronts",
+    accent: "#06B6D4",
+    icon: "💻",
+  },
+  {
+    image: "/Creative 3.jpg",
+    altImages: ["/Creative-3.jpg", "/creative3.jpg", "/Creative3.jpg"],
+    caption: "Creative Team in Studio Review & Project Brainstorm",
+    role: "Brand Strategy & Review",
+    accent: "#16A34A",
+    icon: "✨",
+  },
+  {
+    image: "/Creative 4.jpg",
+    altImages: ["/Creative-4.jpg", "/creative4.jpg", "/Creative4.jpg"],
+    caption: "Videographer Capturing Church Sanctuary & Stained Glass",
+    role: "On-Location Church Videography",
+    accent: "#0284C7",
+    icon: "🎥",
+  },
+  {
+    image: "/Creative5.jpg",
+    altImages: ["/creative5.jpg", "/Creative 5.jpg"],
+    caption: "Video Director & Camera Operator Directing Outdoor Shoot",
+    role: "Commercial Video Production",
+    accent: "#E85D3F",
+    icon: "🎬",
+  },
+  {
+    image: "/creative 6.jpg",
+    altImages: ["/Creative-6.jpg", "/creative6.jpg", "/Creative 6.jpg"],
+    caption: "Field Director at Local Community Venue Shoot",
+    role: "Event Storytelling & Film",
+    accent: "#F59E0B",
+    icon: "📍",
   },
 ];
 
@@ -235,22 +350,40 @@ export default function HomePage() {
       <style>{`
         .pn-home-root {
           min-height: 100vh;
-          background-color: #FFF7F2;
-          color: #1A2821;
+          background-color: #FFF8F4;
+          color: #17271E;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Plus Jakarta Sans", sans-serif;
           position: relative;
           overflow-x: hidden;
         }
 
-        /* VIBRANT WARM PEACH STUDIO LIGHTING & GRID */
+        /* REPEATING WATERMARK TEXTURE */
+        .pn-repeating-watermark {
+          position: absolute;
+          inset: 0;
+          height: 100%;
+          pointer-events: none;
+          z-index: 0;
+          opacity: 0.035;
+          background-image: repeating-linear-gradient(
+            -45deg,
+            #E85D3F,
+            #E85D3F 100px,
+            transparent 100px,
+            transparent 200px
+          );
+        }
+
+        /* VIBRANT WARM PEACH, SKY BLUE & EVERGREEN LIGHTING */
         .pn-studio-lighting {
           position: absolute;
           inset: 0;
-          height: 1000px;
+          height: 1100px;
           background: 
-            radial-gradient(circle at 14% 12%, rgba(254, 215, 170, 0.55) 0%, transparent 45%),
-            radial-gradient(circle at 86% 20%, rgba(251, 146, 60, 0.4) 0%, transparent 50%),
-            radial-gradient(circle at 50% 45%, rgba(255, 237, 213, 0.45) 0%, transparent 65%);
+            radial-gradient(circle at 14% 12%, rgba(254, 215, 170, 0.65) 0%, transparent 45%),
+            radial-gradient(circle at 86% 18%, rgba(6, 182, 212, 0.22) 0%, transparent 48%),
+            radial-gradient(circle at 50% 45%, rgba(255, 237, 213, 0.5) 0%, transparent 65%),
+            radial-gradient(circle at 80% 65%, rgba(22, 163, 74, 0.12) 0%, transparent 45%);
           pointer-events: none;
           z-index: 1;
         }
@@ -258,15 +391,41 @@ export default function HomePage() {
         .pn-grid-texture {
           position: absolute;
           inset: 0;
-          height: 1000px;
-          background-size: 32px 32px;
+          height: 1100px;
+          background-size: 34px 34px;
           background-image: 
-            linear-gradient(to right, rgba(232, 93, 63, 0.08) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(232, 93, 63, 0.08) 1px, transparent 1px);
+            linear-gradient(to right, rgba(232, 93, 63, 0.07) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(6, 182, 212, 0.07) 1px, transparent 1px);
           mask-image: linear-gradient(180deg, black 0%, black 75%, transparent 100%);
           -webkit-mask-image: linear-gradient(180deg, black 0%, black 75%, transparent 100%);
           pointer-events: none;
           z-index: 1;
+        }
+
+        /* RUNNING KINETIC BRAND TICKER */
+        .pn-brand-ticker {
+          background: linear-gradient(90deg, #E85D3F 0%, #FB923C 35%, #06B6D4 70%, #16A34A 100%);
+          color: #FFFFFF;
+          padding: 8px 0;
+          font-size: 11.5px;
+          font-weight: 850;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          overflow: hidden;
+          white-space: nowrap;
+          display: flex;
+          position: relative;
+          z-index: 95;
+          box-shadow: 0 2px 10px rgba(232, 93, 63, 0.25);
+        }
+        .pn-ticker-track {
+          display: inline-flex;
+          gap: 32px;
+          animation: pnTicker 28s linear infinite;
+        }
+        @keyframes pnTicker {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
 
         /* TOP NAVIGATION HEADER */
@@ -282,7 +441,7 @@ export default function HomePage() {
           margin: 0 auto;
           padding: 16px 24px;
           box-sizing: border-box;
-          background: rgba(255, 247, 242, 0.94);
+          background: rgba(255, 248, 244, 0.94);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
           border-bottom: 1.5px solid rgba(232, 93, 63, 0.2);
@@ -297,27 +456,68 @@ export default function HomePage() {
           height: clamp(52px, 6vw, 68px);
           width: auto;
           display: block;
-          filter: drop-shadow(0 4px 14px rgba(232, 93, 63, 0.2));
+          filter: drop-shadow(0 4px 14px rgba(232, 93, 63, 0.22));
           transition: transform 0.2s ease;
         }
         .pn-header-logo:hover {
           transform: scale(1.02);
         }
 
+        .pn-header-nav-links {
+          display: none;
+          align-items: center;
+          gap: 24px;
+        }
+        @media (min-width: 860px) {
+          .pn-header-nav-links {
+            display: flex;
+          }
+        }
+        .pn-h-link {
+          font-size: 14px;
+          font-weight: 750;
+          color: #2D4236;
+          text-decoration: none;
+          transition: color 0.2s ease;
+        }
+        .pn-h-link:hover {
+          color: #E85D3F;
+        }
+
+        .pn-yt-nav-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #FEF2F2;
+          border: 1px solid #FECACA;
+          color: #DC2626;
+          font-size: 12px;
+          font-weight: 800;
+          padding: 6px 14px;
+          border-radius: 99px;
+          text-decoration: none;
+          transition: all 0.2s ease;
+        }
+        .pn-yt-nav-pill:hover {
+          background: #DC2626;
+          color: #FFFFFF;
+          transform: translateY(-1px);
+        }
+
         .pn-header-right {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 14px;
         }
 
         .pn-top-signin-btn {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 11px 24px;
-          font-size: 14px;
+          padding: 10px 22px;
+          font-size: 13.5px;
           font-weight: 750;
-          color: #1E3A2B;
+          color: #17271E;
           background: #FFFFFF;
           border: 1.5px solid rgba(232, 93, 63, 0.28);
           border-radius: 99px;
@@ -330,15 +530,14 @@ export default function HomePage() {
           border-color: #E85D3F;
           color: #E85D3F;
           transform: translateY(-1px);
-          box-shadow: 0 4px 16px rgba(232, 93, 63, 0.22);
         }
 
         .pn-menu-btn {
           background: #FFFFFF;
           border: 1.5px solid rgba(232, 93, 63, 0.28);
-          width: 46px;
-          height: 46px;
-          border-radius: 14px;
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -354,7 +553,7 @@ export default function HomePage() {
           transform: scale(1.04);
         }
         .pn-menu-bar {
-          width: 22px;
+          width: 20px;
           height: 2.2px;
           background-color: #E85D3F;
           border-radius: 2px;
@@ -366,19 +565,19 @@ export default function HomePage() {
           z-index: 10;
           max-width: 1280px;
           margin: 0 auto;
-          padding: 36px 24px 64px 24px;
+          padding: 32px 24px 64px 24px;
           display: grid;
           grid-template-columns: 1fr;
           gap: 40px;
           align-items: center;
-          min-height: calc(88vh - 84px);
+          min-height: calc(88vh - 120px);
         }
 
         @media (min-width: 960px) {
           .pn-hero-section {
             grid-template-columns: 1.15fr 0.85fr;
             gap: 60px;
-            padding: 48px 24px 80px 24px;
+            padding: 40px 24px 80px 24px;
           }
         }
 
@@ -402,16 +601,16 @@ export default function HomePage() {
           color: #E85D3F;
           letter-spacing: 0.05em;
           text-transform: uppercase;
-          margin-bottom: 20px;
+          margin-bottom: 18px;
           box-shadow: 0 4px 16px rgba(232, 93, 63, 0.16);
         }
 
         .pn-hero-title {
           font-size: clamp(38px, 5.2vw, 64px);
-          line-height: 1.06;
+          line-height: 1.05;
           font-weight: 850;
           letter-spacing: -0.03em;
-          color: #162B20;
+          color: #17271E;
           margin: 0 0 18px 0;
         }
         .pn-hero-title span.pn-accent {
@@ -431,11 +630,11 @@ export default function HomePage() {
           max-width: 600px;
         }
         .pn-hero-lead-sub {
-          font-size: 15px;
+          font-size: 15.5px;
           line-height: 1.55;
-          color: #4A5E53;
+          color: #3B4E44;
           margin: 0 0 24px 0;
-          max-width: 540px;
+          max-width: 550px;
         }
 
         .pn-value-pill {
@@ -449,7 +648,7 @@ export default function HomePage() {
           font-size: 13px;
           font-weight: 750;
           color: #9C3D15;
-          margin-bottom: 30px;
+          margin-bottom: 28px;
           box-shadow: 0 4px 16px rgba(232, 93, 63, 0.12);
         }
 
@@ -498,25 +697,25 @@ export default function HomePage() {
           justify-content: center;
           gap: 8px;
           height: 56px;
-          padding: 0 34px;
+          padding: 0 32px;
           background: #FFFFFF;
-          color: #183324;
+          color: #0369A1;
           font-size: 16px;
           font-weight: 750;
           letter-spacing: 0.01em;
           border-radius: 99px;
           text-decoration: none;
-          border: 1.5px solid #FDBA74;
-          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.1);
+          border: 1.5px solid #38BDF8;
+          box-shadow: 0 4px 14px rgba(6, 182, 212, 0.15);
           transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
           cursor: pointer;
         }
         .pn-btn-hero-secondary:hover {
-          background: #FFF0E6;
-          border-color: #E85D3F;
-          color: #E85D3F;
+          background: #E0F2FE;
+          border-color: #0284C7;
+          color: #0284C7;
           transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(232, 93, 63, 0.2);
+          box-shadow: 0 8px 20px rgba(6, 182, 212, 0.25);
         }
 
         /* RIGHT HERO COLUMN: CREATIVE SPOTLIGHT CARD */
@@ -536,7 +735,7 @@ export default function HomePage() {
           border-radius: 32px;
           overflow: hidden;
           box-shadow: 
-            0 28px 65px rgba(24, 45, 33, 0.18),
+            0 28px 65px rgba(23, 39, 30, 0.18),
             0 8px 28px rgba(232, 93, 63, 0.25);
           border: 4px solid #FFFFFF;
           background: linear-gradient(145deg, #2D4236 0%, #15241C 100%);
@@ -628,7 +827,7 @@ export default function HomePage() {
           display: flex;
           flex-direction: column;
           gap: 6px;
-          box-shadow: 0 12px 32px rgba(24, 34, 29, 0.16);
+          box-shadow: 0 12px 32px rgba(23, 39, 30, 0.16);
         }
 
         .pn-plate-header {
@@ -640,7 +839,7 @@ export default function HomePage() {
         .pn-plate-name {
           font-size: 18px;
           font-weight: 850;
-          color: #1A2821;
+          color: #17271E;
           display: flex;
           align-items: center;
           gap: 8px;
@@ -696,29 +895,232 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          background: #FDF0E7;
-          color: #C2410C;
+          background: #E0F2FE;
+          color: #0369A1;
           font-size: 11px;
           font-weight: 750;
           padding: 4px 9px;
           border-radius: 6px;
-          border: 1px solid #FED7AA;
+          border: 1px solid #BAE6FD;
         }
 
         .pn-plate-location {
           font-size: 11px;
-          color: #556B60;
+          color: #4B6355;
           display: flex;
           align-items: center;
           gap: 4px;
           margin-top: 2px;
         }
 
+        /* YOUTUBE BANNER CALLOUT */
+        .pn-yt-feature-banner {
+          max-width: 1280px;
+          margin: 0 auto 60px auto;
+          padding: 0 24px;
+          position: relative;
+          z-index: 10;
+        }
+        .pn-yt-card {
+          background: linear-gradient(135deg, #182820 0%, #0F1E16 60%, #991B1B 100%);
+          border-radius: 28px;
+          padding: 28px 32px;
+          color: #FFFFFF;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          align-items: center;
+          justify-content: space-between;
+          border: 2px solid rgba(239, 68, 68, 0.35);
+          box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+        }
+        @media (min-width: 768px) {
+          .pn-yt-card {
+            flex-direction: row;
+            text-align: left;
+          }
+        }
+        .pn-yt-left {
+          display: flex;
+          align-items: center;
+          gap: 18px;
+        }
+        .pn-yt-play-icon {
+          width: 58px;
+          height: 58px;
+          border-radius: 18px;
+          background: #DC2626;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 28px;
+          color: #FFFFFF;
+          box-shadow: 0 8px 24px rgba(220, 38, 38, 0.45);
+          flex-shrink: 0;
+        }
+        .pn-yt-info h3 {
+          font-size: 20px;
+          font-weight: 850;
+          margin: 0 0 4px 0;
+        }
+        .pn-yt-info p {
+          font-size: 13.5px;
+          color: #FECACA;
+          margin: 0;
+          max-width: 600px;
+          line-height: 1.5;
+        }
+        .pn-yt-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          height: 48px;
+          padding: 0 28px;
+          background: #FFFFFF;
+          color: #DC2626;
+          font-size: 14px;
+          font-weight: 850;
+          border-radius: 99px;
+          text-decoration: none;
+          white-space: nowrap;
+          box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+          transition: all 0.2s ease;
+        }
+        .pn-yt-btn:hover {
+          background: #FEE2E2;
+          transform: translateY(-2px);
+          box-shadow: 0 10px 24px rgba(220, 38, 38, 0.35);
+        }
+
+        /* SECTION: CREATIVES IN ACTION GALLERY */
+        .pn-action-gallery-section {
+          width: 100%;
+          padding: 70px 24px;
+          background: #FFFFFF;
+          position: relative;
+        }
+        .pn-gallery-container {
+          max-width: 1280px;
+          margin: 0 auto;
+        }
+        .pn-gallery-header {
+          text-align: center;
+          max-width: 780px;
+          margin: 0 auto 40px auto;
+        }
+        .pn-gallery-kicker {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #E0F2FE;
+          border: 1px solid #BAE6FD;
+          color: #0284C7;
+          font-size: 12px;
+          font-weight: 850;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          padding: 6px 16px;
+          border-radius: 99px;
+          margin-bottom: 14px;
+        }
+        .pn-gallery-title {
+          font-size: clamp(30px, 4.2vw, 44px);
+          font-weight: 850;
+          letter-spacing: -0.02em;
+          color: #17271E;
+          margin: 0 0 12px 0;
+        }
+        .pn-gallery-title span {
+          color: #0284C7;
+          font-style: italic;
+          font-family: Georgia, "Playfair Display", serif;
+        }
+        .pn-gallery-sub {
+          font-size: 16px;
+          color: #4B6355;
+          margin: 0;
+          line-height: 1.55;
+        }
+
+        .pn-gallery-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+        @media (min-width: 600px) {
+          .pn-gallery-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        @media (min-width: 992px) {
+          .pn-gallery-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+
+        .pn-gallery-card {
+          background: #FFF8F4;
+          border: 1.5px solid rgba(232, 93, 63, 0.2);
+          border-radius: 24px;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+          display: flex;
+          flex-direction: column;
+          transition: all 0.3s ease;
+        }
+        .pn-gallery-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 16px 40px rgba(6, 182, 212, 0.18);
+          border-color: #06B6D4;
+        }
+
+        .pn-gallery-media {
+          width: 100%;
+          height: 230px;
+          position: relative;
+          background: #E2E8F0;
+          overflow: hidden;
+        }
+        .pn-gallery-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          transition: transform 0.4s ease;
+        }
+        .pn-gallery-card:hover .pn-gallery-img {
+          transform: scale(1.05);
+        }
+        .pn-gallery-role-pill {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          background: rgba(255, 255, 255, 0.95);
+          color: #0369A1;
+          font-size: 11px;
+          font-weight: 800;
+          padding: 4px 10px;
+          border-radius: 99px;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .pn-gallery-meta {
+          padding: 18px 20px;
+        }
+        .pn-gallery-caption {
+          font-size: 14px;
+          font-weight: 750;
+          color: #17271E;
+          line-height: 1.45;
+          margin: 0;
+        }
+
         /* SECTION: PITCH DECK BREAKDOWN */
         .pn-deck-section {
           width: 100%;
           padding: 80px 24px;
-          background: linear-gradient(180deg, #FFF7F2 0%, #FFFFFF 100%);
+          background: linear-gradient(180deg, #FFFFFF 0%, #FFF8F4 100%);
           position: relative;
         }
 
@@ -737,7 +1139,7 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: #FDF0E7;
+          background: #FFF0E6;
           border: 1.5px solid #FDBA74;
           color: #C2410C;
           font-size: 12px;
@@ -755,7 +1157,7 @@ export default function HomePage() {
           font-weight: 850;
           line-height: 1.15;
           letter-spacing: -0.02em;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 16px 0;
         }
         .pn-deck-title span {
@@ -767,11 +1169,10 @@ export default function HomePage() {
         .pn-deck-sub {
           font-size: 17px;
           line-height: 1.6;
-          color: #4A5E53;
+          color: #4B6355;
           margin: 0;
         }
 
-        /* 3-Column Comparison Matrix */
         .pn-deck-matrix {
           display: grid;
           grid-template-columns: 1fr;
@@ -791,7 +1192,7 @@ export default function HomePage() {
           padding: 32px 26px;
           display: flex;
           flex-direction: column;
-          box-shadow: 0 10px 30px rgba(24, 34, 29, 0.04);
+          box-shadow: 0 10px 30px rgba(23, 39, 30, 0.04);
           position: relative;
         }
 
@@ -832,14 +1233,14 @@ export default function HomePage() {
         .pn-matrix-title {
           font-size: 22px;
           font-weight: 850;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 14px 0;
         }
 
         .pn-matrix-price {
           font-size: 14px;
           font-weight: 700;
-          color: #556B60;
+          color: #4B6355;
           margin-bottom: 20px;
           padding-bottom: 16px;
           border-bottom: 1px solid rgba(232, 93, 63, 0.15);
@@ -879,7 +1280,7 @@ export default function HomePage() {
         .pn-ai-section {
           width: 100%;
           padding: 80px 24px;
-          background: linear-gradient(180deg, #FFFFFF 0%, #FFF7F2 100%);
+          background: linear-gradient(180deg, #FFF8F4 0%, #FFFFFF 100%);
           position: relative;
         }
 
@@ -898,9 +1299,9 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: #FDF0E7;
-          border: 1.5px solid #FDBA74;
-          color: #C2410C;
+          background: #E0F2FE;
+          border: 1.5px solid #BAE6FD;
+          color: #0284C7;
           font-size: 12px;
           font-weight: 800;
           letter-spacing: 0.12em;
@@ -908,7 +1309,7 @@ export default function HomePage() {
           padding: 6px 18px;
           border-radius: 99px;
           margin-bottom: 14px;
-          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.12);
+          box-shadow: 0 4px 14px rgba(6, 182, 212, 0.15);
         }
 
         .pn-ai-title {
@@ -916,7 +1317,7 @@ export default function HomePage() {
           font-weight: 850;
           line-height: 1.15;
           letter-spacing: -0.02em;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 14px 0;
         }
         .pn-ai-title span {
@@ -928,16 +1329,16 @@ export default function HomePage() {
         .pn-ai-subtitle {
           font-size: 16px;
           line-height: 1.55;
-          color: #4A5E53;
+          color: #4B6355;
           margin: 0;
         }
 
         .pn-ai-flow-card {
           background: #FFFFFF;
-          border: 2px solid rgba(232, 93, 63, 0.3);
+          border: 2px solid rgba(6, 182, 212, 0.35);
           border-radius: 32px;
           padding: 36px 28px;
-          box-shadow: 0 20px 48px rgba(232, 93, 63, 0.08);
+          box-shadow: 0 20px 48px rgba(6, 182, 212, 0.08);
           display: grid;
           grid-template-columns: 1fr;
           gap: 20px;
@@ -953,11 +1354,11 @@ export default function HomePage() {
         }
 
         .pn-mock-brief-card {
-          background: #FFF7F2;
-          border: 1.5px solid #FDBA74;
+          background: #F0FDF4;
+          border: 1.5px solid #86EFAC;
           border-radius: 22px;
           padding: 24px;
-          box-shadow: 0 8px 24px rgba(232, 93, 63, 0.06);
+          box-shadow: 0 8px 24px rgba(22, 163, 74, 0.06);
         }
         .pn-brief-header-pill {
           display: inline-block;
@@ -965,8 +1366,8 @@ export default function HomePage() {
           font-weight: 800;
           letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: #C2410C;
-          background: #FED7AA;
+          color: #166534;
+          background: #DCFCE7;
           padding: 4px 10px;
           border-radius: 99px;
           margin-bottom: 10px;
@@ -974,7 +1375,7 @@ export default function HomePage() {
         .pn-brief-title {
           font-size: 17px;
           font-weight: 850;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 10px 0;
           line-height: 1.35;
         }
@@ -986,8 +1387,8 @@ export default function HomePage() {
         .pn-b-tag {
           font-size: 11px;
           background: #FFFFFF;
-          border: 1px solid #FDBA74;
-          color: #9A3412;
+          border: 1px solid #86EFAC;
+          color: #15803D;
           padding: 4px 9px;
           border-radius: 6px;
           font-weight: 700;
@@ -1004,40 +1405,40 @@ export default function HomePage() {
           width: 64px;
           height: 64px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #FB923C 0%, #E85D3F 100%);
+          background: linear-gradient(135deg, #06B6D4 0%, #E85D3F 100%);
           display: flex;
           align-items: center;
           justify-content: center;
           color: #FFFFFF;
           font-size: 24px;
-          box-shadow: 0 0 28px rgba(232, 93, 63, 0.45);
+          box-shadow: 0 0 28px rgba(6, 182, 212, 0.45);
         }
         .pn-ai-engine-label {
           font-size: 12px;
           font-weight: 850;
-          color: #183324;
+          color: #17271E;
           text-align: center;
         }
 
         .pn-mock-match-card {
           background: #FFFFFF;
-          border: 2px solid #E85D3F;
+          border: 2px solid #0284C7;
           border-radius: 22px;
           padding: 24px;
-          box-shadow: 0 12px 30px rgba(232, 93, 63, 0.15);
+          box-shadow: 0 12px 30px rgba(2, 132, 199, 0.15);
           position: relative;
         }
         .pn-match-score-badge {
           position: absolute;
           top: -12px;
           right: 18px;
-          background: #E85D3F;
+          background: #0284C7;
           color: #FFFFFF;
           font-size: 11px;
           font-weight: 850;
           padding: 4px 12px;
           border-radius: 99px;
-          box-shadow: 0 4px 12px rgba(232, 93, 63, 0.35);
+          box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
         }
         .pn-match-creative-row {
           display: flex;
@@ -1049,7 +1450,7 @@ export default function HomePage() {
           width: 48px;
           height: 48px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #FB923C 0%, #E85D3F 100%);
+          background: linear-gradient(135deg, #06B6D4 0%, #0284C7 100%);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1060,11 +1461,11 @@ export default function HomePage() {
         .pn-match-creative-name {
           font-size: 16px;
           font-weight: 850;
-          color: #1A2821;
+          color: #17271E;
         }
         .pn-match-creative-skills {
           font-size: 12px;
-          color: #E85D3F;
+          color: #0284C7;
           font-weight: 750;
         }
 
@@ -1082,13 +1483,13 @@ export default function HomePage() {
         }
         .pn-mb-green { background: #E8F5E9; color: #166534; }
         .pn-mb-gold { background: #FFF8E1; color: #92400E; border: 1px solid #FDE68A; }
-        .pn-mb-peach { background: #FFF0E6; color: #C2410C; border: 1px solid #FED7AA; }
+        .pn-mb-blue { background: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; }
 
         /* SECTION: RECENT PROJECTS SLIDER */
         .pn-projects-section {
           width: 100%;
           padding: 60px 0 80px 0;
-          background: #FFF7F2;
+          background: #FFF8F4;
           position: relative;
           overflow: hidden;
         }
@@ -1112,15 +1513,15 @@ export default function HomePage() {
         .pn-projects-title {
           font-size: clamp(28px, 4vw, 42px);
           font-weight: 800;
-          color: #1A2821;
+          color: #17271E;
           letter-spacing: -0.02em;
           margin: 0 0 12px 0;
         }
 
         .pn-projects-subtitle {
           font-size: 16px;
-          color: #556B60;
-          max-width: 600px;
+          color: #4B6355;
+          max-width: 650px;
           margin: 0 auto;
           line-height: 1.5;
         }
@@ -1138,7 +1539,7 @@ export default function HomePage() {
           display: flex;
           gap: 24px;
           width: max-content;
-          animation: pnMarquee 40s linear infinite;
+          animation: pnMarquee 50s linear infinite;
         }
         .pn-marquee-track:hover {
           animation-play-state: paused;
@@ -1155,7 +1556,7 @@ export default function HomePage() {
           border-radius: 24px;
           overflow: hidden;
           border: 1.5px solid rgba(232, 93, 63, 0.22);
-          box-shadow: 0 10px 30px rgba(24, 34, 29, 0.06);
+          box-shadow: 0 10px 30px rgba(23, 39, 30, 0.06);
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           flex-shrink: 0;
           display: flex;
@@ -1270,10 +1671,19 @@ export default function HomePage() {
           flex-grow: 1;
         }
 
+        .pn-card-creator-credit {
+          font-size: 11.5px;
+          font-weight: 800;
+          color: #0284C7;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          margin-bottom: 4px;
+        }
+
         .pn-card-client-title {
           font-size: 18px;
           font-weight: 850;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 6px 0;
           line-height: 1.3;
         }
@@ -1288,7 +1698,7 @@ export default function HomePage() {
         .pn-card-desc {
           font-size: 13px;
           line-height: 1.5;
-          color: #556B60;
+          color: #4B6355;
           margin: 0;
         }
 
@@ -1296,7 +1706,7 @@ export default function HomePage() {
         .pn-ecosystem-section {
           width: 100%;
           padding: 85px 24px;
-          background: linear-gradient(180deg, #FFFFFF 0%, #FFF7F2 100%);
+          background: linear-gradient(180deg, #FFFFFF 0%, #FFF8F4 100%);
           position: relative;
         }
 
@@ -1315,7 +1725,7 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: #FDF0E7;
+          background: #FFF0E6;
           border: 1.5px solid #FDBA74;
           color: #C2410C;
           font-size: 12px;
@@ -1333,7 +1743,7 @@ export default function HomePage() {
           font-weight: 850;
           line-height: 1.15;
           letter-spacing: -0.02em;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 16px 0;
         }
         .pn-eco-title span {
@@ -1345,11 +1755,10 @@ export default function HomePage() {
         .pn-eco-sub {
           font-size: 16px;
           line-height: 1.6;
-          color: #4A5E53;
+          color: #4B6355;
           margin: 0;
         }
 
-        /* 3-Tier Vetting Ladder Row */
         .pn-ladder-title-row {
           text-align: center;
           margin-bottom: 24px;
@@ -1357,7 +1766,7 @@ export default function HomePage() {
         .pn-ladder-title-row h3 {
           font-size: 22px;
           font-weight: 850;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 6px 0;
         }
         .pn-ladder-title-row p {
@@ -1383,7 +1792,7 @@ export default function HomePage() {
           border: 1.5px solid rgba(232, 93, 63, 0.22);
           border-radius: 24px;
           padding: 28px 24px;
-          box-shadow: 0 10px 24px rgba(24, 34, 29, 0.04);
+          box-shadow: 0 10px 24px rgba(23, 39, 30, 0.04);
           display: flex;
           flex-direction: column;
           position: relative;
@@ -1404,7 +1813,7 @@ export default function HomePage() {
         .pn-ladder-name {
           font-size: 19px;
           font-weight: 850;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 8px 0;
         }
         .pn-ladder-badge {
@@ -1427,7 +1836,6 @@ export default function HomePage() {
           margin: 0;
         }
 
-        /* 3 Ecosystem Engines */
         .pn-engines-grid {
           display: grid;
           grid-template-columns: 1fr;
@@ -1452,7 +1860,7 @@ export default function HomePage() {
         }
         .pn-engine-card:hover {
           transform: translateY(-4px);
-          border-color: #E85D3F;
+          border-color: #06B6D4;
         }
 
         .pn-engine-icon-box {
@@ -1471,12 +1879,12 @@ export default function HomePage() {
         .pn-engine-title {
           font-size: 20px;
           font-weight: 850;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 10px 0;
         }
         .pn-engine-desc {
           font-size: 13px;
-          color: #556B60;
+          color: #4B6355;
           line-height: 1.55;
           margin: 0 0 16px 0;
           flex-grow: 1;
@@ -1494,7 +1902,7 @@ export default function HomePage() {
         }
 
         .pn-eco-cta-bar {
-          background: linear-gradient(135deg, #183324 0%, #0F2217 100%);
+          background: linear-gradient(135deg, #182820 0%, #0F1E16 100%);
           border-radius: 28px;
           padding: 32px 36px;
           display: flex;
@@ -1502,7 +1910,7 @@ export default function HomePage() {
           align-items: center;
           text-align: center;
           gap: 18px;
-          box-shadow: 0 16px 40px rgba(24, 51, 36, 0.25);
+          box-shadow: 0 16px 40px rgba(23, 39, 30, 0.25);
           border: 2px solid rgba(232, 93, 63, 0.4);
         }
         @media (min-width: 768px) {
@@ -1551,7 +1959,7 @@ export default function HomePage() {
         .pn-pricing-section {
           width: 100%;
           padding: 85px 24px 110px 24px;
-          background-color: #FFF7F2;
+          background-color: #FFF8F4;
           position: relative;
           box-sizing: border-box;
         }
@@ -1562,14 +1970,14 @@ export default function HomePage() {
         }
 
         .pn-ad-callout-card {
-          background: linear-gradient(135deg, #183324 0%, #0F2318 100%);
+          background: linear-gradient(135deg, #182820 0%, #0F1E16 100%);
           color: #FFFFFF;
           border-radius: 32px;
           padding: 40px 32px;
           margin-bottom: 64px;
           position: relative;
           overflow: hidden;
-          box-shadow: 0 20px 50px rgba(24, 51, 36, 0.28);
+          box-shadow: 0 20px 50px rgba(23, 39, 30, 0.28);
           border: 2px solid rgba(232, 93, 63, 0.35);
           display: grid;
           grid-template-columns: 1fr;
@@ -1677,7 +2085,7 @@ export default function HomePage() {
           font-weight: 850;
           line-height: 1.15;
           letter-spacing: -0.02em;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 16px 0;
         }
         .pn-pricing-title span {
@@ -1689,7 +2097,7 @@ export default function HomePage() {
         .pn-pricing-subtitle {
           font-size: clamp(16px, 2vw, 18px);
           line-height: 1.6;
-          color: #4A5E53;
+          color: #4B6355;
           margin: 0;
         }
 
@@ -1706,7 +2114,7 @@ export default function HomePage() {
           border-radius: 99px;
           display: inline-flex;
           gap: 6px;
-          box-shadow: 0 6px 20px rgba(24, 34, 29, 0.06);
+          box-shadow: 0 6px 20px rgba(23, 39, 30, 0.06);
         }
 
         .pn-toggle-btn {
@@ -1718,7 +2126,7 @@ export default function HomePage() {
           cursor: pointer;
           transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
           background: transparent;
-          color: #556B60;
+          color: #4B6355;
         }
         .pn-toggle-btn.is-active {
           background: linear-gradient(135deg, #E85D3F 0%, #D44B2D 100%);
@@ -1726,7 +2134,6 @@ export default function HomePage() {
           box-shadow: 0 4px 14px rgba(232, 93, 63, 0.3);
         }
 
-        /* 6-CARD BALANCED GRID */
         .pn-alacarte-grid {
           display: grid;
           grid-template-columns: 1fr;
@@ -1753,7 +2160,7 @@ export default function HomePage() {
           flex-direction: column;
           justify-content: space-between;
           position: relative;
-          box-shadow: 0 12px 36px rgba(24, 34, 29, 0.06);
+          box-shadow: 0 12px 36px rgba(23, 39, 30, 0.06);
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .pn-coin-card:hover {
@@ -1823,7 +2230,7 @@ export default function HomePage() {
         .pn-price-dollars {
           font-size: 38px;
           font-weight: 900;
-          color: #1A2821;
+          color: #17271E;
           letter-spacing: -0.03em;
         }
         .pn-price-cents {
@@ -1835,14 +2242,14 @@ export default function HomePage() {
         .pn-card-service-title {
           font-size: 20px;
           font-weight: 850;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 6px 0;
           line-height: 1.25;
         }
 
         .pn-card-service-sub {
           font-size: 13px;
-          color: #556B60;
+          color: #4B6355;
           margin: 0 0 20px 0;
           line-height: 1.45;
         }
@@ -1893,14 +2300,14 @@ export default function HomePage() {
           transition: all 0.2s ease;
         }
         .pn-btn-card-primary {
-          background-color: #183324;
+          background-color: #182820;
           color: #FFFFFF;
-          box-shadow: 0 8px 18px rgba(24, 51, 36, 0.2);
+          box-shadow: 0 8px 18px rgba(23, 39, 30, 0.2);
         }
         .pn-btn-card-primary:hover {
-          background-color: #0F2217;
+          background-color: #0F1E16;
           transform: translateY(-2px);
-          box-shadow: 0 12px 24px rgba(24, 51, 36, 0.28);
+          box-shadow: 0 12px 24px rgba(23, 39, 30, 0.28);
         }
         .pn-btn-card-peach {
           background: linear-gradient(135deg, #E85D3F 0%, #D44B2D 100%);
@@ -1934,13 +2341,13 @@ export default function HomePage() {
           flex-direction: column;
           justify-content: space-between;
           position: relative;
-          box-shadow: 0 12px 36px rgba(24, 34, 29, 0.06);
+          box-shadow: 0 12px 36px rgba(23, 39, 30, 0.06);
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .pn-membership-card:hover {
           transform: translateY(-8px);
-          border-color: #E85D3F;
-          box-shadow: 0 24px 50px rgba(232, 93, 63, 0.2);
+          border-color: #06B6D4;
+          box-shadow: 0 24px 50px rgba(6, 182, 212, 0.2);
         }
         .pn-membership-card.is-popular {
           border: 2.5px solid #E85D3F;
@@ -1971,7 +2378,7 @@ export default function HomePage() {
         .pn-tier-price {
           font-size: 44px;
           font-weight: 900;
-          color: #1A2821;
+          color: #17271E;
           letter-spacing: -0.03em;
         }
         .pn-tier-cadence {
@@ -1983,13 +2390,13 @@ export default function HomePage() {
         .pn-tier-title {
           font-size: 22px;
           font-weight: 850;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 8px 0;
         }
 
         .pn-tier-desc {
           font-size: 13px;
-          color: #556B60;
+          color: #4B6355;
           line-height: 1.5;
           margin: 0 0 24px 0;
         }
@@ -2019,12 +2426,12 @@ export default function HomePage() {
         .pn-guarantee-text h4 {
           font-size: 17px;
           font-weight: 850;
-          color: #1A2821;
+          color: #17271E;
           margin: 0 0 4px 0;
         }
         .pn-guarantee-text p {
           font-size: 13px;
-          color: #556B60;
+          color: #4B6355;
           margin: 0;
           max-width: 680px;
         }
@@ -2051,11 +2458,61 @@ export default function HomePage() {
           box-shadow: 0 10px 24px rgba(232, 93, 63, 0.45);
         }
 
+        /* FOOTER */
+        .pn-footer {
+          background: #15241C;
+          color: #FFFFFF;
+          padding: 50px 24px;
+          border-top: 3px solid #E85D3F;
+        }
+        .pn-footer-inner {
+          max-width: 1280px;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
+          align-items: center;
+          text-align: center;
+        }
+        @media (min-width: 768px) {
+          .pn-footer-inner {
+            flex-direction: row;
+            justify-content: space-between;
+            text-align: left;
+          }
+        }
+        .pn-footer-left h4 {
+          font-size: 20px;
+          font-weight: 850;
+          margin: 0 0 8px 0;
+          color: #FFA585;
+        }
+        .pn-footer-left p {
+          font-size: 13.5px;
+          color: #A3C2B1;
+          margin: 0;
+        }
+        .pn-footer-right {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+        }
+        .pn-footer-link {
+          color: #FFFFFF;
+          text-decoration: none;
+          font-size: 13.5px;
+          font-weight: 750;
+          transition: color 0.2s ease;
+        }
+        .pn-footer-link:hover {
+          color: #E85D3F;
+        }
+
         /* DRAWER NAVIGATION */
         .pn-nav-overlay {
           position: fixed;
           inset: 0;
-          background: rgba(26, 51, 36, 0.45);
+          background: rgba(23, 39, 30, 0.5);
           backdrop-filter: blur(6px);
           z-index: 100;
           opacity: 0;
@@ -2073,7 +2530,7 @@ export default function HomePage() {
           right: 0;
           bottom: 0;
           width: 320px;
-          background-color: #FFF7F2;
+          background-color: #FFF8F4;
           z-index: 101;
           padding: 32px 28px;
           display: flex;
@@ -2081,7 +2538,7 @@ export default function HomePage() {
           transform: translateX(100%);
           transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           box-shadow: -10px 0 30px rgba(0,0,0,0.12);
-          border-left: 2px solid rgba(232, 93, 63, 0.2);
+          border-left: 2px solid rgba(232, 93, 63, 0.25);
         }
         .pn-nav-drawer.is-open {
           transform: translateX(0);
@@ -2107,7 +2564,7 @@ export default function HomePage() {
         .pn-drawer-link {
           font-size: 1.2rem;
           font-weight: 700;
-          color: #1E3A2B;
+          color: #17271E;
           text-decoration: none;
           transition: color 0.2s ease;
         }
@@ -2117,8 +2574,27 @@ export default function HomePage() {
       `}</style>
 
       {/* Atmospheric lighting & grid textures */}
+      <div className="pn-repeating-watermark" />
       <div className="pn-studio-lighting" />
       <div className="pn-grid-texture" />
+
+      {/* RUNNING KINETIC BRAND TICKER */}
+      <div className="pn-brand-ticker">
+        <div className="pn-ticker-track">
+          <span>🍑 SWEET AS A PEACH ✦ THE CREATIVE MARKETPLACE OF THE SOUTH</span>
+          <span>✦ VETTED CREATIVES YOU CAN TRUST AT AFFORDABLE PRICES</span>
+          <span>✦ 1 COIN = 1 FINISHED DELIVERABLE</span>
+          <span>✦ 24–48H TURNAROUND</span>
+          <span>✦ 75% DIRECT CREATOR PAYOUT</span>
+          <span>✦ NO RETAINERS ✦ BIRMINGHAM & BEYOND</span>
+          <span>🍑 SWEET AS A PEACH ✦ THE CREATIVE MARKETPLACE OF THE SOUTH</span>
+          <span>✦ VETTED CREATIVES YOU CAN TRUST AT AFFORDABLE PRICES</span>
+          <span>✦ 1 COIN = 1 FINISHED DELIVERABLE</span>
+          <span>✦ 24–48H TURNAROUND</span>
+          <span>✦ 75% DIRECT CREATOR PAYOUT</span>
+          <span>✦ NO RETAINERS ✦ BIRMINGHAM & BEYOND</span>
+        </div>
+      </div>
 
       {/* TOP HEADER */}
       <header className="pn-header">
@@ -2129,6 +2605,21 @@ export default function HomePage() {
             className="pn-header-logo"
           />
         </Link>
+
+        <nav className="pn-header-nav-links">
+          <a href="#work" className="pn-h-link">Work</a>
+          <a href="#creatives" className="pn-h-link">Creatives</a>
+          <a href="#pricing" className="pn-h-link">Pricing</a>
+          <a href="#ecosystem" className="pn-h-link">Academy & Hub</a>
+          <a
+            href="https://youtube.com/PeachNetwork"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="pn-yt-nav-pill"
+          >
+            <span>▶</span> YouTube
+          </a>
+        </nav>
 
         <div className="pn-header-right">
           <Link href="/signin" className="pn-top-signin-btn">
@@ -2165,21 +2656,21 @@ export default function HomePage() {
             Vetted Creatives You Can Trust at Affordable Prices.
           </p>
           <p className="pn-hero-lead-sub">
-            More Creatives. Stronger Businesses. A Sweeter South. Connecting growing businesses with vetted Southern design, video, and web talent. No agency markups, zero bidding wars.
+            More Creatives. Stronger Businesses. A Sweeter South. Good design done right, with real Southern hospitality. No agency retainers, zero bidding wars.
           </p>
 
           <div className="pn-value-pill">
             <span>🪙</span>
-            <span><strong>1 Coin = 1 Finished Deliverable</strong> • No Retainers • No Hourly Creep</span>
+            <span><strong>1 Coin = 1 Finished Deliverable</strong> • Flat Pricing • 24–48h Turnaround</span>
           </div>
 
           <div className="pn-hero-actions">
             <Link href="/match" className="pn-btn-hero-primary">
-              <span>⚡</span> Find a Creative
+              <span>⚡</span> Start a Project (From $50)
             </Link>
-            <Link href="/apply" className="pn-btn-hero-secondary">
-              Join the Network
-            </Link>
+            <a href="#creatives" className="pn-btn-hero-secondary">
+              <span>✨</span> Meet Our Creatives
+            </a>
           </div>
         </div>
 
@@ -2249,6 +2740,71 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* YOUTUBE FEATURE BANNER: SEE OUR CREATIVES IN ACTION */}
+      <section className="pn-yt-feature-banner">
+        <div className="pn-yt-card">
+          <div className="pn-yt-left">
+            <div className="pn-yt-play-icon">▶</div>
+            <div className="pn-yt-info">
+              <h3>Watch Our Creatives in Action on YouTube</h3>
+              <p>
+                Follow our official YouTube channel to watch behind-the-scenes shoots, client case studies, design breakdowns, and creative tutorials across Alabama and the South.
+              </p>
+            </div>
+          </div>
+          <a
+            href="https://youtube.com/PeachNetwork"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="pn-yt-btn"
+          >
+            <span>▶</span> Watch youtube.com/PeachNetwork
+          </a>
+        </div>
+      </section>
+
+      {/* MEET OUR CREATIVES IN ACTION (REAL TEAM GALLERY) */}
+      <section id="creatives" className="pn-action-gallery-section">
+        <div className="pn-gallery-container">
+          <div className="pn-gallery-header">
+            <div className="pn-gallery-kicker">✦ Real Talent • Real Studios ✦</div>
+            <h2 className="pn-gallery-title">
+              Meet the Creatives Behind <span>Sweet As A Peach</span>
+            </h2>
+            <p className="pn-gallery-sub">
+              No anonymous overseas bots. Meet the vetted videographers, brand illustrators, print specialists, and web designers bringing Southern businesses to life.
+            </p>
+          </div>
+
+          <div className="pn-gallery-grid">
+            {CREATIVE_SNAPS.map((snap, idx) => (
+              <div key={idx} className="pn-gallery-card">
+                <div className="pn-gallery-media">
+                  <img
+                    src={snap.image}
+                    alt={snap.caption}
+                    className="pn-gallery-img"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      const next = snap.altImages.find((src) => !target.src.includes(src));
+                      if (next) {
+                        target.src = next;
+                      }
+                    }}
+                  />
+                  <div className="pn-gallery-role-pill">
+                    <span>{snap.icon}</span> {snap.role}
+                  </div>
+                </div>
+                <div className="pn-gallery-meta">
+                  <p className="pn-gallery-caption">{snap.caption}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* PITCH DECK BREAKDOWN: WHY PEACH NETWORK? */}
       <section className="pn-deck-section">
         <div className="pn-deck-container">
@@ -2312,7 +2868,7 @@ export default function HomePage() {
       <section className="pn-ai-section">
         <div className="pn-ai-container">
           <div className="pn-ai-header">
-            <div className="pn-ai-kicker">✦ Proprietary Zero-Bidding AI ✦</div>
+            <div className="pn-ai-kicker">✦ Smart Niche Matching ✦</div>
             <h2 className="pn-ai-title">
               How Peach Match AI <span>Pairs Your Project</span>
             </h2>
@@ -2355,7 +2911,7 @@ export default function HomePage() {
               <div className="pn-match-badges-grid">
                 <span className="pn-m-badge pn-mb-gold">🏆 Featured Sports Illustrator</span>
                 <span className="pn-m-badge pn-mb-green">⭐ 5.0 (18 Projects)</span>
-                <span className="pn-m-badge pn-mb-peach">⚡ 24h Delivery Verified</span>
+                <span className="pn-m-badge pn-mb-blue">⚡ 24h Delivery Verified</span>
               </div>
             </div>
           </div>
@@ -2363,12 +2919,12 @@ export default function HomePage() {
       </section>
 
       {/* INFINITE SLIDING MARQUEE: RECENT WORK */}
-      <section className="pn-projects-section">
+      <section id="work" className="pn-projects-section">
         <div className="pn-projects-header">
           <div className="pn-projects-kicker">✦ Real Deliverables • Real Impact ✦</div>
           <h2 className="pn-projects-title">Recent Work from the Network</h2>
           <p className="pn-projects-subtitle">
-            Explore actual deliverables crafted for Southern institutions, civic chambers, community programs, and local brands.
+            Explore actual deliverables crafted for Southern businesses, community programs, civic chambers, and original creative brands—featuring illustrations by Jose M.
           </p>
         </div>
 
@@ -2400,6 +2956,7 @@ export default function HomePage() {
                   <div className="pn-card-tag-badge">{proj.tag}</div>
                 </div>
                 <div className="pn-card-body">
+                  <div className="pn-card-creator-credit">{proj.creator}</div>
                   <h3 className="pn-card-client-title">{proj.title}</h3>
                   <div className="pn-card-deliverable-label">{proj.category}</div>
                   <p className="pn-card-desc">{proj.desc}</p>
@@ -2407,6 +2964,7 @@ export default function HomePage() {
               </div>
             ))}
 
+            {/* Duplicate for infinite loop */}
             {RECENT_PROJECTS.map((proj) => (
               <div key={`dup-${proj.id}`} className="pn-project-card">
                 <div className="pn-card-media" style={{ background: proj.bgGradient }}>
@@ -2433,6 +2991,7 @@ export default function HomePage() {
                   <div className="pn-card-tag-badge">{proj.tag}</div>
                 </div>
                 <div className="pn-card-body">
+                  <div className="pn-card-creator-credit">{proj.creator}</div>
                   <h3 className="pn-card-client-title">{proj.title}</h3>
                   <div className="pn-card-deliverable-label">{proj.category}</div>
                   <p className="pn-card-desc">{proj.desc}</p>
@@ -2443,8 +3002,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION: CREATIVE ECOSYSTEM (BUILT FOR CREATIVES, BY CREATIVES) */}
-      <section className="pn-ecosystem-section">
+      {/* SECTION: CREATIVE ECOSYSTEM */}
+      <section id="ecosystem" className="pn-ecosystem-section">
         <div className="pn-eco-container">
           <div className="pn-eco-header">
             <div className="pn-eco-kicker">✦ For Creatives, By Creatives ✦</div>
@@ -2548,8 +3107,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION: PRICING ARCHITECTURE & ADVERTISEMENT */}
-      <section className="pn-pricing-section">
+      {/* SECTION: PRICING ARCHITECTURE */}
+      <section id="pricing" className="pn-pricing-section">
         <div className="pn-pricing-container">
           
           {/* COMMERCIAL ADVERTISEMENT CALLOUT */}
@@ -2707,6 +3266,30 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* FOOTER */}
+      <footer className="pn-footer">
+        <div className="pn-footer-inner">
+          <div className="pn-footer-left">
+            <h4>Sweet As A Peach Creative Network</h4>
+            <p>More Creatives. Stronger Businesses. A Sweeter South. • Headquarters: Birmingham, AL</p>
+          </div>
+          <div className="pn-footer-right">
+            <a
+              href="https://youtube.com/PeachNetwork"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pn-footer-link"
+            >
+              ▶ YouTube: youtube.com/PeachNetwork
+            </a>
+            <Link href="/about" className="pn-footer-link">About</Link>
+            <Link href="/match" className="pn-footer-link">Find a Creative</Link>
+            <Link href="/apply" className="pn-footer-link">Apply</Link>
+            <Link href="/signin" className="pn-footer-link">Sign In</Link>
+          </div>
+        </div>
+      </footer>
+
       {/* MOBILE DRAWER NAVIGATION */}
       <div
         className={`pn-nav-overlay ${menuOpen ? "is-open" : ""}`}
@@ -2724,14 +3307,30 @@ export default function HomePage() {
           <Link href="/" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
             Home
           </Link>
-          <Link href="/match" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
-            Find a Creative
-          </Link>
+          <a href="#work" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
+            Recent Work
+          </a>
+          <a href="#creatives" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
+            Creatives in Action
+          </a>
+          <a href="#pricing" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
+            Pricing
+          </a>
+          <a href="#ecosystem" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
+            Academy & Hub
+          </a>
+          <a
+            href="https://youtube.com/PeachNetwork"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="pn-drawer-link"
+            onClick={() => setMenuOpen(false)}
+            style={{ color: "#DC2626" }}
+          >
+            ▶ Watch YouTube
+          </a>
           <Link href="/apply" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
-            Join the Network
-          </Link>
-          <Link href="/about" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
-            About Us
+            Apply as a Creative
           </Link>
           <Link href="/signin" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
             Sign In
