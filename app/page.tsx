@@ -63,6 +63,7 @@ const RECENT_PROJECTS = [
   },
 ];
 
+// Balanced 6 items for a clean 3-column grid without awkward empty space
 const ALACARTE_ITEMS = [
   {
     coins: 1,
@@ -113,10 +114,26 @@ const ALACARTE_ITEMS = [
     cta: "Order 1 Job ($150)",
   },
   {
+    coins: 4,
+    price: "$200",
+    name: "Editorial Program / Menu",
+    subtitle: "Multi-page booklets & event menus",
+    turnaround: "48–72h Turnaround",
+    icon: "📖",
+    includes: [
+      "Multi-page commemorative service program or menu",
+      "High-res 300 DPI print-ready PDF with crop marks",
+      "Digital flipbook / mobile-friendly PDF copy",
+      "Typography hierarchy & photo layout polish",
+    ],
+    popular: false,
+    cta: "Order 1 Job ($200)",
+  },
+  {
     coins: 6,
     price: "$300",
     name: "Mini Brand Identity Kit",
-    subtitle: "The full foundational visual system",
+    subtitle: "The foundational visual system",
     turnaround: "3–5 Business Days",
     icon: "✨",
     includes: [
@@ -253,7 +270,7 @@ export default function HomePage() {
           z-index: 1;
         }
 
-        /* TOP NAVIGATION HEADER - BIGGER LOGO */
+        /* TOP NAVIGATION HEADER - PROMINENT LOGO */
         .pn-header {
           position: sticky;
           top: 0;
@@ -512,8 +529,8 @@ export default function HomePage() {
         .pn-spotlight-card {
           position: relative;
           width: 100%;
-          max-width: 450px;
-          aspect-ratio: 4 / 5.2;
+          max-width: 480px;
+          aspect-ratio: 4 / 4.9;
           border-radius: 32px;
           overflow: hidden;
           box-shadow: 
@@ -532,8 +549,7 @@ export default function HomePage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center 12%;
-          transform: scale(1.08);
+          object-position: center 25%;
           display: block;
           z-index: 1;
         }
@@ -695,10 +711,10 @@ export default function HomePage() {
           margin-top: 2px;
         }
 
-        /* SECTION: PEACH MATCH AI SHOWCASE */
+        /* SECTION: PEACH MATCH AI */
         .pn-ai-section {
           width: 100%;
-          padding: 80px 24px;
+          padding: 70px 24px;
           background: linear-gradient(180deg, #FAF2EB 0%, #FFFFFF 100%);
           position: relative;
         }
@@ -710,8 +726,8 @@ export default function HomePage() {
 
         .pn-ai-header {
           text-align: center;
-          max-width: 780px;
-          margin: 0 auto 50px auto;
+          max-width: 760px;
+          margin: 0 auto 40px auto;
         }
 
         .pn-ai-kicker {
@@ -726,17 +742,17 @@ export default function HomePage() {
           text-transform: uppercase;
           padding: 6px 18px;
           border-radius: 99px;
-          margin-bottom: 16px;
+          margin-bottom: 14px;
           box-shadow: 0 4px 14px rgba(24, 51, 36, 0.2);
         }
 
         .pn-ai-title {
-          font-size: clamp(32px, 4.5vw, 50px);
+          font-size: clamp(30px, 4.2vw, 46px);
           font-weight: 850;
           line-height: 1.15;
           letter-spacing: -0.02em;
           color: #1A2821;
-          margin: 0 0 16px 0;
+          margin: 0 0 14px 0;
         }
         .pn-ai-title span {
           color: #E85D3F;
@@ -745,72 +761,71 @@ export default function HomePage() {
         }
 
         .pn-ai-subtitle {
-          font-size: clamp(16px, 2vw, 18px);
-          line-height: 1.6;
+          font-size: 16px;
+          line-height: 1.55;
           color: #4A5E53;
           margin: 0;
         }
 
-        /* Interactive Matching Flow Card */
+        /* Visual 3-Stage AI Match Flow */
         .pn-ai-flow-card {
           background: #FAF2EB;
           border: 2px solid rgba(232, 139, 104, 0.35);
-          border-radius: 36px;
-          padding: 40px 32px;
-          box-shadow: 0 20px 50px rgba(24, 34, 29, 0.08);
+          border-radius: 32px;
+          padding: 36px 28px;
+          box-shadow: 0 20px 48px rgba(24, 34, 29, 0.07);
           display: grid;
           grid-template-columns: 1fr;
-          gap: 24px;
+          gap: 20px;
           align-items: center;
-          position: relative;
         }
 
         @media (min-width: 992px) {
           .pn-ai-flow-card {
-            grid-template-columns: 1fr auto 1fr;
-            gap: 36px;
-            padding: 50px 48px;
+            grid-template-columns: 1.05fr auto 1.15fr;
+            gap: 28px;
+            padding: 44px 40px;
           }
         }
 
         .pn-mock-brief-card {
           background: #FFFFFF;
-          border: 1.5px solid rgba(232, 139, 104, 0.25);
-          border-radius: 24px;
-          padding: 26px;
-          box-shadow: 0 8px 24px rgba(24, 34, 29, 0.05);
+          border: 1.5px solid rgba(232, 139, 104, 0.28);
+          border-radius: 22px;
+          padding: 24px;
+          box-shadow: 0 8px 24px rgba(24, 34, 29, 0.04);
         }
         .pn-brief-header-pill {
           display: inline-block;
           font-size: 11px;
           font-weight: 800;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.06em;
           text-transform: uppercase;
           color: #E85D3F;
           background: #FDF0E7;
-          padding: 4px 12px;
+          padding: 4px 10px;
           border-radius: 99px;
-          margin-bottom: 12px;
+          margin-bottom: 10px;
         }
         .pn-brief-title {
-          font-size: 18px;
+          font-size: 17px;
           font-weight: 850;
           color: #1A2821;
           margin: 0 0 10px 0;
+          line-height: 1.35;
         }
         .pn-brief-tags {
           display: flex;
           flex-wrap: wrap;
-          gap: 8px;
-          margin-top: 12px;
+          gap: 6px;
         }
         .pn-b-tag {
-          font-size: 12px;
+          font-size: 11px;
           background: #F1F5F9;
           color: #334155;
-          padding: 4px 10px;
-          border-radius: 8px;
-          font-weight: 600;
+          padding: 4px 9px;
+          border-radius: 6px;
+          font-weight: 700;
         }
 
         .pn-ai-connector {
@@ -818,47 +833,39 @@ export default function HomePage() {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 12px;
+          gap: 10px;
         }
         .pn-ai-pulse-orb {
-          width: 68px;
-          height: 68px;
+          width: 64px;
+          height: 64px;
           border-radius: 50%;
           background: linear-gradient(135deg, #183324 0%, #E85D3F 100%);
           display: flex;
           align-items: center;
           justify-content: center;
           color: #FFFFFF;
-          font-size: 26px;
-          box-shadow: 0 0 30px rgba(232, 93, 63, 0.45);
-          animation: pnOrbPulse 3s ease-in-out infinite;
+          font-size: 24px;
+          box-shadow: 0 0 28px rgba(232, 93, 63, 0.45);
         }
-
-        @keyframes pnOrbPulse {
-          0%, 100% { transform: scale(0.95); box-shadow: 0 0 20px rgba(232, 93, 63, 0.3); }
-          50% { transform: scale(1.08); box-shadow: 0 0 36px rgba(232, 93, 63, 0.6); }
-        }
-
         .pn-ai-engine-label {
           font-size: 12px;
           font-weight: 850;
           color: #183324;
-          letter-spacing: 0.05em;
           text-align: center;
         }
 
         .pn-mock-match-card {
           background: #FFFFFF;
           border: 2px solid #16A34A;
-          border-radius: 24px;
-          padding: 26px;
+          border-radius: 22px;
+          padding: 24px;
           box-shadow: 0 12px 30px rgba(22, 163, 74, 0.12);
           position: relative;
         }
         .pn-match-score-badge {
           position: absolute;
           top: -12px;
-          right: 20px;
+          right: 18px;
           background: #16A34A;
           color: #FFFFFF;
           font-size: 11px;
@@ -870,12 +877,12 @@ export default function HomePage() {
         .pn-match-creative-row {
           display: flex;
           align-items: center;
-          gap: 14px;
-          margin-bottom: 12px;
+          gap: 12px;
+          margin-bottom: 10px;
         }
         .pn-match-avatar {
-          width: 52px;
-          height: 52px;
+          width: 48px;
+          height: 48px;
           border-radius: 50%;
           background: #E85D3F;
           display: flex;
@@ -883,24 +890,40 @@ export default function HomePage() {
           justify-content: center;
           color: #FFFFFF;
           font-weight: 850;
-          font-size: 18px;
+          font-size: 17px;
         }
         .pn-match-creative-name {
-          font-size: 17px;
+          font-size: 16px;
           font-weight: 850;
           color: #1A2821;
         }
         .pn-match-creative-skills {
           font-size: 12px;
           color: #E85D3F;
-          font-weight: 700;
+          font-weight: 750;
         }
+
+        .pn-match-badges-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 8px;
+        }
+        .pn-m-badge {
+          font-size: 11px;
+          font-weight: 750;
+          padding: 3px 8px;
+          border-radius: 6px;
+        }
+        .pn-mb-green { background: #E8F5E9; color: #166534; }
+        .pn-mb-gold { background: #FFF8E1; color: #92400E; border: 1px solid #FDE68A; }
+        .pn-mb-peach { background: #FDF0E7; color: #C2410C; }
 
         .pn-ai-pillars-row {
           display: grid;
           grid-template-columns: 1fr;
-          gap: 24px;
-          margin-top: 40px;
+          gap: 20px;
+          margin-top: 36px;
         }
         @media (min-width: 768px) {
           .pn-ai-pillars-row {
@@ -909,14 +932,14 @@ export default function HomePage() {
         }
         .pn-ai-pillar {
           background: #FFFFFF;
-          border: 1px solid rgba(232, 139, 104, 0.25);
+          border: 1.5px solid rgba(232, 139, 104, 0.22);
           border-radius: 20px;
           padding: 24px;
           box-shadow: 0 6px 18px rgba(24, 34, 29, 0.04);
         }
         .pn-pillar-icon {
           font-size: 26px;
-          margin-bottom: 12px;
+          margin-bottom: 10px;
         }
         .pn-pillar-title {
           font-size: 16px;
@@ -1318,6 +1341,7 @@ export default function HomePage() {
           box-shadow: 0 4px 14px rgba(24, 51, 36, 0.22);
         }
 
+        /* EXACT BALANCED 6-CARD GRID: 2 rows of 3 on desktop with ZERO blank space! */
         .pn-alacarte-grid {
           display: grid;
           grid-template-columns: 1fr;
@@ -1708,7 +1732,7 @@ export default function HomePage() {
       <div className="pn-studio-lighting" />
       <div className="pn-grid-texture" />
 
-      {/* TOP HEADER - BIGGER COMMANDING LOGO */}
+      {/* TOP HEADER - PROMINENT COMMANDING LOGO */}
       <header className="pn-header">
         <Link href="/" className="pn-header-logo-link">
           <img
@@ -1741,7 +1765,7 @@ export default function HomePage() {
         <div className="pn-hero-text-wrap">
           <div className="pn-hero-eyebrow">
             <span>✦</span>
-            Birmingham's Creative Marketplace
+            The Creative Marketplace of the South
           </div>
 
           <h1 className="pn-hero-title">
@@ -1754,7 +1778,7 @@ export default function HomePage() {
             Vetted Creatives You Can Trust at Affordable Prices.
           </p>
           <p className="pn-hero-lead-sub">
-            Connecting Southern businesses with top-tier local design, branding, and web talent. No agency markups, zero bidding wars.
+            Connecting businesses with top-tier Southern design, video, and web talent. No agency markups, zero bidding wars.
           </p>
 
           <div className="pn-value-pill">
@@ -1772,7 +1796,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: CREATIVE SPOTLIGHT (JOSE - TIGHTER PRO CROP) */}
+        {/* RIGHT COLUMN: CREATIVE SPOTLIGHT (JOSE AT HIS STUDIO DESK) */}
         <div className="pn-hero-visual-wrap">
           <div className="pn-spotlight-card">
             <div className="pn-spotlight-top-tag">
@@ -1787,17 +1811,17 @@ export default function HomePage() {
 
             {!imageError && (
               <img
-                src="/jose-creative.jpg"
-                alt="Jose M. - Video Editor, Illustrator & Graphic Designer in Birmingham & Troy AL"
+                src="/Josedesk.jpg"
+                alt="Jose M. - Video Editor, Illustrator & Motion Designer"
                 className="pn-spotlight-img"
                 onError={(e) => {
                   const target = e.currentTarget;
-                  if (!target.src.includes('jose.jpg') && !target.src.includes('Brown') && !target.src.includes('Jose')) {
+                  if (!target.src.includes('josedesk.jpg') && !target.src.includes('jose-creative') && !target.src.includes('jose.jpg')) {
+                    target.src = '/josedesk.jpg';
+                  } else if (!target.src.includes('jose-creative') && !target.src.includes('jose.jpg')) {
+                    target.src = '/jose-creative.jpg';
+                  } else if (!target.src.includes('jose.jpg')) {
                     target.src = '/jose.jpg';
-                  } else if (!target.src.includes('Brown') && !target.src.includes('Jose')) {
-                    target.src = '/Brown and White Minimalist Packaging Mockup Instagram Post.jpg';
-                  } else if (!target.src.includes('Jose')) {
-                    target.src = '/Jose.jpg';
                   } else {
                     setImageError(true);
                   }
@@ -1818,7 +1842,7 @@ export default function HomePage() {
               </div>
 
               <div className="pn-plate-role">
-                Video Editor • Illustrator • Graphic Designer
+                Video Editor • Illustrator • Graphic & Motion Designer
               </div>
 
               <div className="pn-plate-badges">
@@ -1838,7 +1862,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION: PEACH MATCH AI (FLASHY INTERACTIVE SHOWCASE) */}
+      {/* SECTION: PEACH MATCH AI (VISUAL, NICHE MATCHING) */}
       <section className="pn-ai-section">
         <div className="pn-ai-container">
           <div className="pn-ai-header">
@@ -1847,78 +1871,71 @@ export default function HomePage() {
               How Peach Match AI <span>Pairs Your Project</span>
             </h2>
             <p className="pn-ai-subtitle">
-              Say goodbye to 50 spam bids and endless negotiations. Describe your vision in 60 seconds, and our intelligent matching engine pairs you directly with the right local creator for your budget and timeline.
+              Say goodbye to 50 spam bids. Tell us what you need in 60 seconds, and our AI pairs your project with a creator who specializes in that exact medium.
             </p>
           </div>
 
-          {/* Interactive Flow Diagram Card */}
+          {/* Visual Niche Matching Flow */}
           <div className="pn-ai-flow-card">
-            {/* Step 1: Client Request */}
+            {/* Step 1: Project Request */}
             <div className="pn-mock-brief-card">
               <span className="pn-brief-header-pill">1. Your 60-Second Brief</span>
-              <h4 className="pn-brief-title">"Need a custom brand kit & event flyer for our Birmingham boutique launch."</h4>
+              <h4 className="pn-brief-title">"Youth Basketball Tournament Event Poster & Social Media Graphics Pack"</h4>
               <div className="pn-brief-tags">
-                <span className="pn-b-tag">🎨 Branding & Print</span>
-                <span className="pn-b-tag">⚡ 48h Turnaround</span>
+                <span className="pn-b-tag">🏀 Sports & Event Design</span>
+                <span className="pn-b-tag">⚡ 24–48h Turnaround</span>
                 <span className="pn-b-tag">🪙 2 Coins ($100)</span>
-                <span className="pn-b-tag">📍 Birmingham, AL</span>
               </div>
             </div>
 
-            {/* Step 2: The AI Matching Hub */}
+            {/* Step 2: AI Matching Engine */}
             <div className="pn-ai-connector">
               <div className="pn-ai-pulse-orb">🍑</div>
               <div className="pn-ai-engine-label">
                 Peach Match AI™<br />
-                <span style={{ color: "#E85D3F", fontWeight: 700 }}>Skill & Style Match</span>
+                <span style={{ color: "#E85D3F", fontWeight: 700 }}>Niche & Skill Matched</span>
               </div>
             </div>
 
-            {/* Step 3: Verified Creator Pair */}
+            {/* Step 3: Exact Niche Specialist Paired */}
             <div className="pn-mock-match-card">
               <div className="pn-match-score-badge">99% Best Match</div>
               <div className="pn-match-creative-row">
-                <div className="pn-match-avatar">JM</div>
+                <div className="pn-match-avatar">MR</div>
                 <div>
-                  <div className="pn-match-creative-name">Jose M.</div>
-                  <div className="pn-match-creative-skills">Brand Identity & Event Print Specialist</div>
+                  <div className="pn-match-creative-name">Marcus R.</div>
+                  <div className="pn-match-creative-skills">Specialty: Sports Graphics & Poster Illustrator</div>
                 </div>
               </div>
-              <p style={{ fontSize: "13px", color: "#556B60", margin: "0 0 10px 0" }}>
-                Vetted portfolio verified • 2026 ADDY® Winner • Available to start today.
-              </p>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <span style={{ fontSize: "11px", background: "#E8F5E9", color: "#166534", padding: "3px 8px", borderRadius: "6px", fontWeight: "750" }}>
-                  ✓ Instant Handover
-                </span>
-                <span style={{ fontSize: "11px", background: "#FDF0E7", color: "#C2410C", padding: "3px 8px", borderRadius: "6px", fontWeight: "750" }}>
-                  ✓ 75% Creator Payout
-                </span>
+              <div className="pn-match-badges-grid">
+                <span className="pn-m-badge pn-mb-gold">🏆 Featured Sports Illustrator</span>
+                <span className="pn-m-badge pn-mb-green">⭐ 5.0 (18 Projects)</span>
+                <span className="pn-m-badge pn-mb-peach">⚡ 24h Delivery Verified</span>
               </div>
             </div>
           </div>
 
-          {/* 3 Core Match Pillars */}
+          {/* 3 Core Value Pillars */}
           <div className="pn-ai-pillars-row">
             <div className="pn-ai-pillar">
               <div className="pn-pillar-icon">🎯</div>
-              <h4 className="pn-pillar-title">Zero-Bidding Clarity</h4>
+              <h4 className="pn-pillar-title">Niche-Specific Pairing</h4>
               <p className="pn-pillar-desc">
-                Never waste hours reading through dozens of unqualified proposals. Peach Match AI matches you with the top vetted choice upfront.
+                Whether you need a sports tournament flyer, a church bulletin, or a restaurant menu, we match you with a designer with proven work in that exact category.
               </p>
             </div>
             <div className="pn-ai-pillar">
-              <div className="pn-pillar-icon">📍</div>
-              <h4 className="pn-pillar-title">Deep Southern Context</h4>
+              <div className="pn-pillar-icon">🍑</div>
+              <h4 className="pn-pillar-title">The Creative Marketplace of the South</h4>
               <p className="pn-pillar-desc">
-                Matched creatives understand the culture, churches, chambers, and businesses of Birmingham and Alabama.
+                Deeply rooted in Southern creative talent, connecting growing businesses with vetted regional creators ready to scale nationwide.
               </p>
             </div>
             <div className="pn-ai-pillar">
               <div className="pn-pillar-icon">🛡️</div>
-              <h4 className="pn-pillar-title">Human QA Art Direction</h4>
+              <h4 className="pn-pillar-title">Senior Art-Direction QA</h4>
               <p className="pn-pillar-desc">
-                Senior agency mentors review all final files for 300 DPI print bleeds, typography hierarchy, and brand consistency.
+                Every final delivery is reviewed by Senior Creative Mentors for technical print bleeds, resolution, typography, and brand consistency.
               </p>
             </div>
           </div>
@@ -1931,7 +1948,7 @@ export default function HomePage() {
           <div className="pn-projects-kicker">✦ Real Deliverables • Real Impact ✦</div>
           <h2 className="pn-projects-title">Recent Work from the Network</h2>
           <p className="pn-projects-subtitle">
-            Explore actual deliverables crafted for Birmingham institutions, civic chambers, community programs, and local brands.
+            Explore actual deliverables crafted for Southern institutions, civic chambers, community programs, and local brands.
           </p>
         </div>
 
@@ -2018,7 +2035,7 @@ export default function HomePage() {
                 <span>Get it done today with just the tap of a button.</span>
               </h3>
               <p>
-                No more waiting weeks for traditional agency callbacks or wading through 50 unvetted bids online. Choose your deliverable, tap submit, and get matched with an award-winning creative in 24 hours.
+                No more waiting weeks for agency callbacks or wading through 50 unvetted bids online. Choose your deliverable, tap submit, and get matched with an award-winning creative in 24 hours.
               </p>
             </div>
             <div className="pn-ad-action-box">
@@ -2036,7 +2053,7 @@ export default function HomePage() {
               Clear Pricing. <span>Zero Surprises.</span>
             </h2>
             <p className="pn-pricing-subtitle">
-              Need just one flyer or logo? Go <strong>À La Carte</strong>. Need a continuous stream of creative work every month? Save with our <strong>Monthly Membership Tiers</strong>.
+              Need just one flyer or menu? Go <strong>À La Carte</strong>. Need a continuous stream of creative work every month? Save with our <strong>Monthly Membership Tiers</strong>.
             </p>
           </div>
 
@@ -2058,7 +2075,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* TAB 1: À LA CARTE SERVICES */}
+          {/* TAB 1: À LA CARTE SERVICES (EXACT BALANCED 6 CARDS, ZERO VOID) */}
           {pricingTab === "alacarte" && (
             <div className="pn-alacarte-grid">
               {ALACARTE_ITEMS.map((item, idx) => (
@@ -2153,9 +2170,9 @@ export default function HomePage() {
           {/* Guarantee Banner */}
           <div className="pn-pricing-guarantee-banner">
             <div className="pn-guarantee-text">
-              <h4>🛡️ 100% Agency Quality Guarantee & 75% Payout</h4>
+              <h4>🛡️️ 100% Agency Quality Guarantee & 75% Payout</h4>
               <p>
-                Every project includes 2 revision rounds and direct art-direction oversight. Best of all: 75% of your investment stays directly in the hands of Alabama creators.
+                Every project includes 2 revision rounds and direct art-direction oversight. Best of all: 75% of your investment stays directly in the hands of Southern creators.
               </p>
             </div>
             <Link href="/match" className="pn-guarantee-btn">
