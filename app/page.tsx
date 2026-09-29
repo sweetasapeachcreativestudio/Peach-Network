@@ -42,7 +42,7 @@ const RECENT_PROJECTS = [
     altImages: ["/project-3.png", "/projects/Project 3.png", "/projects/project-bessemer-brand.png"],
     accent: "#60A5FA",
     bgGradient: "linear-gradient(135deg, #133E8D 0%, #091B42 100%)",
-    icon: "🏛️",
+    icon: "🏛️️",
     tag: "Civic & Chamber",
     headline: "Building Connections That Matter",
     desc: "Official municipal seal, reception dimensional signage, business stationery, and member merchandise.",
@@ -63,7 +63,6 @@ const RECENT_PROJECTS = [
   },
 ];
 
-// Balanced 6 items for a clean 3-column grid without awkward empty space
 const ALACARTE_ITEMS = [
   {
     coins: 1,
@@ -236,22 +235,22 @@ export default function HomePage() {
       <style>{`
         .pn-home-root {
           min-height: 100vh;
-          background-color: #FAF2EB;
+          background-color: #FFF7F2;
           color: #1A2821;
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Plus Jakarta Sans", sans-serif;
           position: relative;
           overflow-x: hidden;
         }
 
-        /* SOUTHERN CREATIVE STUDIO LIGHTING & GRID */
+        /* VIBRANT WARM PEACH STUDIO LIGHTING & GRID */
         .pn-studio-lighting {
           position: absolute;
           inset: 0;
-          height: 850px;
+          height: 1000px;
           background: 
-            radial-gradient(circle at 12% 14%, rgba(254, 237, 226, 0.85) 0%, transparent 45%),
-            radial-gradient(circle at 86% 22%, rgba(247, 209, 188, 0.6) 0%, transparent 50%),
-            radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.55) 0%, transparent 65%);
+            radial-gradient(circle at 14% 12%, rgba(254, 215, 170, 0.55) 0%, transparent 45%),
+            radial-gradient(circle at 86% 20%, rgba(251, 146, 60, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 50% 45%, rgba(255, 237, 213, 0.45) 0%, transparent 65%);
           pointer-events: none;
           z-index: 1;
         }
@@ -259,18 +258,18 @@ export default function HomePage() {
         .pn-grid-texture {
           position: absolute;
           inset: 0;
-          height: 850px;
+          height: 1000px;
           background-size: 32px 32px;
           background-image: 
-            linear-gradient(to right, rgba(232, 139, 104, 0.08) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(232, 139, 104, 0.08) 1px, transparent 1px);
-          mask-image: linear-gradient(180deg, black 0%, black 70%, transparent 100%);
-          -webkit-mask-image: linear-gradient(180deg, black 0%, black 70%, transparent 100%);
+            linear-gradient(to right, rgba(232, 93, 63, 0.08) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(232, 93, 63, 0.08) 1px, transparent 1px);
+          mask-image: linear-gradient(180deg, black 0%, black 75%, transparent 100%);
+          -webkit-mask-image: linear-gradient(180deg, black 0%, black 75%, transparent 100%);
           pointer-events: none;
           z-index: 1;
         }
 
-        /* TOP NAVIGATION HEADER - PROMINENT LOGO */
+        /* TOP NAVIGATION HEADER */
         .pn-header {
           position: sticky;
           top: 0;
@@ -281,12 +280,12 @@ export default function HomePage() {
           width: 100%;
           max-width: 1280px;
           margin: 0 auto;
-          padding: 18px 24px;
+          padding: 16px 24px;
           box-sizing: border-box;
-          background: rgba(250, 242, 235, 0.94);
+          background: rgba(255, 247, 242, 0.94);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          border-bottom: 1.5px solid rgba(232, 139, 104, 0.2);
+          border-bottom: 1.5px solid rgba(232, 93, 63, 0.2);
         }
 
         .pn-header-logo-link {
@@ -298,7 +297,7 @@ export default function HomePage() {
           height: clamp(52px, 6vw, 68px);
           width: auto;
           display: block;
-          filter: drop-shadow(0 4px 14px rgba(24, 34, 29, 0.12));
+          filter: drop-shadow(0 4px 14px rgba(232, 93, 63, 0.2));
           transition: transform 0.2s ease;
         }
         .pn-header-logo:hover {
@@ -319,24 +318,24 @@ export default function HomePage() {
           font-size: 14px;
           font-weight: 750;
           color: #1E3A2B;
-          background: rgba(255, 255, 255, 0.95);
-          border: 1.5px solid rgba(30, 58, 43, 0.22);
+          background: #FFFFFF;
+          border: 1.5px solid rgba(232, 93, 63, 0.28);
           border-radius: 99px;
           text-decoration: none;
           transition: all 0.2s ease;
-          box-shadow: 0 2px 10px rgba(30, 58, 43, 0.05);
+          box-shadow: 0 2px 10px rgba(232, 93, 63, 0.08);
         }
         .pn-top-signin-btn:hover {
-          background: #FFFFFF;
+          background: #FFF0E6;
           border-color: #E85D3F;
           color: #E85D3F;
           transform: translateY(-1px);
-          box-shadow: 0 4px 16px rgba(232, 93, 63, 0.18);
+          box-shadow: 0 4px 16px rgba(232, 93, 63, 0.22);
         }
 
         .pn-menu-btn {
-          background: rgba(255, 255, 255, 0.95);
-          border: 1.5px solid rgba(232, 139, 104, 0.28);
+          background: #FFFFFF;
+          border: 1.5px solid rgba(232, 93, 63, 0.28);
           width: 46px;
           height: 46px;
           border-radius: 14px;
@@ -350,14 +349,14 @@ export default function HomePage() {
           padding: 0;
         }
         .pn-menu-btn:hover {
-          background: #FFFFFF;
+          background: #FFF0E6;
           border-color: #E85D3F;
           transform: scale(1.04);
         }
         .pn-menu-bar {
           width: 22px;
           height: 2.2px;
-          background-color: #1E3A2B;
+          background-color: #E85D3F;
           border-radius: 2px;
         }
 
@@ -395,7 +394,7 @@ export default function HomePage() {
           align-items: center;
           gap: 8px;
           background: #FFFFFF;
-          border: 1.5px solid #E88B68;
+          border: 1.5px solid #FDBA74;
           border-radius: 100px;
           padding: 8px 20px;
           font-size: 13px;
@@ -404,7 +403,7 @@ export default function HomePage() {
           letter-spacing: 0.05em;
           text-transform: uppercase;
           margin-bottom: 20px;
-          box-shadow: 0 4px 16px rgba(232, 93, 63, 0.14);
+          box-shadow: 0 4px 16px rgba(232, 93, 63, 0.16);
         }
 
         .pn-hero-title {
@@ -422,19 +421,20 @@ export default function HomePage() {
           font-weight: 400;
         }
 
+        /* CORE VALUE PROPOSITION */
         .pn-hero-lead {
-          font-size: clamp(17px, 2.2vw, 20px);
-          line-height: 1.5;
-          color: #2D4236;
-          font-weight: 700;
+          font-size: clamp(18px, 2.3vw, 22px);
+          line-height: 1.45;
+          color: #C2410C;
+          font-weight: 850;
           margin: 0 0 10px 0;
-          max-width: 580px;
+          max-width: 600px;
         }
         .pn-hero-lead-sub {
           font-size: 15px;
           line-height: 1.55;
-          color: #556B60;
-          margin: 0 0 26px 0;
+          color: #4A5E53;
+          margin: 0 0 24px 0;
           max-width: 540px;
         }
 
@@ -442,15 +442,15 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          background: rgba(255, 255, 255, 0.95);
-          border: 1.5px dashed #E88B68;
+          background: #FFFFFF;
+          border: 1.5px solid #FDBA74;
           padding: 10px 20px;
           border-radius: 99px;
           font-size: 13px;
           font-weight: 750;
           color: #9C3D15;
           margin-bottom: 30px;
-          box-shadow: 0 4px 14px rgba(232, 139, 104, 0.12);
+          box-shadow: 0 4px 16px rgba(232, 93, 63, 0.12);
         }
 
         .pn-hero-actions {
@@ -467,34 +467,36 @@ export default function HomePage() {
           }
         }
 
-        .pn-btn-green {
+        .pn-btn-hero-primary {
           display: inline-flex;
           align-items: center;
           justify-content: center;
+          gap: 8px;
           height: 56px;
           padding: 0 34px;
-          background-color: #183324;
+          background: linear-gradient(135deg, #E85D3F 0%, #D44B2D 100%);
           color: #FFFFFF;
           font-size: 16px;
-          font-weight: 750;
+          font-weight: 800;
           letter-spacing: 0.01em;
           border-radius: 99px;
           text-decoration: none;
-          box-shadow: 0 10px 24px rgba(24, 51, 36, 0.22);
+          box-shadow: 0 10px 24px rgba(232, 93, 63, 0.38);
           transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
           border: none;
           cursor: pointer;
         }
-        .pn-btn-green:hover {
-          background-color: #0F2217;
+        .pn-btn-hero-primary:hover {
+          background: linear-gradient(135deg, #F06A4D 0%, #E85D3F 100%);
           transform: translateY(-2px);
-          box-shadow: 0 14px 28px rgba(24, 51, 36, 0.3);
+          box-shadow: 0 14px 30px rgba(232, 93, 63, 0.48);
         }
 
-        .pn-btn-peach {
+        .pn-btn-hero-secondary {
           display: inline-flex;
           align-items: center;
           justify-content: center;
+          gap: 8px;
           height: 56px;
           padding: 0 34px;
           background: #FFFFFF;
@@ -504,17 +506,17 @@ export default function HomePage() {
           letter-spacing: 0.01em;
           border-radius: 99px;
           text-decoration: none;
-          border: 1.5px solid rgba(232, 139, 104, 0.5);
-          box-shadow: 0 4px 14px rgba(232, 139, 104, 0.1);
+          border: 1.5px solid #FDBA74;
+          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.1);
           transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
           cursor: pointer;
         }
-        .pn-btn-peach:hover {
-          background: #FFF9F5;
+        .pn-btn-hero-secondary:hover {
+          background: #FFF0E6;
           border-color: #E85D3F;
           color: #E85D3F;
           transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(232, 139, 104, 0.18);
+          box-shadow: 0 8px 20px rgba(232, 93, 63, 0.2);
         }
 
         /* RIGHT HERO COLUMN: CREATIVE SPOTLIGHT CARD */
@@ -534,8 +536,8 @@ export default function HomePage() {
           border-radius: 32px;
           overflow: hidden;
           box-shadow: 
-            0 28px 65px rgba(24, 45, 33, 0.22),
-            0 8px 24px rgba(232, 139, 104, 0.25);
+            0 28px 65px rgba(24, 45, 33, 0.18),
+            0 8px 28px rgba(232, 93, 63, 0.25);
           border: 4px solid #FFFFFF;
           background: linear-gradient(145deg, #2D4236 0%, #15241C 100%);
           display: flex;
@@ -570,7 +572,7 @@ export default function HomePage() {
           width: 110px;
           height: 110px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #E88B68 0%, #D45B38 100%);
+          background: linear-gradient(135deg, #FB923C 0%, #E85D3F 100%);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -599,17 +601,17 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          background: rgba(24, 51, 36, 0.9);
+          background: rgba(232, 93, 63, 0.95);
           backdrop-filter: blur(10px);
           color: #FFFFFF;
-          border: 1px solid rgba(255, 255, 255, 0.25);
+          border: 1px solid rgba(255, 255, 255, 0.35);
           padding: 6px 14px;
           border-radius: 99px;
           font-size: 11px;
           font-weight: 800;
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+          box-shadow: 0 4px 12px rgba(232, 93, 63, 0.35);
           z-index: 5;
         }
 
@@ -617,16 +619,16 @@ export default function HomePage() {
           position: relative;
           z-index: 5;
           margin: 16px;
-          background: rgba(255, 255, 255, 0.95);
+          background: rgba(255, 255, 255, 0.96);
           backdrop-filter: blur(14px);
           -webkit-backdrop-filter: blur(14px);
-          border: 1.5px solid rgba(232, 139, 104, 0.38);
+          border: 1.5px solid rgba(232, 93, 63, 0.35);
           border-radius: 22px;
           padding: 16px 18px;
           display: flex;
           flex-direction: column;
           gap: 6px;
-          box-shadow: 0 12px 32px rgba(24, 34, 29, 0.18);
+          box-shadow: 0 12px 32px rgba(24, 34, 29, 0.16);
         }
 
         .pn-plate-header {
@@ -694,12 +696,13 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          background: #F1F5F9;
-          color: #334155;
+          background: #FDF0E7;
+          color: #C2410C;
           font-size: 11px;
           font-weight: 750;
           padding: 4px 9px;
           border-radius: 6px;
+          border: 1px solid #FED7AA;
         }
 
         .pn-plate-location {
@@ -711,11 +714,172 @@ export default function HomePage() {
           margin-top: 2px;
         }
 
+        /* SECTION: PITCH DECK BREAKDOWN */
+        .pn-deck-section {
+          width: 100%;
+          padding: 80px 24px;
+          background: linear-gradient(180deg, #FFF7F2 0%, #FFFFFF 100%);
+          position: relative;
+        }
+
+        .pn-deck-container {
+          max-width: 1240px;
+          margin: 0 auto;
+        }
+
+        .pn-deck-header {
+          text-align: center;
+          max-width: 820px;
+          margin: 0 auto 50px auto;
+        }
+
+        .pn-deck-motto {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: #FDF0E7;
+          border: 1.5px solid #FDBA74;
+          color: #C2410C;
+          font-size: 12px;
+          font-weight: 850;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          padding: 6px 18px;
+          border-radius: 99px;
+          margin-bottom: 16px;
+          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.12);
+        }
+
+        .pn-deck-title {
+          font-size: clamp(30px, 4.2vw, 48px);
+          font-weight: 850;
+          line-height: 1.15;
+          letter-spacing: -0.02em;
+          color: #1A2821;
+          margin: 0 0 16px 0;
+        }
+        .pn-deck-title span {
+          color: #E85D3F;
+          font-style: italic;
+          font-family: Georgia, "Playfair Display", serif;
+        }
+
+        .pn-deck-sub {
+          font-size: 17px;
+          line-height: 1.6;
+          color: #4A5E53;
+          margin: 0;
+        }
+
+        /* 3-Column Comparison Matrix */
+        .pn-deck-matrix {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+
+        @media (min-width: 880px) {
+          .pn-deck-matrix {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+
+        .pn-matrix-card {
+          background: #FFFFFF;
+          border: 1.5px solid rgba(232, 93, 63, 0.18);
+          border-radius: 28px;
+          padding: 32px 26px;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 10px 30px rgba(24, 34, 29, 0.04);
+          position: relative;
+        }
+
+        .pn-matrix-card.is-winner {
+          background: linear-gradient(180deg, #FFFFFF 0%, #FFF7F2 100%);
+          border: 2.5px solid #E85D3F;
+          box-shadow: 0 18px 48px rgba(232, 93, 63, 0.22);
+          transform: scale(1.02);
+        }
+
+        .pn-winner-badge {
+          position: absolute;
+          top: -14px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: linear-gradient(135deg, #E85D3F 0%, #D44B2D 100%);
+          color: #FFFFFF;
+          font-size: 11px;
+          font-weight: 850;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          padding: 5px 16px;
+          border-radius: 99px;
+          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.4);
+          white-space: nowrap;
+        }
+
+        .pn-matrix-tag {
+          font-size: 12px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          margin-bottom: 8px;
+        }
+        .pn-mt-gray { color: #64748B; }
+        .pn-mt-peach { color: #E85D3F; }
+
+        .pn-matrix-title {
+          font-size: 22px;
+          font-weight: 850;
+          color: #1A2821;
+          margin: 0 0 14px 0;
+        }
+
+        .pn-matrix-price {
+          font-size: 14px;
+          font-weight: 700;
+          color: #556B60;
+          margin-bottom: 20px;
+          padding-bottom: 16px;
+          border-bottom: 1px solid rgba(232, 93, 63, 0.15);
+        }
+
+        .pn-matrix-points {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          font-size: 13px;
+          line-height: 1.45;
+        }
+
+        .pn-mp-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        .pn-mp-con {
+          color: #EF4444;
+          font-weight: 900;
+          font-size: 15px;
+          flex-shrink: 0;
+        }
+        .pn-mp-pro {
+          color: #16A34A;
+          font-weight: 900;
+          font-size: 15px;
+          flex-shrink: 0;
+        }
+
         /* SECTION: PEACH MATCH AI */
         .pn-ai-section {
           width: 100%;
-          padding: 70px 24px;
-          background: linear-gradient(180deg, #FAF2EB 0%, #FFFFFF 100%);
+          padding: 80px 24px;
+          background: linear-gradient(180deg, #FFFFFF 0%, #FFF7F2 100%);
           position: relative;
         }
 
@@ -734,8 +898,9 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: #183324;
-          color: #FFA585;
+          background: #FDF0E7;
+          border: 1.5px solid #FDBA74;
+          color: #C2410C;
           font-size: 12px;
           font-weight: 800;
           letter-spacing: 0.12em;
@@ -743,7 +908,7 @@ export default function HomePage() {
           padding: 6px 18px;
           border-radius: 99px;
           margin-bottom: 14px;
-          box-shadow: 0 4px 14px rgba(24, 51, 36, 0.2);
+          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.12);
         }
 
         .pn-ai-title {
@@ -767,13 +932,12 @@ export default function HomePage() {
           margin: 0;
         }
 
-        /* Visual 3-Stage AI Match Flow */
         .pn-ai-flow-card {
-          background: #FAF2EB;
-          border: 2px solid rgba(232, 139, 104, 0.35);
+          background: #FFFFFF;
+          border: 2px solid rgba(232, 93, 63, 0.3);
           border-radius: 32px;
           padding: 36px 28px;
-          box-shadow: 0 20px 48px rgba(24, 34, 29, 0.07);
+          box-shadow: 0 20px 48px rgba(232, 93, 63, 0.08);
           display: grid;
           grid-template-columns: 1fr;
           gap: 20px;
@@ -789,11 +953,11 @@ export default function HomePage() {
         }
 
         .pn-mock-brief-card {
-          background: #FFFFFF;
-          border: 1.5px solid rgba(232, 139, 104, 0.28);
+          background: #FFF7F2;
+          border: 1.5px solid #FDBA74;
           border-radius: 22px;
           padding: 24px;
-          box-shadow: 0 8px 24px rgba(24, 34, 29, 0.04);
+          box-shadow: 0 8px 24px rgba(232, 93, 63, 0.06);
         }
         .pn-brief-header-pill {
           display: inline-block;
@@ -801,8 +965,8 @@ export default function HomePage() {
           font-weight: 800;
           letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: #E85D3F;
-          background: #FDF0E7;
+          color: #C2410C;
+          background: #FED7AA;
           padding: 4px 10px;
           border-radius: 99px;
           margin-bottom: 10px;
@@ -821,8 +985,9 @@ export default function HomePage() {
         }
         .pn-b-tag {
           font-size: 11px;
-          background: #F1F5F9;
-          color: #334155;
+          background: #FFFFFF;
+          border: 1px solid #FDBA74;
+          color: #9A3412;
           padding: 4px 9px;
           border-radius: 6px;
           font-weight: 700;
@@ -839,7 +1004,7 @@ export default function HomePage() {
           width: 64px;
           height: 64px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #183324 0%, #E85D3F 100%);
+          background: linear-gradient(135deg, #FB923C 0%, #E85D3F 100%);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -856,23 +1021,23 @@ export default function HomePage() {
 
         .pn-mock-match-card {
           background: #FFFFFF;
-          border: 2px solid #16A34A;
+          border: 2px solid #E85D3F;
           border-radius: 22px;
           padding: 24px;
-          box-shadow: 0 12px 30px rgba(22, 163, 74, 0.12);
+          box-shadow: 0 12px 30px rgba(232, 93, 63, 0.15);
           position: relative;
         }
         .pn-match-score-badge {
           position: absolute;
           top: -12px;
           right: 18px;
-          background: #16A34A;
+          background: #E85D3F;
           color: #FFFFFF;
           font-size: 11px;
           font-weight: 850;
           padding: 4px 12px;
           border-radius: 99px;
-          box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+          box-shadow: 0 4px 12px rgba(232, 93, 63, 0.35);
         }
         .pn-match-creative-row {
           display: flex;
@@ -884,7 +1049,7 @@ export default function HomePage() {
           width: 48px;
           height: 48px;
           border-radius: 50%;
-          background: #E85D3F;
+          background: linear-gradient(135deg, #FB923C 0%, #E85D3F 100%);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -917,48 +1082,13 @@ export default function HomePage() {
         }
         .pn-mb-green { background: #E8F5E9; color: #166534; }
         .pn-mb-gold { background: #FFF8E1; color: #92400E; border: 1px solid #FDE68A; }
-        .pn-mb-peach { background: #FDF0E7; color: #C2410C; }
+        .pn-mb-peach { background: #FFF0E6; color: #C2410C; border: 1px solid #FED7AA; }
 
-        .pn-ai-pillars-row {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 20px;
-          margin-top: 36px;
-        }
-        @media (min-width: 768px) {
-          .pn-ai-pillars-row {
-            grid-template-columns: repeat(3, 1fr);
-          }
-        }
-        .pn-ai-pillar {
-          background: #FFFFFF;
-          border: 1.5px solid rgba(232, 139, 104, 0.22);
-          border-radius: 20px;
-          padding: 24px;
-          box-shadow: 0 6px 18px rgba(24, 34, 29, 0.04);
-        }
-        .pn-pillar-icon {
-          font-size: 26px;
-          margin-bottom: 10px;
-        }
-        .pn-pillar-title {
-          font-size: 16px;
-          font-weight: 850;
-          color: #1A2821;
-          margin-bottom: 6px;
-        }
-        .pn-pillar-desc {
-          font-size: 13px;
-          color: #556B60;
-          line-height: 1.5;
-          margin: 0;
-        }
-
-        /* SECTION 2: SLIDING PROJECT EXAMPLES */
+        /* SECTION: RECENT PROJECTS SLIDER */
         .pn-projects-section {
           width: 100%;
           padding: 60px 0 80px 0;
-          background: linear-gradient(180deg, #FFFFFF 0%, #FAF2EB 100%);
+          background: #FFF7F2;
           position: relative;
           overflow: hidden;
         }
@@ -1021,11 +1151,11 @@ export default function HomePage() {
 
         .pn-project-card {
           width: 380px;
-          background: #FAF2EB;
+          background: #FFFFFF;
           border-radius: 24px;
           overflow: hidden;
-          border: 1.5px solid rgba(232, 139, 104, 0.24);
-          box-shadow: 0 10px 30px rgba(24, 34, 29, 0.07);
+          border: 1.5px solid rgba(232, 93, 63, 0.22);
+          box-shadow: 0 10px 30px rgba(24, 34, 29, 0.06);
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           flex-shrink: 0;
           display: flex;
@@ -1035,7 +1165,7 @@ export default function HomePage() {
         }
         .pn-project-card:hover {
           transform: translateY(-8px);
-          box-shadow: 0 18px 40px rgba(232, 93, 63, 0.16);
+          box-shadow: 0 18px 40px rgba(232, 93, 63, 0.22);
           border-color: #E85D3F;
         }
 
@@ -1104,7 +1234,7 @@ export default function HomePage() {
           position: absolute;
           top: 14px;
           right: 14px;
-          background: rgba(24, 51, 36, 0.92);
+          background: rgba(232, 93, 63, 0.95);
           backdrop-filter: blur(8px);
           color: #FFFFFF;
           font-size: 11px;
@@ -1112,8 +1242,8 @@ export default function HomePage() {
           letter-spacing: 0.04em;
           padding: 6px 12px;
           border-radius: 99px;
-          border: 1px solid rgba(255, 255, 255, 0.25);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+          border: 1px solid rgba(255, 255, 255, 0.35);
+          box-shadow: 0 4px 12px rgba(232, 93, 63, 0.3);
           z-index: 2;
         }
 
@@ -1122,7 +1252,7 @@ export default function HomePage() {
           bottom: 14px;
           left: 14px;
           background: rgba(255, 255, 255, 0.95);
-          color: #E85D3F;
+          color: #C2410C;
           font-size: 11px;
           font-weight: 800;
           text-transform: uppercase;
@@ -1162,11 +1292,266 @@ export default function HomePage() {
           margin: 0;
         }
 
-        /* SECTION 4: PRICING ARCHITECTURE & ADVERTISEMENT */
+        /* SECTION: CREATIVE ECOSYSTEM */
+        .pn-ecosystem-section {
+          width: 100%;
+          padding: 85px 24px;
+          background: linear-gradient(180deg, #FFFFFF 0%, #FFF7F2 100%);
+          position: relative;
+        }
+
+        .pn-eco-container {
+          max-width: 1240px;
+          margin: 0 auto;
+        }
+
+        .pn-eco-header {
+          text-align: center;
+          max-width: 820px;
+          margin: 0 auto 50px auto;
+        }
+
+        .pn-eco-kicker {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: #FDF0E7;
+          border: 1.5px solid #FDBA74;
+          color: #C2410C;
+          font-size: 12px;
+          font-weight: 850;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          padding: 6px 18px;
+          border-radius: 99px;
+          margin-bottom: 16px;
+          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.12);
+        }
+
+        .pn-eco-title {
+          font-size: clamp(32px, 4.5vw, 48px);
+          font-weight: 850;
+          line-height: 1.15;
+          letter-spacing: -0.02em;
+          color: #1A2821;
+          margin: 0 0 16px 0;
+        }
+        .pn-eco-title span {
+          color: #E85D3F;
+          font-style: italic;
+          font-family: Georgia, "Playfair Display", serif;
+        }
+
+        .pn-eco-sub {
+          font-size: 16px;
+          line-height: 1.6;
+          color: #4A5E53;
+          margin: 0;
+        }
+
+        /* 3-Tier Vetting Ladder Row */
+        .pn-ladder-title-row {
+          text-align: center;
+          margin-bottom: 24px;
+        }
+        .pn-ladder-title-row h3 {
+          font-size: 22px;
+          font-weight: 850;
+          color: #1A2821;
+          margin: 0 0 6px 0;
+        }
+        .pn-ladder-title-row p {
+          font-size: 14px;
+          color: #64748B;
+          margin: 0;
+        }
+
+        .pn-ladder-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 20px;
+          margin-bottom: 48px;
+        }
+        @media (min-width: 820px) {
+          .pn-ladder-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+
+        .pn-ladder-card {
+          background: #FFFFFF;
+          border: 1.5px solid rgba(232, 93, 63, 0.22);
+          border-radius: 24px;
+          padding: 28px 24px;
+          box-shadow: 0 10px 24px rgba(24, 34, 29, 0.04);
+          display: flex;
+          flex-direction: column;
+          position: relative;
+        }
+        .pn-ladder-card.is-spotlight {
+          border-color: #E85D3F;
+          background: #FFF9F5;
+        }
+
+        .pn-ladder-step-num {
+          font-size: 11px;
+          font-weight: 850;
+          color: #E85D3F;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          margin-bottom: 6px;
+        }
+        .pn-ladder-name {
+          font-size: 19px;
+          font-weight: 850;
+          color: #1A2821;
+          margin: 0 0 8px 0;
+        }
+        .pn-ladder-badge {
+          display: inline-block;
+          font-size: 11px;
+          font-weight: 800;
+          padding: 3px 10px;
+          border-radius: 99px;
+          margin-bottom: 12px;
+          width: fit-content;
+        }
+        .pn-lb-orange { background: #FFEDD5; color: #9A3412; }
+        .pn-lb-peach { background: #FED7AA; color: #C2410C; }
+        .pn-lb-gold { background: #FEF3C7; color: #92400E; }
+
+        .pn-ladder-desc {
+          font-size: 13px;
+          color: #475569;
+          line-height: 1.5;
+          margin: 0;
+        }
+
+        /* 3 Ecosystem Engines */
+        .pn-engines-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 24px;
+          margin-bottom: 40px;
+        }
+        @media (min-width: 860px) {
+          .pn-engines-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+
+        .pn-engine-card {
+          background: #FFFFFF;
+          border: 1.5px solid rgba(232, 93, 63, 0.22);
+          border-radius: 26px;
+          padding: 32px 26px;
+          box-shadow: 0 10px 28px rgba(232, 93, 63, 0.06);
+          display: flex;
+          flex-direction: column;
+          transition: transform 0.2s ease;
+        }
+        .pn-engine-card:hover {
+          transform: translateY(-4px);
+          border-color: #E85D3F;
+        }
+
+        .pn-engine-icon-box {
+          width: 54px;
+          height: 54px;
+          border-radius: 16px;
+          background: #FFF0E6;
+          border: 1px solid #FDBA74;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 26px;
+          margin-bottom: 18px;
+        }
+
+        .pn-engine-title {
+          font-size: 20px;
+          font-weight: 850;
+          color: #1A2821;
+          margin: 0 0 10px 0;
+        }
+        .pn-engine-desc {
+          font-size: 13px;
+          color: #556B60;
+          line-height: 1.55;
+          margin: 0 0 16px 0;
+          flex-grow: 1;
+        }
+        .pn-engine-perks {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          font-size: 12px;
+          color: #334155;
+          font-weight: 700;
+        }
+
+        .pn-eco-cta-bar {
+          background: linear-gradient(135deg, #183324 0%, #0F2217 100%);
+          border-radius: 28px;
+          padding: 32px 36px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          gap: 18px;
+          box-shadow: 0 16px 40px rgba(24, 51, 36, 0.25);
+          border: 2px solid rgba(232, 93, 63, 0.4);
+        }
+        @media (min-width: 768px) {
+          .pn-eco-cta-bar {
+            flex-direction: row;
+            justify-content: space-between;
+            text-align: left;
+          }
+        }
+        .pn-eco-cta-text h4 {
+          font-size: 20px;
+          font-weight: 850;
+          color: #FFFFFF;
+          margin: 0 0 6px 0;
+        }
+        .pn-eco-cta-text p {
+          font-size: 14px;
+          color: #CFE0D6;
+          margin: 0;
+          max-width: 650px;
+        }
+        .pn-eco-apply-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          height: 52px;
+          padding: 0 32px;
+          background: linear-gradient(135deg, #E85D3F 0%, #D44B2D 100%);
+          color: #FFFFFF;
+          font-size: 15px;
+          font-weight: 800;
+          border-radius: 99px;
+          text-decoration: none;
+          white-space: nowrap;
+          box-shadow: 0 8px 20px rgba(232, 93, 63, 0.4);
+          transition: all 0.2s ease;
+        }
+        .pn-eco-apply-btn:hover {
+          background: linear-gradient(135deg, #F06A4D 0%, #E85D3F 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 12px 28px rgba(232, 93, 63, 0.5);
+        }
+
+        /* SECTION: PRICING ARCHITECTURE */
         .pn-pricing-section {
           width: 100%;
-          padding: 80px 24px 110px 24px;
-          background-color: #FAF2EB;
+          padding: 85px 24px 110px 24px;
+          background-color: #FFF7F2;
           position: relative;
           box-sizing: border-box;
         }
@@ -1185,7 +1570,7 @@ export default function HomePage() {
           position: relative;
           overflow: hidden;
           box-shadow: 0 20px 50px rgba(24, 51, 36, 0.28);
-          border: 2px solid rgba(232, 139, 104, 0.35);
+          border: 2px solid rgba(232, 93, 63, 0.35);
           display: grid;
           grid-template-columns: 1fr;
           gap: 30px;
@@ -1239,7 +1624,7 @@ export default function HomePage() {
           align-items: center;
           justify-content: center;
           gap: 8px;
-          background: #E85D3F;
+          background: linear-gradient(135deg, #E85D3F 0%, #D44B2D 100%);
           color: #FFFFFF;
           padding: 16px 36px;
           font-size: 16px;
@@ -1253,7 +1638,7 @@ export default function HomePage() {
           box-sizing: border-box;
         }
         .pn-tap-btn:hover {
-          background: #D44B2D;
+          background: linear-gradient(135deg, #F06A4D 0%, #E85D3F 100%);
           transform: translateY(-2px);
           box-shadow: 0 14px 30px rgba(232, 93, 63, 0.5);
         }
@@ -1275,10 +1660,10 @@ export default function HomePage() {
           align-items: center;
           gap: 6px;
           background: #FFFFFF;
-          border: 1.5px solid #E88B68;
-          color: #E85D3F;
+          border: 1.5px solid #FDBA74;
+          color: #C2410C;
           font-size: 12px;
-          font-weight: 800;
+          font-weight: 850;
           letter-spacing: 0.12em;
           text-transform: uppercase;
           padding: 6px 16px;
@@ -1316,7 +1701,7 @@ export default function HomePage() {
 
         .pn-toggle-shell {
           background: #FFFFFF;
-          border: 1.5px solid rgba(232, 139, 104, 0.35);
+          border: 1.5px solid rgba(232, 93, 63, 0.35);
           padding: 6px;
           border-radius: 99px;
           display: inline-flex;
@@ -1336,12 +1721,12 @@ export default function HomePage() {
           color: #556B60;
         }
         .pn-toggle-btn.is-active {
-          background: #183324;
+          background: linear-gradient(135deg, #E85D3F 0%, #D44B2D 100%);
           color: #FFFFFF;
-          box-shadow: 0 4px 14px rgba(24, 51, 36, 0.22);
+          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.3);
         }
 
-        /* EXACT BALANCED 6-CARD GRID: 2 rows of 3 on desktop with ZERO blank space! */
+        /* 6-CARD BALANCED GRID */
         .pn-alacarte-grid {
           display: grid;
           grid-template-columns: 1fr;
@@ -1361,7 +1746,7 @@ export default function HomePage() {
 
         .pn-coin-card {
           background: #FFFFFF;
-          border: 1.5px solid rgba(232, 139, 104, 0.28);
+          border: 1.5px solid rgba(232, 93, 63, 0.24);
           border-radius: 28px;
           padding: 32px 28px;
           display: flex;
@@ -1374,13 +1759,13 @@ export default function HomePage() {
         .pn-coin-card:hover {
           transform: translateY(-6px);
           border-color: #E85D3F;
-          box-shadow: 0 20px 48px rgba(232, 93, 63, 0.16);
+          box-shadow: 0 20px 48px rgba(232, 93, 63, 0.18);
         }
 
         .pn-coin-card.is-popular {
           border: 2.5px solid #E85D3F;
           background: linear-gradient(180deg, #FFFFFF 0%, #FFF8F4 100%);
-          box-shadow: 0 16px 44px rgba(232, 93, 63, 0.18);
+          box-shadow: 0 16px 44px rgba(232, 93, 63, 0.2);
         }
 
         .pn-popular-pill {
@@ -1388,7 +1773,7 @@ export default function HomePage() {
           top: -14px;
           left: 50%;
           transform: translateX(-50%);
-          background: #E85D3F;
+          background: linear-gradient(135deg, #E85D3F 0%, #D44B2D 100%);
           color: #FFFFFF;
           font-size: 11px;
           font-weight: 850;
@@ -1411,9 +1796,9 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          background: #FDF0E7;
-          border: 1px solid #E88B68;
-          color: #E85D3F;
+          background: #FFF0E6;
+          border: 1px solid #FDBA74;
+          color: #C2410C;
           font-size: 13px;
           font-weight: 850;
           padding: 6px 14px;
@@ -1465,7 +1850,7 @@ export default function HomePage() {
         .pn-card-divider {
           width: 100%;
           height: 1px;
-          background: rgba(232, 139, 104, 0.2);
+          background: rgba(232, 93, 63, 0.18);
           margin-bottom: 20px;
         }
 
@@ -1518,14 +1903,14 @@ export default function HomePage() {
           box-shadow: 0 12px 24px rgba(24, 51, 36, 0.28);
         }
         .pn-btn-card-peach {
-          background-color: #E85D3F;
+          background: linear-gradient(135deg, #E85D3F 0%, #D44B2D 100%);
           color: #FFFFFF;
-          box-shadow: 0 8px 20px rgba(232, 93, 63, 0.28);
+          box-shadow: 0 8px 20px rgba(232, 93, 63, 0.3);
         }
         .pn-btn-card-peach:hover {
-          background-color: #D44B2D;
+          background: linear-gradient(135deg, #F06A4D 0%, #E85D3F 100%);
           transform: translateY(-2px);
-          box-shadow: 0 12px 28px rgba(232, 93, 63, 0.38);
+          box-shadow: 0 12px 28px rgba(232, 93, 63, 0.4);
         }
 
         .pn-membership-grid {
@@ -1542,7 +1927,7 @@ export default function HomePage() {
 
         .pn-membership-card {
           background: #FFFFFF;
-          border: 1.5px solid rgba(232, 139, 104, 0.3);
+          border: 1.5px solid rgba(232, 93, 63, 0.25);
           border-radius: 32px;
           padding: 38px 30px;
           display: flex;
@@ -1555,21 +1940,21 @@ export default function HomePage() {
         .pn-membership-card:hover {
           transform: translateY(-8px);
           border-color: #E85D3F;
-          box-shadow: 0 24px 50px rgba(232, 93, 63, 0.18);
+          box-shadow: 0 24px 50px rgba(232, 93, 63, 0.2);
         }
         .pn-membership-card.is-popular {
           border: 2.5px solid #E85D3F;
           background: linear-gradient(180deg, #FFFFFF 0%, #FFF7F2 100%);
-          box-shadow: 0 18px 48px rgba(232, 93, 63, 0.2);
+          box-shadow: 0 18px 48px rgba(232, 93, 63, 0.22);
         }
 
         .pn-tier-badge {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          background: #FDF0E7;
-          border: 1px solid #E88B68;
-          color: #E85D3F;
+          background: #FFF0E6;
+          border: 1px solid #FDBA74;
+          color: #C2410C;
           font-size: 12px;
           font-weight: 850;
           padding: 5px 14px;
@@ -1612,7 +1997,7 @@ export default function HomePage() {
         .pn-pricing-guarantee-banner {
           margin-top: 56px;
           background: #FFFFFF;
-          border: 1.5px solid rgba(232, 139, 104, 0.3);
+          border: 1.5px solid rgba(232, 93, 63, 0.3);
           border-radius: 28px;
           padding: 28px 36px;
           display: flex;
@@ -1620,7 +2005,7 @@ export default function HomePage() {
           align-items: center;
           text-align: center;
           gap: 18px;
-          box-shadow: 0 10px 30px rgba(24, 34, 29, 0.05);
+          box-shadow: 0 10px 30px rgba(232, 93, 63, 0.08);
         }
 
         @media (min-width: 768px) {
@@ -1650,7 +2035,7 @@ export default function HomePage() {
           justify-content: center;
           height: 50px;
           padding: 0 30px;
-          background-color: #183324;
+          background: linear-gradient(135deg, #E85D3F 0%, #D44B2D 100%);
           color: #FFFFFF;
           font-size: 14px;
           font-weight: 750;
@@ -1658,10 +2043,12 @@ export default function HomePage() {
           text-decoration: none;
           white-space: nowrap;
           transition: all 0.2s ease;
+          box-shadow: 0 6px 18px rgba(232, 93, 63, 0.35);
         }
         .pn-guarantee-btn:hover {
-          background-color: #0F2217;
+          background: linear-gradient(135deg, #F06A4D 0%, #E85D3F 100%);
           transform: translateY(-2px);
+          box-shadow: 0 10px 24px rgba(232, 93, 63, 0.45);
         }
 
         /* DRAWER NAVIGATION */
@@ -1686,7 +2073,7 @@ export default function HomePage() {
           right: 0;
           bottom: 0;
           width: 320px;
-          background-color: #FAF2EB;
+          background-color: #FFF7F2;
           z-index: 101;
           padding: 32px 28px;
           display: flex;
@@ -1694,6 +2081,7 @@ export default function HomePage() {
           transform: translateX(100%);
           transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           box-shadow: -10px 0 30px rgba(0,0,0,0.12);
+          border-left: 2px solid rgba(232, 93, 63, 0.2);
         }
         .pn-nav-drawer.is-open {
           transform: translateX(0);
@@ -1704,7 +2092,7 @@ export default function HomePage() {
           background: none;
           border: none;
           font-size: 1.6rem;
-          color: #1E3A2B;
+          color: #E85D3F;
           cursor: pointer;
           margin-bottom: 36px;
           padding: 4px;
@@ -1732,7 +2120,7 @@ export default function HomePage() {
       <div className="pn-studio-lighting" />
       <div className="pn-grid-texture" />
 
-      {/* TOP HEADER - PROMINENT COMMANDING LOGO */}
+      {/* TOP HEADER */}
       <header className="pn-header">
         <Link href="/" className="pn-header-logo-link">
           <img
@@ -1759,12 +2147,12 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* TWO-COLUMN EDITORIAL HERO SECTION */}
+      {/* HERO SECTION */}
       <section className="pn-hero-section">
         {/* LEFT COLUMN: Copy & Actions */}
         <div className="pn-hero-text-wrap">
           <div className="pn-hero-eyebrow">
-            <span>✦</span>
+            <span>🍑</span>
             The Creative Marketplace of the South
           </div>
 
@@ -1773,12 +2161,11 @@ export default function HomePage() {
             Right when you <span className="pn-accent">need them.</span>
           </h1>
 
-          {/* User Requested: "Vetted Creatives You Can Trust at Affordable Prices" */}
           <p className="pn-hero-lead">
             Vetted Creatives You Can Trust at Affordable Prices.
           </p>
           <p className="pn-hero-lead-sub">
-            Connecting businesses with top-tier Southern design, video, and web talent. No agency markups, zero bidding wars.
+            More Creatives. Stronger Businesses. A Sweeter South. Connecting growing businesses with vetted Southern design, video, and web talent. No agency markups, zero bidding wars.
           </p>
 
           <div className="pn-value-pill">
@@ -1787,10 +2174,10 @@ export default function HomePage() {
           </div>
 
           <div className="pn-hero-actions">
-            <Link href="/match" className="pn-btn-green">
-              Find a Creative
+            <Link href="/match" className="pn-btn-hero-primary">
+              <span>⚡</span> Find a Creative
             </Link>
-            <Link href="/apply" className="pn-btn-peach">
+            <Link href="/apply" className="pn-btn-hero-secondary">
               Join the Network
             </Link>
           </div>
@@ -1862,7 +2249,66 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION: PEACH MATCH AI (VISUAL, NICHE MATCHING) */}
+      {/* PITCH DECK BREAKDOWN: WHY PEACH NETWORK? */}
+      <section className="pn-deck-section">
+        <div className="pn-deck-container">
+          <div className="pn-deck-header">
+            <div className="pn-deck-motto">✦ The Pitch Deck Breakdown ✦</div>
+            <h2 className="pn-deck-title">
+              Why Peach Network? <span>The Sweeter Alternative.</span>
+            </h2>
+            <p className="pn-deck-sub">
+              Traditional agencies drain your budget. Gig apps drain your patience. We built Peach Network to give you vetted agency polish at transparent, affordable coin rates.
+            </p>
+          </div>
+
+          <div className="pn-deck-matrix">
+            {/* Column 1: Traditional Agencies */}
+            <div className="pn-matrix-card">
+              <div className="pn-matrix-tag pn-mt-gray">The Old Agency Way</div>
+              <h3 className="pn-matrix-title">Traditional Agencies</h3>
+              <div className="pn-matrix-price">💸 $3,000 – $5,000 / mo retainers</div>
+              <ul className="pn-matrix-points">
+                <li className="pn-mp-item"><span className="pn-mp-con">✕</span> <span>Prohibitive monthly retainers locking you in</span></li>
+                <li className="pn-mp-item"><span className="pn-mp-con">✕</span> <span>Bloated overhead, middle management & meetings</span></li>
+                <li className="pn-mp-item"><span className="pn-mp-con">✕</span> <span>Slow 3–4 week timelines for simple flyers or ads</span></li>
+                <li className="pn-mp-item"><span className="pn-mp-con">✕</span> <span>Priced out for churches, nonprofits & local shops</span></li>
+              </ul>
+            </div>
+
+            {/* Column 2: Global Gig Platforms */}
+            <div className="pn-matrix-card">
+              <div className="pn-matrix-tag pn-mt-gray">Open Freelance Platforms</div>
+              <h3 className="pn-matrix-title">Fiverr & Upwork</h3>
+              <div className="pn-matrix-price">⚠️ Hourly Creep & Hidden Fees</div>
+              <ul className="pn-matrix-points">
+                <li className="pn-mp-item"><span className="pn-mp-con">✕</span> <span>50+ spam bids & bot proposals to sort through</span></li>
+                <li className="pn-mp-item"><span className="pn-mp-con">✕</span> <span>Unvetted quality, stolen templates & ghosting</span></li>
+                <li className="pn-mp-item"><span className="pn-mp-con">✕</span> <span>Unpredictable hourly billing creep and scope creep</span></li>
+                <li className="pn-mp-item"><span className="pn-mp-con">✕</span> <span>20–30% platform cuts taken out of creators&apos; pockets</span></li>
+              </ul>
+            </div>
+
+            {/* Column 3: The Peach Network (THE WINNER) */}
+            <div className="pn-matrix-card is-winner">
+              <div className="pn-winner-badge">✦ The Southern Sweet Spot ✦</div>
+              <div className="pn-matrix-tag pn-mt-peach">Vetted & Curated</div>
+              <h3 className="pn-matrix-title">Peach Network</h3>
+              <div className="pn-matrix-price" style={{ color: "#E85D3F", fontWeight: 800 }}>
+                🪙 Flat Coins ($50 base) • 75% to Talent
+              </div>
+              <ul className="pn-matrix-points">
+                <li className="pn-mp-item"><span className="pn-mp-pro">✓</span> <span><strong>Vetted Creatives You Can Trust</strong> at affordable rates</span></li>
+                <li className="pn-mp-item"><span className="pn-mp-pro">✓</span> <span>Zero bidding wars—Peach Match AI pairs you in 60 seconds</span></li>
+                <li className="pn-mp-item"><span className="pn-mp-pro">✓</span> <span>Fast 24–48 hour turnaround with 2 revision rounds</span></li>
+                <li className="pn-mp-item"><span className="pn-mp-pro">✓</span> <span><strong>75% Creator Payout</strong> keeps local Southern talent thriving</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION: PEACH MATCH AI */}
       <section className="pn-ai-section">
         <div className="pn-ai-container">
           <div className="pn-ai-header">
@@ -1875,9 +2321,8 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Visual Niche Matching Flow */}
           <div className="pn-ai-flow-card">
-            {/* Step 1: Project Request */}
+            {/* Step 1: Brief */}
             <div className="pn-mock-brief-card">
               <span className="pn-brief-header-pill">1. Your 60-Second Brief</span>
               <h4 className="pn-brief-title">"Youth Basketball Tournament Event Poster & Social Media Graphics Pack"</h4>
@@ -1888,7 +2333,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Step 2: AI Matching Engine */}
+            {/* Step 2: AI Engine */}
             <div className="pn-ai-connector">
               <div className="pn-ai-pulse-orb">🍑</div>
               <div className="pn-ai-engine-label">
@@ -1897,7 +2342,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Step 3: Exact Niche Specialist Paired */}
+            {/* Step 3: Match */}
             <div className="pn-mock-match-card">
               <div className="pn-match-score-badge">99% Best Match</div>
               <div className="pn-match-creative-row">
@@ -1914,35 +2359,10 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-
-          {/* 3 Core Value Pillars */}
-          <div className="pn-ai-pillars-row">
-            <div className="pn-ai-pillar">
-              <div className="pn-pillar-icon">🎯</div>
-              <h4 className="pn-pillar-title">Niche-Specific Pairing</h4>
-              <p className="pn-pillar-desc">
-                Whether you need a sports tournament flyer, a church bulletin, or a restaurant menu, we match you with a designer with proven work in that exact category.
-              </p>
-            </div>
-            <div className="pn-ai-pillar">
-              <div className="pn-pillar-icon">🍑</div>
-              <h4 className="pn-pillar-title">The Creative Marketplace of the South</h4>
-              <p className="pn-pillar-desc">
-                Deeply rooted in Southern creative talent, connecting growing businesses with vetted regional creators ready to scale nationwide.
-              </p>
-            </div>
-            <div className="pn-ai-pillar">
-              <div className="pn-pillar-icon">🛡️</div>
-              <h4 className="pn-pillar-title">Senior Art-Direction QA</h4>
-              <p className="pn-pillar-desc">
-                Every final delivery is reviewed by Senior Creative Mentors for technical print bleeds, resolution, typography, and brand consistency.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* INFINITE SLIDING MARQUEE: RECENT WORK FROM THE NETWORK */}
+      {/* INFINITE SLIDING MARQUEE: RECENT WORK */}
       <section className="pn-projects-section">
         <div className="pn-projects-header">
           <div className="pn-projects-kicker">✦ Real Deliverables • Real Impact ✦</div>
@@ -2023,7 +2443,112 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 4: PRICING ARCHITECTURE & ADVERTISEMENT */}
+      {/* SECTION: CREATIVE ECOSYSTEM (BUILT FOR CREATIVES, BY CREATIVES) */}
+      <section className="pn-ecosystem-section">
+        <div className="pn-eco-container">
+          <div className="pn-eco-header">
+            <div className="pn-eco-kicker">✦ For Creatives, By Creatives ✦</div>
+            <h2 className="pn-eco-title">
+              A Home Where <span>Southern Talent Thrives</span>
+            </h2>
+            <p className="pn-eco-sub">
+              We rejected the race-to-the-bottom freelancing apps. Peach Network is an incubator and community where designers earn a transparent 75% payout, receive senior mentorship, and level up through real-world work.
+            </p>
+          </div>
+
+          {/* Vetting Ladder */}
+          <div className="pn-ladder-title-row">
+            <h3>The 3-Tier Creator Growth Ladder</h3>
+            <p>You apply, our creative directors review your portfolio, and we place you on an active career trajectory:</p>
+          </div>
+
+          <div className="pn-ladder-grid">
+            <div className="pn-ladder-card">
+              <div className="pn-ladder-step-num">Level 1</div>
+              <h4 className="pn-ladder-name">Rising Creative</h4>
+              <div className="pn-ladder-badge pn-lb-orange">Apprentice Track</div>
+              <p className="pn-ladder-desc">
+                Emerging designers and recent graduates paired with Senior Mentors on entry tasks (1–2 Coin graphics) while sharpening their craft through Academy masterclasses.
+              </p>
+            </div>
+
+            <div className="pn-ladder-card is-spotlight">
+              <div className="pn-ladder-step-num">Level 2</div>
+              <h4 className="pn-ladder-name">Verified Pro</h4>
+              <div className="pn-ladder-badge pn-lb-peach">Specialist Track</div>
+              <p className="pn-ladder-desc">
+                Proven designers with demonstrated mastery in specific niches (sports flyers, church media, menus, web). Matched directly to client tickets with full 75% deliverable payouts.
+              </p>
+            </div>
+
+            <div className="pn-ladder-card">
+              <div className="pn-ladder-step-num">Level 3</div>
+              <h4 className="pn-ladder-name">Senior Mentor</h4>
+              <div className="pn-ladder-badge pn-lb-gold">Art Director Track</div>
+              <p className="pn-ladder-desc">
+                ADDY® award winners and studio veterans who direct complex brand systems, conduct QA reviews before client delivery, and mentor rising designers.
+              </p>
+            </div>
+          </div>
+
+          {/* 3 Ecosystem Engines */}
+          <div className="pn-engines-grid">
+            <div className="pn-engine-card">
+              <div className="pn-engine-icon-box">🎓</div>
+              <h4 className="pn-engine-title">The Peach Academy</h4>
+              <p className="pn-engine-desc">
+                Practical, agency-grade skill workshops. Master 300 DPI print-bleed setups, typography hierarchy, packaging dielines, and effective client communication.
+              </p>
+              <ul className="pn-engine-perks">
+                <li>✓ Live mentor portfolio critique nights</li>
+                <li>✓ Agency file-prep certification</li>
+                <li>✓ Unlocks higher-tier coin projects</li>
+              </ul>
+            </div>
+
+            <div className="pn-engine-card">
+              <div className="pn-engine-icon-box">🍑</div>
+              <h4 className="pn-engine-title">The Peach Hub</h4>
+              <p className="pn-engine-desc">
+                The creative clubhouse for Southern designers. Say goodbye to isolating solo freelancing—collaborate, share assets, and bounce ideas off peers.
+              </p>
+              <ul className="pn-engine-perks">
+                <li>✓ Curated font vaults & mockup library</li>
+                <li>✓ Pre-delivery peer feedback channels</li>
+                <li>✓ Local print shop vendor discounts</li>
+              </ul>
+            </div>
+
+            <div className="pn-engine-card">
+              <div className="pn-engine-icon-box">🏆</div>
+              <h4 className="pn-engine-title">Sponsored Challenges</h4>
+              <p className="pn-engine-desc">
+                Daily and weekly design competitions sponsored by real businesses. Win cash prizes, build your portfolio with real-world briefs, and get hired.
+              </p>
+              <ul className="pn-engine-perks">
+                <li>✓ Cash prizes ($100 – $500+) & Peach Coins</li>
+                <li>✓ Real business briefs (logos, merch, flyers)</li>
+                <li>✓ High client discovery & follow-on gigs</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Creator Banner */}
+          <div className="pn-eco-cta-bar">
+            <div className="pn-eco-cta-text">
+              <h4>Ready to do your best work with fair 75% payouts?</h4>
+              <p>
+                No bidding wars, no pay-to-work fees, and no race to the bottom. Apply today and join the premier creative network of the South.
+              </p>
+            </div>
+            <Link href="/apply" className="pn-eco-apply-btn">
+              <span>🍑</span> Apply as a Creative
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION: PRICING ARCHITECTURE & ADVERTISEMENT */}
       <section className="pn-pricing-section">
         <div className="pn-pricing-container">
           
@@ -2031,7 +2556,7 @@ export default function HomePage() {
           <div className="pn-ad-callout-card">
             <div className="pn-ad-callout-text">
               <h3>
-                That project you've been putting off? <br />
+                That project you&apos;ve been putting off? <br />
                 <span>Get it done today with just the tap of a button.</span>
               </h3>
               <p>
@@ -2075,7 +2600,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* TAB 1: À LA CARTE SERVICES (EXACT BALANCED 6 CARDS, ZERO VOID) */}
+          {/* TAB 1: À LA CARTE SERVICES */}
           {pricingTab === "alacarte" && (
             <div className="pn-alacarte-grid">
               {ALACARTE_ITEMS.map((item, idx) => (
@@ -2170,7 +2695,7 @@ export default function HomePage() {
           {/* Guarantee Banner */}
           <div className="pn-pricing-guarantee-banner">
             <div className="pn-guarantee-text">
-              <h4>🛡️️ 100% Agency Quality Guarantee & 75% Payout</h4>
+              <h4>🛡 100% Agency Quality Guarantee & 75% Payout</h4>
               <p>
                 Every project includes 2 revision rounds and direct art-direction oversight. Best of all: 75% of your investment stays directly in the hands of Southern creators.
               </p>
