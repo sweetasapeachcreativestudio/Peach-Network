@@ -63,9 +63,153 @@ const RECENT_PROJECTS = [
   },
 ];
 
+const ALACARTE_ITEMS = [
+  {
+    coins: 1,
+    price: "$50",
+    name: "Quick Graphic / Ad",
+    subtitle: "Fast single graphic deliverable",
+    turnaround: "24h Turnaround",
+    icon: "⚡",
+    includes: [
+      "1 Custom branded promotional graphic",
+      "Sized for Instagram, Facebook, or web banner",
+      "High-res PNG, JPG + editable source files",
+      "2 Minor revision rounds included",
+    ],
+    popular: false,
+    cta: "Order 1 Job ($50)",
+  },
+  {
+    coins: 2,
+    price: "$100",
+    name: "Custom Event Flyer Kit",
+    subtitle: "Our most requested local package",
+    turnaround: "24–48h Turnaround",
+    icon: "🎨",
+    includes: [
+      "Print-ready 8.5\" x 11\" PDF with 300 DPI bleeds",
+      "Matching Instagram Square (1:1) version",
+      "Matching Instagram Story (9:16) version",
+      "2 Revision rounds on copy & layout",
+    ],
+    popular: true,
+    cta: "Order 1 Job ($100)",
+  },
+  {
+    coins: 3,
+    price: "$150",
+    name: "Social Media 4-Pack",
+    subtitle: "A month of cohesive social presence",
+    turnaround: "48h Turnaround",
+    icon: "📱",
+    includes: [
+      "4 Custom branded social templates / posts",
+      "Cohesive brand colors, fonts & photo styling",
+      "Editable Canva or Figma handover files",
+      "Captions & hashtag suggestions included",
+    ],
+    popular: false,
+    cta: "Order 1 Job ($150)",
+  },
+  {
+    coins: 6,
+    price: "$300",
+    name: "Mini Brand Identity Kit",
+    subtitle: "The full foundational visual system",
+    turnaround: "3–5 Business Days",
+    icon: "✨",
+    includes: [
+      "Primary logo + secondary submark / favicon",
+      "Official brand color hex palette & typography suite",
+      "Social media profile & cover asset pack",
+      "1-Page Brand Identity Guide PDF",
+    ],
+    popular: false,
+    cta: "Order 1 Job ($300)",
+  },
+  {
+    coins: 10,
+    price: "$500",
+    name: "Web Experience & Storefront",
+    subtitle: "Custom agency-grade web UI design",
+    turnaround: "5–7 Business Days",
+    icon: "💻",
+    includes: [
+      "Full responsive desktop & mobile page designs",
+      "Shopify, WordPress, or custom web architecture",
+      "Interactive prototype & developer handover specs",
+      "Senior Creative Mentor art-directed review",
+    ],
+    popular: false,
+    cta: "Order 1 Job ($500)",
+  },
+];
+
+const MEMBERSHIP_TIERS = [
+  {
+    id: "essentials",
+    name: "Essentials Tier",
+    price: "$499",
+    cadence: "/ month",
+    coins: "10 Peach Coins",
+    valueTag: "$49.90 / coin",
+    desc: "Perfect for solo entrepreneurs, churches, and local shops needing steady monthly marketing graphics.",
+    features: [
+      "10 Peach Coins refreshed monthly ($500 value)",
+      "1 active request at a time",
+      "48-hour draft turnaround SLA",
+      "Active Rollover Banking (bank up to 20 unused coins)",
+      "Permanent Brand Asset Vault access",
+      "Full commercial source files included",
+    ],
+    popular: false,
+    cta: "Start Essentials",
+  },
+  {
+    id: "growth",
+    name: "Growth Tier",
+    price: "$1,099",
+    cadence: "/ month",
+    coins: "24 + 4 Bonus = 28 Coins",
+    valueTag: "Most Popular • Save 20%",
+    desc: "For growing businesses running active marketing campaigns, product launches, and weekly content.",
+    features: [
+      "28 Total Coins per month ($1,400 deliverable value)",
+      "2 active requests in parallel",
+      "24–48 hour fast-track turnaround",
+      "Dedicated Creative Match (consistent brand voice)",
+      "Active Rollover Banking (bank up to 48 coins)",
+      "10% discount on extra coin top-ups",
+    ],
+    popular: true,
+    cta: "Start Growth Plan",
+  },
+  {
+    id: "partner",
+    name: "Partner Tier",
+    price: "$2,199",
+    cadence: "/ month",
+    coins: "50 + 10 Bonus = 60 Coins",
+    valueTag: "Best Value • Agency Alternative",
+    desc: "A full outsourced creative department for high-growth companies, institutions, and civic organizations.",
+    features: [
+      "60 Total Coins per month ($3,000 deliverable value)",
+      "3–4 active requests in parallel",
+      "24-hour priority queue & rush options",
+      "Dedicated Brand Pod (Art Director + Specialist)",
+      "Active Rollover Banking (bank up to 100 coins)",
+      "Quarterly 1-on-1 Creative Strategy Review",
+    ],
+    popular: false,
+    cta: "Start Partner Plan",
+  },
+];
+
 export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [pricingTab, setPricingTab] = useState<"alacarte" | "membership">("alacarte");
 
   return (
     <main className="pn-home-root">
@@ -82,7 +226,7 @@ export default function HomePage() {
           overflow-x: hidden;
         }
 
-        /* SOUTHERN CREATIVE STUDIO LIGHTING */
+        /* SOUTHERN CREATIVE STUDIO LIGHTING & GRID */
         .pn-studio-lighting {
           position: absolute;
           inset: 0;
@@ -95,7 +239,6 @@ export default function HomePage() {
           z-index: 1;
         }
 
-        /* Architectural grid texture */
         .pn-grid-texture {
           position: absolute;
           inset: 0;
@@ -219,7 +362,6 @@ export default function HomePage() {
           }
         }
 
-        /* LEFT HERO COLUMN */
         .pn-hero-text-wrap {
           display: flex;
           flex-direction: column;
@@ -541,63 +683,6 @@ export default function HomePage() {
           margin-top: 2px;
         }
 
-        /* THREE-STEP PROCESS STRIP */
-        .pn-how-it-works-strip {
-          max-width: 1280px;
-          margin: 0 auto 50px auto;
-          padding: 0 24px;
-        }
-
-        .pn-strip-card {
-          background: #FFFFFF;
-          border: 1.5px solid rgba(232, 139, 104, 0.28);
-          border-radius: 24px;
-          padding: 24px 32px;
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 20px;
-          box-shadow: 0 10px 30px rgba(24, 34, 29, 0.05);
-        }
-
-        @media (min-width: 768px) {
-          .pn-strip-card {
-            grid-template-columns: repeat(3, 1fr);
-            gap: 32px;
-          }
-        }
-
-        .pn-step-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 14px;
-        }
-        .pn-step-num {
-          width: 38px;
-          height: 38px;
-          border-radius: 12px;
-          background: #FDF0E7;
-          border: 1px solid #E88B68;
-          color: #E85D3F;
-          font-size: 16px;
-          font-weight: 850;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-        .pn-step-title {
-          font-size: 15px;
-          font-weight: 800;
-          color: #1A2821;
-          margin-bottom: 4px;
-        }
-        .pn-step-desc {
-          font-size: 13px;
-          line-height: 1.45;
-          color: #5F7368;
-          margin: 0;
-        }
-
         /* SECTION 2: SLIDING PROJECT EXAMPLES */
         .pn-projects-section {
           width: 100%;
@@ -639,7 +724,6 @@ export default function HomePage() {
           line-height: 1.5;
         }
 
-        /* Infinite Sliding Track */
         .pn-marquee-wrap {
           display: flex;
           width: 100%;
@@ -664,7 +748,6 @@ export default function HomePage() {
           100% { transform: translateX(-50%); }
         }
 
-        /* STYLED EDITORIAL PROJECT CARDS */
         .pn-project-card {
           width: 380px;
           background: #FAF2EB;
@@ -808,6 +891,569 @@ export default function HomePage() {
           margin: 0;
         }
 
+        /* SECTION 3: COMMERCIAL ADVERTISEMENT & PRICING ARCHITECTURE */
+        .pn-pricing-section {
+          width: 100%;
+          padding: 80px 24px 110px 24px;
+          background-color: #FAF2EB;
+          position: relative;
+          box-sizing: border-box;
+        }
+
+        .pn-pricing-container {
+          max-width: 1280px;
+          margin: 0 auto;
+        }
+
+        /* ADVERTISEMENT CALLOUT HERO BOX */
+        .pn-ad-callout-card {
+          background: linear-gradient(135deg, #183324 0%, #0F2318 100%);
+          color: #FFFFFF;
+          border-radius: 32px;
+          padding: 40px 32px;
+          margin-bottom: 64px;
+          position: relative;
+          overflow: hidden;
+          box-shadow: 0 20px 50px rgba(24, 51, 36, 0.28);
+          border: 2px solid rgba(232, 139, 104, 0.35);
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 30px;
+          align-items: center;
+        }
+
+        @media (min-width: 900px) {
+          .pn-ad-callout-card {
+            grid-template-columns: 1.35fr 0.65fr;
+            padding: 50px 48px;
+          }
+        }
+
+        .pn-ad-callout-text h3 {
+          font-size: clamp(26px, 3.8vw, 40px);
+          font-weight: 850;
+          line-height: 1.15;
+          letter-spacing: -0.02em;
+          margin: 0 0 16px 0;
+          color: #FFFFFF;
+        }
+        .pn-ad-callout-text h3 span {
+          color: #FFA585;
+          font-style: italic;
+          font-family: Georgia, "Playfair Display", serif;
+        }
+
+        .pn-ad-callout-text p {
+          font-size: clamp(15px, 2vw, 17px);
+          line-height: 1.6;
+          color: #CFE0D6;
+          margin: 0;
+          max-width: 640px;
+        }
+
+        .pn-ad-action-box {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          align-items: flex-start;
+        }
+
+        @media (min-width: 900px) {
+          .pn-ad-action-box {
+            align-items: flex-end;
+          }
+        }
+
+        .pn-tap-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          background: #E85D3F;
+          color: #FFFFFF;
+          padding: 16px 36px;
+          font-size: 16px;
+          font-weight: 800;
+          border-radius: 99px;
+          text-decoration: none;
+          box-shadow: 0 10px 24px rgba(232, 93, 63, 0.4);
+          transition: all 0.2s ease;
+          width: 100%;
+          text-align: center;
+          box-sizing: border-box;
+        }
+        .pn-tap-btn:hover {
+          background: #D44B2D;
+          transform: translateY(-2px);
+          box-shadow: 0 14px 30px rgba(232, 93, 63, 0.5);
+        }
+
+        .pn-ad-tagline-sub {
+          font-size: 12px;
+          color: #A3C2B1;
+          letter-spacing: 0.04em;
+        }
+
+        /* SECTION HEADER & TOGGLE */
+        .pn-pricing-header {
+          text-align: center;
+          max-width: 780px;
+          margin: 0 auto 40px auto;
+        }
+
+        .pn-pricing-kicker {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #FFFFFF;
+          border: 1.5px solid #E88B68;
+          color: #E85D3F;
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          padding: 6px 16px;
+          border-radius: 99px;
+          margin-bottom: 16px;
+          box-shadow: 0 4px 12px rgba(232, 93, 63, 0.1);
+        }
+
+        .pn-pricing-title {
+          font-size: clamp(32px, 4.5vw, 48px);
+          font-weight: 850;
+          line-height: 1.15;
+          letter-spacing: -0.02em;
+          color: #1A2821;
+          margin: 0 0 16px 0;
+        }
+        .pn-pricing-title span {
+          color: #E85D3F;
+          font-style: italic;
+          font-family: Georgia, "Playfair Display", serif;
+        }
+
+        .pn-pricing-subtitle {
+          font-size: clamp(16px, 2vw, 18px);
+          line-height: 1.6;
+          color: #4A5E53;
+          margin: 0;
+        }
+
+        /* INTERACTIVE TOGGLE PILL: À LA CARTE vs MEMBERSHIP */
+        .pn-toggle-container {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 48px;
+        }
+
+        .pn-toggle-shell {
+          background: #FFFFFF;
+          border: 1.5px solid rgba(232, 139, 104, 0.35);
+          padding: 6px;
+          border-radius: 99px;
+          display: inline-flex;
+          gap: 6px;
+          box-shadow: 0 6px 20px rgba(24, 34, 29, 0.06);
+        }
+
+        .pn-toggle-btn {
+          padding: 12px 24px;
+          border-radius: 99px;
+          font-size: 14px;
+          font-weight: 800;
+          border: none;
+          cursor: pointer;
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          background: transparent;
+          color: #556B60;
+        }
+        .pn-toggle-btn.is-active {
+          background: #183324;
+          color: #FFFFFF;
+          box-shadow: 0 4px 14px rgba(24, 51, 36, 0.22);
+        }
+
+        /* 5-Card À La Carte Grid */
+        .pn-alacarte-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+
+        @media (min-width: 640px) {
+          .pn-alacarte-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        @media (min-width: 1024px) {
+          .pn-alacarte-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+
+        .pn-coin-card {
+          background: #FFFFFF;
+          border: 1.5px solid rgba(232, 139, 104, 0.28);
+          border-radius: 28px;
+          padding: 32px 28px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          position: relative;
+          box-shadow: 0 12px 36px rgba(24, 34, 29, 0.06);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .pn-coin-card:hover {
+          transform: translateY(-6px);
+          border-color: #E85D3F;
+          box-shadow: 0 20px 48px rgba(232, 93, 63, 0.16);
+        }
+
+        .pn-coin-card.is-popular {
+          border: 2.5px solid #E85D3F;
+          background: linear-gradient(180deg, #FFFFFF 0%, #FFF8F4 100%);
+          box-shadow: 0 16px 44px rgba(232, 93, 63, 0.18);
+        }
+
+        .pn-popular-pill {
+          position: absolute;
+          top: -14px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: #E85D3F;
+          color: #FFFFFF;
+          font-size: 11px;
+          font-weight: 850;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          padding: 5px 16px;
+          border-radius: 99px;
+          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.4);
+          white-space: nowrap;
+        }
+
+        .pn-card-top-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 16px;
+        }
+
+        .pn-coin-amount-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #FDF0E7;
+          border: 1px solid #E88B68;
+          color: #E85D3F;
+          font-size: 13px;
+          font-weight: 850;
+          padding: 6px 14px;
+          border-radius: 99px;
+        }
+
+        .pn-turnaround-pill {
+          font-size: 11px;
+          font-weight: 700;
+          color: #15803D;
+          background: #E8F5E9;
+          padding: 4px 10px;
+          border-radius: 99px;
+        }
+
+        .pn-card-price-display {
+          display: flex;
+          align-items: baseline;
+          gap: 6px;
+          margin-bottom: 8px;
+        }
+        .pn-price-dollars {
+          font-size: 38px;
+          font-weight: 900;
+          color: #1A2821;
+          letter-spacing: -0.03em;
+        }
+        .pn-price-cents {
+          font-size: 14px;
+          color: #6B8576;
+          font-weight: 700;
+        }
+
+        .pn-card-service-title {
+          font-size: 20px;
+          font-weight: 850;
+          color: #1A2821;
+          margin: 0 0 6px 0;
+          line-height: 1.25;
+        }
+
+        .pn-card-service-sub {
+          font-size: 13px;
+          color: #556B60;
+          margin: 0 0 20px 0;
+          line-height: 1.45;
+        }
+
+        .pn-card-divider {
+          width: 100%;
+          height: 1px;
+          background: rgba(232, 139, 104, 0.2);
+          margin-bottom: 20px;
+        }
+
+        .pn-features-list {
+          list-style: none;
+          padding: 0;
+          margin: 0 0 28px 0;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .pn-feature-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          font-size: 13px;
+          color: #33443C;
+          line-height: 1.45;
+        }
+
+        .pn-feature-check {
+          color: #15803D;
+          font-size: 14px;
+          font-weight: 900;
+          flex-shrink: 0;
+          margin-top: 1px;
+        }
+
+        .pn-card-order-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 50px;
+          border-radius: 99px;
+          font-size: 15px;
+          font-weight: 750;
+          text-decoration: none;
+          transition: all 0.2s ease;
+        }
+        .pn-btn-card-primary {
+          background-color: #183324;
+          color: #FFFFFF;
+          box-shadow: 0 8px 18px rgba(24, 51, 36, 0.2);
+        }
+        .pn-btn-card-primary:hover {
+          background-color: #0F2217;
+          transform: translateY(-2px);
+          box-shadow: 0 12px 24px rgba(24, 51, 36, 0.28);
+        }
+        .pn-btn-card-peach {
+          background-color: #E85D3F;
+          color: #FFFFFF;
+          box-shadow: 0 8px 20px rgba(232, 93, 63, 0.28);
+        }
+        .pn-btn-card-peach:hover {
+          background-color: #D44B2D;
+          transform: translateY(-2px);
+          box-shadow: 0 12px 28px rgba(232, 93, 63, 0.38);
+        }
+
+        /* 3-Card Membership Tiers Grid */
+        .pn-membership-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 28px;
+        }
+
+        @media (min-width: 900px) {
+          .pn-membership-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+
+        .pn-membership-card {
+          background: #FFFFFF;
+          border: 1.5px solid rgba(232, 139, 104, 0.3);
+          border-radius: 32px;
+          padding: 38px 30px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          position: relative;
+          box-shadow: 0 12px 36px rgba(24, 34, 29, 0.06);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .pn-membership-card:hover {
+          transform: translateY(-8px);
+          border-color: #E85D3F;
+          box-shadow: 0 24px 50px rgba(232, 93, 63, 0.18);
+        }
+        .pn-membership-card.is-popular {
+          border: 2.5px solid #E85D3F;
+          background: linear-gradient(180deg, #FFFFFF 0%, #FFF7F2 100%);
+          box-shadow: 0 18px 48px rgba(232, 93, 63, 0.2);
+        }
+
+        .pn-tier-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #FDF0E7;
+          border: 1px solid #E88B68;
+          color: #E85D3F;
+          font-size: 12px;
+          font-weight: 850;
+          padding: 5px 14px;
+          border-radius: 99px;
+          margin-bottom: 14px;
+        }
+
+        .pn-tier-price-row {
+          display: flex;
+          align-items: baseline;
+          gap: 6px;
+          margin-bottom: 8px;
+        }
+        .pn-tier-price {
+          font-size: 44px;
+          font-weight: 900;
+          color: #1A2821;
+          letter-spacing: -0.03em;
+        }
+        .pn-tier-cadence {
+          font-size: 15px;
+          font-weight: 700;
+          color: #6B8576;
+        }
+
+        .pn-tier-title {
+          font-size: 22px;
+          font-weight: 850;
+          color: #1A2821;
+          margin: 0 0 8px 0;
+        }
+
+        .pn-tier-desc {
+          font-size: 13px;
+          color: #556B60;
+          line-height: 1.5;
+          margin: 0 0 24px 0;
+        }
+
+        .pn-pricing-guarantee-banner {
+          margin-top: 56px;
+          background: #FFFFFF;
+          border: 1.5px solid rgba(232, 139, 104, 0.3);
+          border-radius: 28px;
+          padding: 28px 36px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          gap: 18px;
+          box-shadow: 0 10px 30px rgba(24, 34, 29, 0.05);
+        }
+
+        @media (min-width: 768px) {
+          .pn-pricing-guarantee-banner {
+            flex-direction: row;
+            justify-content: space-between;
+            text-align: left;
+          }
+        }
+
+        .pn-guarantee-text h4 {
+          font-size: 17px;
+          font-weight: 850;
+          color: #1A2821;
+          margin: 0 0 4px 0;
+        }
+        .pn-guarantee-text p {
+          font-size: 13px;
+          color: #556B60;
+          margin: 0;
+          max-width: 680px;
+        }
+
+        .pn-guarantee-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          height: 50px;
+          padding: 0 30px;
+          background-color: #183324;
+          color: #FFFFFF;
+          font-size: 14px;
+          font-weight: 750;
+          border-radius: 99px;
+          text-decoration: none;
+          white-space: nowrap;
+          transition: all 0.2s ease;
+        }
+        .pn-guarantee-btn:hover {
+          background-color: #0F2217;
+          transform: translateY(-2px);
+        }
+
+        /* THREE-STEP PROCESS STRIP */
+        .pn-how-it-works-strip {
+          max-width: 1280px;
+          margin: 0 auto 60px auto;
+          padding: 0 24px;
+        }
+
+        .pn-strip-card {
+          background: #FFFFFF;
+          border: 1.5px solid rgba(232, 139, 104, 0.28);
+          border-radius: 24px;
+          padding: 24px 32px;
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 20px;
+          box-shadow: 0 10px 30px rgba(24, 34, 29, 0.05);
+        }
+
+        @media (min-width: 768px) {
+          .pn-strip-card {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+          }
+        }
+
+        .pn-step-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 14px;
+        }
+        .pn-step-num {
+          width: 38px;
+          height: 38px;
+          border-radius: 12px;
+          background: #FDF0E7;
+          border: 1px solid #E88B68;
+          color: #E85D3F;
+          font-size: 16px;
+          font-weight: 850;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .pn-step-title {
+          font-size: 15px;
+          font-weight: 800;
+          color: #1A2821;
+          margin-bottom: 4px;
+        }
+        .pn-step-desc {
+          font-size: 13px;
+          line-height: 1.45;
+          color: #5F7368;
+          margin: 0;
+        }
+
         /* DRAWER NAVIGATION */
         .pn-nav-overlay {
           position: fixed;
@@ -921,7 +1567,6 @@ export default function HomePage() {
             Vetted creatives. Quality work for fair prices. Connecting Southern businesses with top-tier local design, branding, and web talent.
           </p>
 
-          {/* Value Proposition Pill */}
           <div className="pn-value-pill">
             <span>🪙</span>
             <span><strong>1 Coin = 1 Finished Deliverable</strong> • No Retainers • No Hourly Creep</span>
@@ -944,14 +1589,12 @@ export default function HomePage() {
               <span>✦</span> Creative Spotlight
             </div>
 
-            {/* Stylized fallback if photo is still uploading */}
             <div className="pn-spotlight-placeholder-artwork">
               <div className="pn-placeholder-avatar">JM</div>
               <div className="pn-placeholder-title">Jose M.</div>
               <div className="pn-placeholder-sub">Video Editor & Illustrator</div>
             </div>
 
-            {/* Photo with multi-name fallback chain */}
             {!imageError && (
               <img
                 src="/jose-creative.jpg"
@@ -1042,10 +1685,8 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Continuous Looping Track */}
         <div className="pn-marquee-wrap">
           <div className="pn-marquee-track">
-            {/* Loop Set 1 */}
             {RECENT_PROJECTS.map((proj) => (
               <div key={proj.id} className="pn-project-card">
                 <div className="pn-card-media" style={{ background: proj.bgGradient }}>
@@ -1079,7 +1720,6 @@ export default function HomePage() {
               </div>
             ))}
 
-            {/* Loop Set 2 (for seamless loop) */}
             {RECENT_PROJECTS.map((proj) => (
               <div key={`dup-${proj.id}`} className="pn-project-card">
                 <div className="pn-card-media" style={{ background: proj.bgGradient }}>
@@ -1112,6 +1752,165 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 3: COMMERCIAL ADVERTISEMENT & PRICING ARCHITECTURE */}
+      <section className="pn-pricing-section">
+        <div className="pn-pricing-container">
+          
+          {/* COMMERCIAL ADVERTISEMENT CALLOUT */}
+          <div className="pn-ad-callout-card">
+            <div className="pn-ad-callout-text">
+              <h3>
+                That project you've been putting off? <br />
+                <span>Get it done today with just the tap of a button.</span>
+              </h3>
+              <p>
+                No more waiting weeks for traditional agency callbacks or wading through 50 unvetted bids online. Choose your deliverable, tap submit, and get matched with an award-winning creative in 24 hours.
+              </p>
+            </div>
+            <div className="pn-ad-action-box">
+              <Link href="/match" className="pn-tap-btn">
+                <span>⚡</span> Tap to Start a Project
+              </Link>
+              <span className="pn-ad-tagline-sub">Vetted Talent • 24–48h Turnaround • 75% Creative Payout</span>
+            </div>
+          </div>
+
+          {/* PRICING HEADER */}
+          <div className="pn-pricing-header">
+            <div className="pn-pricing-kicker">✦ Simple, Transparent Pricing ✦</div>
+            <h2 className="pn-pricing-title">
+              Clear Pricing. <span>Zero Surprises.</span>
+            </h2>
+            <p className="pn-pricing-subtitle">
+              Need just one flyer or logo? Go <strong>À La Carte</strong>. Need a continuous stream of creative work every month? Save with our <strong>Monthly Membership Tiers</strong>.
+            </p>
+          </div>
+
+          {/* INTERACTIVE TOGGLE: À LA CARTE vs MEMBERSHIP */}
+          <div className="pn-toggle-container">
+            <div className="pn-toggle-shell">
+              <button
+                className={`pn-toggle-btn ${pricingTab === "alacarte" ? "is-active" : ""}`}
+                onClick={() => setPricingTab("alacarte")}
+              >
+                🪙 À La Carte (Pay-As-You-Go)
+              </button>
+              <button
+                className={`pn-toggle-btn ${pricingTab === "membership" ? "is-active" : ""}`}
+                onClick={() => setPricingTab("membership")}
+              >
+                🚀 Monthly Membership Tiers
+              </button>
+            </div>
+          </div>
+
+          {/* TAB 1: À LA CARTE SERVICES */}
+          {pricingTab === "alacarte" && (
+            <div className="pn-alacarte-grid">
+              {ALACARTE_ITEMS.map((item, idx) => (
+                <div key={idx} className={`pn-coin-card ${item.popular ? "is-popular" : ""}`}>
+                  {item.popular && <div className="pn-popular-pill">Most Popular Choice</div>}
+                  
+                  <div>
+                    <div className="pn-card-top-row">
+                      <div className="pn-coin-amount-badge">
+                        <span>🪙</span> {item.coins} Peach {item.coins === 1 ? "Coin" : "Coins"}
+                      </div>
+                      <div className="pn-turnaround-pill">{item.turnaround}</div>
+                    </div>
+
+                    <div className="pn-card-price-display">
+                      <span className="pn-price-dollars">{item.price}</span>
+                      <span className="pn-price-cents">total fixed price</span>
+                    </div>
+
+                    <h3 className="pn-card-service-title">{item.name}</h3>
+                    <p className="pn-card-service-sub">{item.subtitle}</p>
+
+                    <div className="pn-card-divider" />
+
+                    <ul className="pn-features-list">
+                      {item.includes.map((feat, fIdx) => (
+                        <li key={fIdx} className="pn-feature-item">
+                          <span className="pn-feature-check">✓</span>
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <Link
+                    href="/match"
+                    className={`pn-card-order-btn ${item.popular ? "pn-btn-card-peach" : "pn-btn-card-primary"}`}
+                  >
+                    {item.cta}
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* TAB 2: MONTHLY MEMBERSHIP TIERS */}
+          {pricingTab === "membership" && (
+            <div className="pn-membership-grid">
+              {MEMBERSHIP_TIERS.map((tier) => (
+                <div key={tier.id} className={`pn-membership-card ${tier.popular ? "is-popular" : ""}`}>
+                  {tier.popular && <div className="pn-popular-pill">Recommended Plan</div>}
+
+                  <div>
+                    <div className="pn-tier-badge">
+                      <span>✦</span> {tier.valueTag}
+                    </div>
+
+                    <div className="pn-tier-price-row">
+                      <span className="pn-tier-price">{tier.price}</span>
+                      <span className="pn-tier-cadence">{tier.cadence}</span>
+                    </div>
+
+                    <h3 className="pn-tier-title">{tier.name}</h3>
+                    <div style={{ color: "#E85D3F", fontWeight: "800", fontSize: "14px", marginBottom: "8px" }}>
+                      🪙 {tier.coins}
+                    </div>
+                    <p className="pn-tier-desc">{tier.desc}</p>
+
+                    <div className="pn-card-divider" />
+
+                    <ul className="pn-features-list">
+                      {tier.features.map((feat, fIdx) => (
+                        <li key={fIdx} className="pn-feature-item">
+                          <span className="pn-feature-check">✓</span>
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <Link
+                    href="/match"
+                    className={`pn-card-order-btn ${tier.popular ? "pn-btn-card-peach" : "pn-btn-card-primary"}`}
+                  >
+                    {tier.cta}
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Guarantee Banner */}
+          <div className="pn-pricing-guarantee-banner">
+            <div className="pn-guarantee-text">
+              <h4>🛡️ 100% Agency Quality Guarantee & 75% Payout</h4>
+              <p>
+                Every project includes 2 revision rounds and direct art-direction oversight. Best of all: 75% of your investment stays directly in the hands of Alabama creators.
+              </p>
+            </div>
+            <Link href="/match" className="pn-guarantee-btn">
+              Get Matched Today
+            </Link>
           </div>
         </div>
       </section>
