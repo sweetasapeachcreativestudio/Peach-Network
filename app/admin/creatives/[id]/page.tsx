@@ -29,6 +29,9 @@ export default async function CreativeReviewDetail({
         experience,
         tools,
         portfolio_url,
+        work_sample_urls,
+        contact_phone,
+        social_url,
         admin_notes,
         submitted_at,
         reviewed_at
@@ -75,12 +78,12 @@ export default async function CreativeReviewDetail({
         <div style={{marginTop:18}}>
           <h3>Portfolio</h3>
           {application?.portfolio_url ? (
-            <a href={application.portfolio_url} target="_blank" rel="noreferrer" className="btn btn-outline" style={{display:"inline-block"}}>
+            <a href={/^https?:\/\//i.test(application.portfolio_url) ? application.portfolio_url : `https://${application.portfolio_url}`} target="_blank" rel="noreferrer" className="btn btn-outline" style={{display:"inline-block"}}>
               Open Portfolio
             </a>
-          ) : (
-            <p className="muted">No portfolio URL provided.</p>
-          )}
+          ) : <p className="muted">No formal portfolio website provided.</p>}
+          {application?.work_sample_urls?.length > 0 && <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:12}}>{application.work_sample_urls.map((url:string,index:number)=><a key={url+index} href={/^https?:\/\//i.test(url)?url:`https://${url}`} target="_blank" rel="noreferrer" className="btn btn-outline">Work Sample {index+1}</a>)}</div>}
+          {(application?.contact_phone||application?.social_url)&&<div style={{marginTop:18}}><h3>Contact & professional links</h3>{application.contact_phone&&<p><strong>Phone:</strong> {application.contact_phone}</p>}{application.social_url&&<p><a href={/^https?:\/\//i.test(application.social_url)?application.social_url:`https://${application.social_url}`} target="_blank" rel="noreferrer">Open professional social profile →</a></p>}</div>}
         </div>
       </section>
 
