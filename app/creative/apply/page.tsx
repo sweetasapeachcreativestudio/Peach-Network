@@ -10,6 +10,9 @@ export default function CreativeApply() {
   const [specialty, setSpecialty] = useState("Graphic Design");
   const [experience, setExperience] = useState("");
   const [portfolioUrl, setPortfolioUrl] = useState("");
+  const [workSamples, setWorkSamples] = useState("");
+  const [phone, setPhone] = useState("");
+  const [socialUrl, setSocialUrl] = useState("");
   const [tools, setTools] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("AL");
@@ -19,12 +22,12 @@ export default function CreativeApply() {
   async function submitApplication() {
     setBusy(true); setMessage("");
     try {
-      if (!portfolioUrl.trim()) throw new Error("Add a portfolio link so Peach can review your work.");
+      if (!portfolioUrl.trim() && !workSamples.trim()) throw new Error("Give Peach a portfolio link or links to work samples so we can review your work.");
       if (!experience.trim()) throw new Error("Tell Peach a little about your experience.");
       const res = await fetch("/api/creative/application", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ specialty, experience, portfolioUrl, tools, city, state }),
+        body: JSON.stringify({ specialty, experience, portfolioUrl, workSamples, phone, socialUrl, tools, city, state }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not submit your application.");
@@ -41,8 +44,10 @@ export default function CreativeApply() {
     <section className="card" style={{display:"grid",gap:10}}>
       <div className="grid grid-2">
         <label><strong>Primary specialty</strong><select className="field" value={specialty} onChange={e=>setSpecialty(e.target.value)}><option>Graphic Design</option><option>Web Design</option><option>Video Editing</option><option>Animation / Motion</option><option>Photography</option><option>Illustration</option></select></label>
-        <label><strong>Portfolio URL</strong><input className="field" value={portfolioUrl} onChange={e=>setPortfolioUrl(e.target.value)} placeholder="https://yourportfolio.com"/></label>
+        <label><strong>Portfolio / website link <span className="muted">(optional)</span></strong><input className="field" value={portfolioUrl} onChange={e=>setPortfolioUrl(e.target.value)} placeholder="https://yourportfolio.com"/></label>
       </div>
+      <label><strong>Links to work samples <span className="muted">(if you do not have a portfolio)</span></strong><textarea className="field" value={workSamples} onChange={e=>setWorkSamples(e.target.value)} placeholder={"Paste links to your work — one per line. Google Drive, Dropbox, Behance, Canva, Instagram, etc."}/><small className="muted">A formal portfolio website is not required. For now, share direct links to examples of your work. File uploads are coming next.</small></label>
+      <div className="grid grid-2"><label><strong>Phone <span className="muted">(optional)</span></strong><input className="field" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="(205) 555-0123"/></label><label><strong>Professional social link <span className="muted">(optional)</span></strong><input className="field" value={socialUrl} onChange={e=>setSocialUrl(e.target.value)} placeholder="Instagram, LinkedIn, Behance…"/></label></div>
       <label><strong>Your experience</strong><textarea className="field" value={experience} onChange={e=>setExperience(e.target.value)} placeholder="What kind of work do you do? What kinds of clients or projects have you worked on?"/></label>
       <label><strong>Software / equipment</strong><input className="field" value={tools} onChange={e=>setTools(e.target.value)} placeholder="Adobe Creative Cloud, Figma, camera kit, editing setup…"/></label>
       <div className="grid grid-2"><label><strong>City</strong><input className="field" value={city} onChange={e=>setCity(e.target.value)} placeholder="Birmingham"/></label><label><strong>State</strong><input className="field" value={state} onChange={e=>setState(e.target.value)} placeholder="AL"/></label></div>
