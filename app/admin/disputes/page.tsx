@@ -1,12 +1,7 @@
-import {createClient} from "@/lib/supabase/server";
-import {redirect} from "next/navigation";
+import {createAdminClient} from "@/lib/supabase/admin";
 
 export default async function DisputesPage(){
-  const supabase=await createClient();
-  const {data:{user}}=await supabase.auth.getUser();
-  if(!user)redirect("/auth");
-  const {data:me}=await supabase.from("profiles").select("role").eq("id",user.id).single();
-  if(me?.role!=="admin")redirect("/");
+  const supabase=createAdminClient();
 
   const {data:disputes}=await supabase.from("disputes")
     .select("id,status,requested_resolution,client_statement,creative_statement,created_at,projects(id,title,coin_amount)")
