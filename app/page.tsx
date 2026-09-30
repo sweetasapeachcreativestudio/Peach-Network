@@ -9,7 +9,7 @@ const RECENT_PROJECTS = [
     id: 1,
     title: "Runa Cultural Brand & Moon Iconography",
     category: "Brand Identity & Custom Iconography",
-    deliverable: "Mini Brand Kit • 6 Coins",
+    deliverable: "Mini Brand Kit • 6 Peach Coins",
     creator: "Crafted by Jose M.",
     image: "/project 7.jpg",
     altImages: ["/project-7.jpg", "/project7.jpg", "/projects/project 7.jpg"],
@@ -24,7 +24,7 @@ const RECENT_PROJECTS = [
     id: 2,
     title: "The Guardian's Portal Concept Art",
     category: "Original Editorial & Concept Illustration",
-    deliverable: "Editorial Illustration • 4 Coins",
+    deliverable: "Editorial Illustration • 4 Peach Coins",
     creator: "Crafted by Jose M.",
     image: "/Project 6.jpg",
     altImages: ["/project-6.jpg", "/project6.jpg", "/projects/Project 6.jpg"],
@@ -39,7 +39,7 @@ const RECENT_PROJECTS = [
     id: 3,
     title: "Bessemer Chamber of Commerce Web Portal",
     category: "Web UI Design & Civic Platform",
-    deliverable: "Web Experience • 10 Coins",
+    deliverable: "Web Experience • 10 Peach Coins",
     creator: "Peach Web Studio",
     image: "/project 8.jpg",
     altImages: ["/project-8.jpg", "/project8.jpg", "/projects/project 8.jpg"],
@@ -54,7 +54,7 @@ const RECENT_PROJECTS = [
     id: 4,
     title: "Remy Event Center Luxury Wedding Stationery",
     category: "Editorial Print & Event Suite",
-    deliverable: "Editorial Print • 4 Coins",
+    deliverable: "Editorial Print • 4 Peach Coins",
     creator: "Peach Print Lab",
     image: "/project 9.jpg",
     altImages: ["/project-9.jpg", "/project9.jpg", "/projects/project 9.jpg"],
@@ -69,7 +69,7 @@ const RECENT_PROJECTS = [
     id: 5,
     title: "Lawson State Community College",
     category: "Social Media Campaign & Templates",
-    deliverable: "Social 4-Pack • 3 Coins",
+    deliverable: "Social 4-Pack • 3 Peach Coins",
     creator: "Peach Creative Network",
     image: "/Project 1.png",
     altImages: ["/project-1.png", "/projects/Project 1.png", "/projects/project-lawson-state.png"],
@@ -84,7 +84,7 @@ const RECENT_PROJECTS = [
     id: 6,
     title: "New Joy Fellowship BBQ Fundraiser",
     category: "Fundraiser Menu Board & Signage",
-    deliverable: "Print Signage • 2 Coins",
+    deliverable: "Print Signage • 2 Peach Coins",
     creator: "Peach Creative Network",
     image: "/Project 2.png",
     altImages: ["/project-2.png", "/projects/Project 2.png", "/projects/project-church-menu.png"],
@@ -99,7 +99,7 @@ const RECENT_PROJECTS = [
     id: 7,
     title: "Bessemer Area Chamber of Commerce Brand Kit",
     category: "Full Brand Identity & Merch Kit",
-    deliverable: "Mini Brand Kit • 6 Coins",
+    deliverable: "Mini Brand Kit • 6 Peach Coins",
     creator: "Peach Creative Network",
     image: "/Project 3.png",
     altImages: ["/project-3.png", "/projects/Project 3.png", "/projects/project-bessemer-brand.png"],
@@ -114,7 +114,7 @@ const RECENT_PROJECTS = [
     id: 8,
     title: "New Joy Fellowship Baptist Church",
     category: "Event Program & Editorial Print Kit",
-    deliverable: "Editorial Print • 4 Coins",
+    deliverable: "Editorial Print • 4 Peach Coins",
     creator: "Peach Creative Network",
     image: "/Project 4.png",
     altImages: ["/project-4.png", "/projects/Project 4.png", "/projects/project-church-program.png"],
@@ -127,54 +127,42 @@ const RECENT_PROJECTS = [
   },
 ];
 
-const CREATIVE_SNAPS = [
+const CREATIVES_IN_THE_WILD = [
   {
+    id: 1,
     image: "/Creative1.jpg",
-    altImages: ["/creative1.jpg", "/Creative 1.jpg"],
-    caption: "Sweet As A Peach Team & Brand Ambassadors at Local Event",
-    role: "Studio Community & Pop-Up Merch",
-    accent: "#E85D3F",
-    icon: "🍑",
+    altImages: ["/Creative 1.jpg", "/creative1.jpg", "/creative-1.jpg", "/Creative1.png"],
+    label: "Sweet As A Peach Live Pop-Up & Merch",
   },
   {
+    id: 2,
     image: "/Creative2.jpg",
-    altImages: ["/creative2.jpg", "/Creative 2.jpg"],
-    caption: "UI/UX & Web Pro in the Zone on Turquoise Setup",
-    role: "Digital Design & Storefronts",
-    accent: "#06B6D4",
-    icon: "💻",
+    altImages: ["/Creative 2.jpg", "/creative2.jpg", "/creative-2.jpg", "/Creative2.png"],
+    label: "Digital Design on Turquoise Setup",
   },
   {
+    id: 3,
     image: "/Creative 3.jpg",
-    altImages: ["/Creative-3.jpg", "/creative3.jpg", "/Creative3.jpg"],
-    caption: "Creative Team in Studio Review & Project Brainstorm",
-    role: "Brand Strategy & Review",
-    accent: "#16A34A",
-    icon: "✨",
+    altImages: ["/Creative-3.jpg", "/creative3.jpg", "/Creative3.jpg", "/creative 3.jpg"],
+    label: "Studio Creative Brainstorm & Review",
   },
   {
+    id: 4,
     image: "/Creative 4.jpg",
-    altImages: ["/Creative-4.jpg", "/creative4.jpg", "/Creative4.jpg"],
-    caption: "Videographer Capturing Church Sanctuary & Stained Glass",
-    role: "On-Location Church Videography",
-    accent: "#0284C7",
-    icon: "🎥",
+    altImages: ["/Creative-4.jpg", "/creative4.jpg", "/Creative4.jpg", "/creative 4.jpg"],
+    label: "On-Location Church Sanctuary Videography",
   },
   {
+    id: 5,
     image: "/Creative5.jpg",
-    altImages: ["/creative5.jpg", "/Creative 5.jpg"],
-    caption: "Video Director & Camera Operator Directing Outdoor Shoot",
-    role: "Commercial Video Production",
-    accent: "#E85D3F",
-    icon: "🎬",
+    altImages: ["/Creative 5.jpg", "/creative5.jpg", "/creative-5.jpg", "/Creative5.png"],
+    label: "Commercial Outdoor Camera Rig Shoot",
   },
   {
+    id: 6,
     image: "/creative 6.jpg",
-    altImages: ["/Creative-6.jpg", "/creative6.jpg", "/Creative 6.jpg"],
-    caption: "Field Director at Local Community Venue Shoot",
-    role: "Event Storytelling & Film",
-    accent: "#F59E0B",
-    icon: "📍",
+    altImages: ["/creative-6.jpg", "/Creative6.jpg", "/Creative 6.jpg", "/creative6.jpg"],
+    label: "Field Production at Community Venue",
   },
 ];
 
@@ -302,7 +290,7 @@ const MEMBERSHIP_TIERS = [
     name: "Growth Tier",
     price: "$1,099",
     cadence: "/ month",
-    coins: "24 + 4 Bonus = 28 Coins",
+    coins: "24 + 4 Bonus = 28 Peach Coins",
     valueTag: "Most Popular • Save 20%",
     desc: "For growing businesses running active marketing campaigns, product launches, and weekly content.",
     features: [
@@ -321,7 +309,7 @@ const MEMBERSHIP_TIERS = [
     name: "Partner Tier",
     price: "$2,199",
     cadence: "/ month",
-    coins: "50 + 10 Bonus = 60 Coins",
+    coins: "50 + 10 Bonus = 60 Peach Coins",
     valueTag: "Best Value • Agency Alternative",
     desc: "A full outsourced creative department for high-growth companies, institutions, and civic organizations.",
     features: [
@@ -342,6 +330,12 @@ export default function HomePage() {
   const [imageError, setImageError] = useState(false);
   const [pricingTab, setPricingTab] = useState<"alacarte" | "membership">("alacarte");
 
+  const scrollToTop = () => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   return (
     <main className="pn-home-root">
       {/* Cinematic Splash Screen */}
@@ -357,33 +351,15 @@ export default function HomePage() {
           overflow-x: hidden;
         }
 
-        /* REPEATING WATERMARK TEXTURE */
-        .pn-repeating-watermark {
-          position: absolute;
-          inset: 0;
-          height: 100%;
-          pointer-events: none;
-          z-index: 0;
-          opacity: 0.035;
-          background-image: repeating-linear-gradient(
-            -45deg,
-            #E85D3F,
-            #E85D3F 100px,
-            transparent 100px,
-            transparent 200px
-          );
-        }
-
-        /* VIBRANT WARM PEACH, SKY BLUE & EVERGREEN LIGHTING */
+        /* WARM PEACH & SKY BLUE STUDIO LIGHTING */
         .pn-studio-lighting {
           position: absolute;
           inset: 0;
-          height: 1100px;
+          height: 950px;
           background: 
-            radial-gradient(circle at 14% 12%, rgba(254, 215, 170, 0.65) 0%, transparent 45%),
-            radial-gradient(circle at 86% 18%, rgba(6, 182, 212, 0.22) 0%, transparent 48%),
-            radial-gradient(circle at 50% 45%, rgba(255, 237, 213, 0.5) 0%, transparent 65%),
-            radial-gradient(circle at 80% 65%, rgba(22, 163, 74, 0.12) 0%, transparent 45%);
+            radial-gradient(circle at 14% 12%, rgba(254, 215, 170, 0.55) 0%, transparent 45%),
+            radial-gradient(circle at 86% 18%, rgba(6, 182, 212, 0.16) 0%, transparent 48%),
+            radial-gradient(circle at 50% 45%, rgba(255, 237, 213, 0.4) 0%, transparent 65%);
           pointer-events: none;
           z-index: 1;
         }
@@ -391,41 +367,15 @@ export default function HomePage() {
         .pn-grid-texture {
           position: absolute;
           inset: 0;
-          height: 1100px;
+          height: 950px;
           background-size: 34px 34px;
           background-image: 
-            linear-gradient(to right, rgba(232, 93, 63, 0.07) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(6, 182, 212, 0.07) 1px, transparent 1px);
+            linear-gradient(to right, rgba(232, 93, 63, 0.06) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(6, 182, 212, 0.06) 1px, transparent 1px);
           mask-image: linear-gradient(180deg, black 0%, black 75%, transparent 100%);
           -webkit-mask-image: linear-gradient(180deg, black 0%, black 75%, transparent 100%);
           pointer-events: none;
           z-index: 1;
-        }
-
-        /* RUNNING KINETIC BRAND TICKER */
-        .pn-brand-ticker {
-          background: linear-gradient(90deg, #E85D3F 0%, #FB923C 35%, #06B6D4 70%, #16A34A 100%);
-          color: #FFFFFF;
-          padding: 8px 0;
-          font-size: 11.5px;
-          font-weight: 850;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          overflow: hidden;
-          white-space: nowrap;
-          display: flex;
-          position: relative;
-          z-index: 95;
-          box-shadow: 0 2px 10px rgba(232, 93, 63, 0.25);
-        }
-        .pn-ticker-track {
-          display: inline-flex;
-          gap: 32px;
-          animation: pnTicker 28s linear infinite;
-        }
-        @keyframes pnTicker {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
         }
 
         /* TOP NAVIGATION HEADER */
@@ -441,10 +391,10 @@ export default function HomePage() {
           margin: 0 auto;
           padding: 16px 24px;
           box-sizing: border-box;
-          background: rgba(255, 248, 244, 0.94);
+          background: rgba(255, 248, 244, 0.95);
           backdrop-filter: blur(16px);
           -webkit-backdrop-filter: blur(16px);
-          border-bottom: 1.5px solid rgba(232, 93, 63, 0.2);
+          border-bottom: 1.5px solid rgba(232, 93, 63, 0.18);
         }
 
         .pn-header-logo-link {
@@ -456,7 +406,7 @@ export default function HomePage() {
           height: clamp(52px, 6vw, 68px);
           width: auto;
           display: block;
-          filter: drop-shadow(0 4px 14px rgba(232, 93, 63, 0.22));
+          filter: drop-shadow(0 4px 14px rgba(232, 93, 63, 0.2));
           transition: transform 0.2s ease;
         }
         .pn-header-logo:hover {
@@ -491,7 +441,7 @@ export default function HomePage() {
           background: #FEF2F2;
           border: 1px solid #FECACA;
           color: #DC2626;
-          font-size: 12px;
+          font-size: 12.5px;
           font-weight: 800;
           padding: 6px 14px;
           border-radius: 99px;
@@ -565,19 +515,19 @@ export default function HomePage() {
           z-index: 10;
           max-width: 1280px;
           margin: 0 auto;
-          padding: 32px 24px 64px 24px;
+          padding: 36px 24px 64px 24px;
           display: grid;
           grid-template-columns: 1fr;
           gap: 40px;
           align-items: center;
-          min-height: calc(88vh - 120px);
+          min-height: calc(86vh - 84px);
         }
 
         @media (min-width: 960px) {
           .pn-hero-section {
             grid-template-columns: 1.15fr 0.85fr;
             gap: 60px;
-            padding: 40px 24px 80px 24px;
+            padding: 40px 24px 76px 24px;
           }
         }
 
@@ -602,7 +552,7 @@ export default function HomePage() {
           letter-spacing: 0.05em;
           text-transform: uppercase;
           margin-bottom: 18px;
-          box-shadow: 0 4px 16px rgba(232, 93, 63, 0.16);
+          box-shadow: 0 4px 16px rgba(232, 93, 63, 0.14);
         }
 
         .pn-hero-title {
@@ -913,26 +863,26 @@ export default function HomePage() {
           margin-top: 2px;
         }
 
-        /* YOUTUBE BANNER CALLOUT */
+        /* YOUTUBE BANNER - SOFT, WARM PEACH CARD */
         .pn-yt-feature-banner {
           max-width: 1280px;
-          margin: 0 auto 60px auto;
+          margin: 0 auto 56px auto;
           padding: 0 24px;
           position: relative;
           z-index: 10;
         }
         .pn-yt-card {
-          background: linear-gradient(135deg, #182820 0%, #0F1E16 60%, #991B1B 100%);
+          background: #FFFFFF;
           border-radius: 28px;
-          padding: 28px 32px;
-          color: #FFFFFF;
+          padding: 26px 32px;
+          color: #17271E;
           display: flex;
           flex-direction: column;
           gap: 20px;
           align-items: center;
           justify-content: space-between;
-          border: 2px solid rgba(239, 68, 68, 0.35);
-          box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+          border: 2px solid rgba(232, 93, 63, 0.25);
+          box-shadow: 0 14px 36px rgba(232, 93, 63, 0.09);
         }
         @media (min-width: 768px) {
           .pn-yt-card {
@@ -946,26 +896,27 @@ export default function HomePage() {
           gap: 18px;
         }
         .pn-yt-play-icon {
-          width: 58px;
-          height: 58px;
-          border-radius: 18px;
+          width: 54px;
+          height: 54px;
+          border-radius: 16px;
           background: #DC2626;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 28px;
+          font-size: 26px;
           color: #FFFFFF;
-          box-shadow: 0 8px 24px rgba(220, 38, 38, 0.45);
+          box-shadow: 0 6px 20px rgba(220, 38, 38, 0.35);
           flex-shrink: 0;
         }
         .pn-yt-info h3 {
-          font-size: 20px;
+          font-size: 19px;
           font-weight: 850;
           margin: 0 0 4px 0;
+          color: #17271E;
         }
         .pn-yt-info p {
           font-size: 13.5px;
-          color: #FECACA;
+          color: #556B60;
           margin: 0;
           max-width: 600px;
           line-height: 1.5;
@@ -976,27 +927,27 @@ export default function HomePage() {
           justify-content: center;
           gap: 8px;
           height: 48px;
-          padding: 0 28px;
-          background: #FFFFFF;
-          color: #DC2626;
+          padding: 0 26px;
+          background: #DC2626;
+          color: #FFFFFF;
           font-size: 14px;
-          font-weight: 850;
+          font-weight: 800;
           border-radius: 99px;
           text-decoration: none;
           white-space: nowrap;
-          box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+          box-shadow: 0 6px 18px rgba(220, 38, 38, 0.28);
           transition: all 0.2s ease;
         }
         .pn-yt-btn:hover {
-          background: #FEE2E2;
+          background: #B91C1C;
           transform: translateY(-2px);
-          box-shadow: 0 10px 24px rgba(220, 38, 38, 0.35);
+          box-shadow: 0 10px 24px rgba(220, 38, 38, 0.4);
         }
 
-        /* SECTION: CREATIVES IN ACTION GALLERY */
+        /* SECTION: CREATIVES IN THE WILD (PURE CANDID PHOTOS - NO SQUARES, FULL HEADS/COMPOSITIONS, NO UNWANTED TAGS) */
         .pn-action-gallery-section {
           width: 100%;
-          padding: 70px 24px;
+          padding: 60px 24px 80px 24px;
           background: #FFFFFF;
           position: relative;
         }
@@ -1007,7 +958,7 @@ export default function HomePage() {
         .pn-gallery-header {
           text-align: center;
           max-width: 780px;
-          margin: 0 auto 40px auto;
+          margin: 0 auto 36px auto;
         }
         .pn-gallery-kicker {
           display: inline-flex;
@@ -1022,14 +973,14 @@ export default function HomePage() {
           text-transform: uppercase;
           padding: 6px 16px;
           border-radius: 99px;
-          margin-bottom: 14px;
+          margin-bottom: 12px;
         }
         .pn-gallery-title {
-          font-size: clamp(30px, 4.2vw, 44px);
+          font-size: clamp(28px, 4vw, 42px);
           font-weight: 850;
           letter-spacing: -0.02em;
           color: #17271E;
-          margin: 0 0 12px 0;
+          margin: 0 0 10px 0;
         }
         .pn-gallery-title span {
           color: #0284C7;
@@ -1037,83 +988,60 @@ export default function HomePage() {
           font-family: Georgia, "Playfair Display", serif;
         }
         .pn-gallery-sub {
-          font-size: 16px;
+          font-size: 15.5px;
           color: #4B6355;
           margin: 0;
-          line-height: 1.55;
+          line-height: 1.5;
         }
 
-        .pn-gallery-grid {
+        /* Organic 3-column portrait gallery preserving full heads and composition */
+        .pn-wild-grid {
           display: grid;
           grid-template-columns: 1fr;
-          gap: 20px;
+          gap: 22px;
         }
         @media (min-width: 600px) {
-          .pn-gallery-grid {
+          .pn-wild-grid {
             grid-template-columns: repeat(2, 1fr);
           }
         }
-        @media (min-width: 992px) {
-          .pn-gallery-grid {
+        @media (min-width: 960px) {
+          .pn-wild-grid {
             grid-template-columns: repeat(3, 1fr);
           }
         }
 
-        .pn-gallery-card {
+        .pn-wild-card {
+          position: relative;
           background: #FFF8F4;
-          border: 1.5px solid rgba(232, 93, 63, 0.2);
           border-radius: 24px;
           overflow: hidden;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-          display: flex;
-          flex-direction: column;
+          border: 1.5px solid rgba(232, 93, 63, 0.2);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.05);
           transition: all 0.3s ease;
+          min-height: 380px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
-        .pn-gallery-card:hover {
+        .pn-wild-card:hover {
           transform: translateY(-6px);
-          box-shadow: 0 16px 40px rgba(6, 182, 212, 0.18);
           border-color: #06B6D4;
+          box-shadow: 0 18px 44px rgba(6, 182, 212, 0.18);
         }
 
-        .pn-gallery-media {
-          width: 100%;
-          height: 230px;
-          position: relative;
-          background: #E2E8F0;
-          overflow: hidden;
-        }
-        .pn-gallery-img {
+        .pn-wild-img {
           width: 100%;
           height: 100%;
+          min-height: 380px;
+          max-height: 440px;
           object-fit: cover;
+          object-position: center 15%;
           display: block;
           transition: transform 0.4s ease;
         }
-        .pn-gallery-card:hover .pn-gallery-img {
-          transform: scale(1.05);
-        }
-        .pn-gallery-role-pill {
-          position: absolute;
-          top: 12px;
-          left: 12px;
-          background: rgba(255, 255, 255, 0.95);
-          color: #0369A1;
-          font-size: 11px;
-          font-weight: 800;
-          padding: 4px 10px;
-          border-radius: 99px;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .pn-gallery-meta {
-          padding: 18px 20px;
-        }
-        .pn-gallery-caption {
-          font-size: 14px;
-          font-weight: 750;
-          color: #17271E;
-          line-height: 1.45;
-          margin: 0;
+        .pn-wild-card:hover .pn-wild-img {
+          transform: scale(1.03);
         }
 
         /* SECTION: PITCH DECK BREAKDOWN */
@@ -2458,11 +2386,39 @@ export default function HomePage() {
           box-shadow: 0 10px 24px rgba(232, 93, 63, 0.45);
         }
 
+        /* BACK TO TOP BUTTON */
+        .pn-back-to-top-bar {
+          display: flex;
+          justify-content: center;
+          margin-top: 40px;
+        }
+        .pn-back-to-top-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: #FFFFFF;
+          border: 1.5px solid rgba(232, 93, 63, 0.3);
+          color: #E85D3F;
+          font-size: 13.5px;
+          font-weight: 800;
+          padding: 10px 24px;
+          border-radius: 99px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 4px 14px rgba(232, 93, 63, 0.1);
+        }
+        .pn-back-to-top-btn:hover {
+          background: #FFF0E6;
+          border-color: #E85D3F;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(232, 93, 63, 0.2);
+        }
+
         /* FOOTER */
         .pn-footer {
           background: #15241C;
           color: #FFFFFF;
-          padding: 50px 24px;
+          padding: 48px 24px;
           border-top: 3px solid #E85D3F;
         }
         .pn-footer-inner {
@@ -2470,7 +2426,7 @@ export default function HomePage() {
           margin: 0 auto;
           display: flex;
           flex-direction: column;
-          gap: 30px;
+          gap: 28px;
           align-items: center;
           text-align: center;
         }
@@ -2484,7 +2440,7 @@ export default function HomePage() {
         .pn-footer-left h4 {
           font-size: 20px;
           font-weight: 850;
-          margin: 0 0 8px 0;
+          margin: 0 0 6px 0;
           color: #FFA585;
         }
         .pn-footer-left p {
@@ -2495,6 +2451,8 @@ export default function HomePage() {
         .pn-footer-right {
           display: flex;
           align-items: center;
+          flex-wrap: wrap;
+          justify-content: center;
           gap: 20px;
         }
         .pn-footer-link {
@@ -2506,6 +2464,13 @@ export default function HomePage() {
         }
         .pn-footer-link:hover {
           color: #E85D3F;
+        }
+        .pn-footer-yt-link {
+          color: #F87171;
+          font-weight: 800;
+        }
+        .pn-footer-yt-link:hover {
+          color: #FFFFFF;
         }
 
         /* DRAWER NAVIGATION */
@@ -2574,27 +2539,8 @@ export default function HomePage() {
       `}</style>
 
       {/* Atmospheric lighting & grid textures */}
-      <div className="pn-repeating-watermark" />
       <div className="pn-studio-lighting" />
       <div className="pn-grid-texture" />
-
-      {/* RUNNING KINETIC BRAND TICKER */}
-      <div className="pn-brand-ticker">
-        <div className="pn-ticker-track">
-          <span>🍑 SWEET AS A PEACH ✦ THE CREATIVE MARKETPLACE OF THE SOUTH</span>
-          <span>✦ VETTED CREATIVES YOU CAN TRUST AT AFFORDABLE PRICES</span>
-          <span>✦ 1 COIN = 1 FINISHED DELIVERABLE</span>
-          <span>✦ 24–48H TURNAROUND</span>
-          <span>✦ 75% DIRECT CREATOR PAYOUT</span>
-          <span>✦ NO RETAINERS ✦ BIRMINGHAM & BEYOND</span>
-          <span>🍑 SWEET AS A PEACH ✦ THE CREATIVE MARKETPLACE OF THE SOUTH</span>
-          <span>✦ VETTED CREATIVES YOU CAN TRUST AT AFFORDABLE PRICES</span>
-          <span>✦ 1 COIN = 1 FINISHED DELIVERABLE</span>
-          <span>✦ 24–48H TURNAROUND</span>
-          <span>✦ 75% DIRECT CREATOR PAYOUT</span>
-          <span>✦ NO RETAINERS ✦ BIRMINGHAM & BEYOND</span>
-        </div>
-      </div>
 
       {/* TOP HEADER */}
       <header className="pn-header">
@@ -2608,11 +2554,11 @@ export default function HomePage() {
 
         <nav className="pn-header-nav-links">
           <a href="#work" className="pn-h-link">Work</a>
-          <a href="#creatives" className="pn-h-link">Creatives</a>
+          <a href="#creatives" className="pn-h-link">Creatives in Action</a>
           <a href="#pricing" className="pn-h-link">Pricing</a>
           <a href="#ecosystem" className="pn-h-link">Academy & Hub</a>
           <a
-            href="https://youtube.com/PeachNetwork"
+            href="https://www.youtube.com/@SweetAsapeachCS"
             target="_blank"
             rel="noopener noreferrer"
             className="pn-yt-nav-pill"
@@ -2661,7 +2607,7 @@ export default function HomePage() {
 
           <div className="pn-value-pill">
             <span>🪙</span>
-            <span><strong>1 Coin = 1 Finished Deliverable</strong> • Flat Pricing • 24–48h Turnaround</span>
+            <span><strong>1 Peach Coin = 1 Finished Deliverable</strong> • Flat Coin Pricing • 24–48h Turnaround</span>
           </div>
 
           <div className="pn-hero-actions">
@@ -2740,7 +2686,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* YOUTUBE FEATURE BANNER: SEE OUR CREATIVES IN ACTION */}
+      {/* YOUTUBE FEATURE BANNER: SOFT, WARM PEACH CARD */}
       <section className="pn-yt-feature-banner">
         <div className="pn-yt-card">
           <div className="pn-yt-left">
@@ -2748,57 +2694,49 @@ export default function HomePage() {
             <div className="pn-yt-info">
               <h3>Watch Our Creatives in Action on YouTube</h3>
               <p>
-                Follow our official YouTube channel to watch behind-the-scenes shoots, client case studies, design breakdowns, and creative tutorials across Alabama and the South.
+                Follow our official YouTube channel at <strong>@SweetAsapeachCS</strong> to see behind-the-scenes video shoots, client case studies, and creative masterclasses.
               </p>
             </div>
           </div>
           <a
-            href="https://youtube.com/PeachNetwork"
+            href="https://www.youtube.com/@SweetAsapeachCS"
             target="_blank"
             rel="noopener noreferrer"
             className="pn-yt-btn"
           >
-            <span>▶</span> Watch youtube.com/PeachNetwork
+            <span>▶</span> youtube.com/@SweetAsapeachCS
           </a>
         </div>
       </section>
 
-      {/* MEET OUR CREATIVES IN ACTION (REAL TEAM GALLERY) */}
+      {/* CREATIVES IN THE WILD */}
       <section id="creatives" className="pn-action-gallery-section">
         <div className="pn-gallery-container">
           <div className="pn-gallery-header">
-            <div className="pn-gallery-kicker">✦ Real Talent • Real Studios ✦</div>
+            <div className="pn-gallery-kicker">✦ Behind The Scenes ✦</div>
             <h2 className="pn-gallery-title">
-              Meet the Creatives Behind <span>Sweet As A Peach</span>
+              Creatives <span>in the Wild</span>
             </h2>
             <p className="pn-gallery-sub">
-              No anonymous overseas bots. Meet the vetted videographers, brand illustrators, print specialists, and web designers bringing Southern businesses to life.
+              Candid snapshots from client video shoots, studio reviews, laptop setups, and local community events across the South.
             </p>
           </div>
 
-          <div className="pn-gallery-grid">
-            {CREATIVE_SNAPS.map((snap, idx) => (
-              <div key={idx} className="pn-gallery-card">
-                <div className="pn-gallery-media">
-                  <img
-                    src={snap.image}
-                    alt={snap.caption}
-                    className="pn-gallery-img"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      const next = snap.altImages.find((src) => !target.src.includes(src));
-                      if (next) {
-                        target.src = next;
-                      }
-                    }}
-                  />
-                  <div className="pn-gallery-role-pill">
-                    <span>{snap.icon}</span> {snap.role}
-                  </div>
-                </div>
-                <div className="pn-gallery-meta">
-                  <p className="pn-gallery-caption">{snap.caption}</p>
-                </div>
+          <div className="pn-wild-grid">
+            {CREATIVES_IN_THE_WILD.map((item) => (
+              <div key={item.id} className="pn-wild-card">
+                <img
+                  src={item.image}
+                  alt={item.label}
+                  className="pn-wild-img"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    const next = item.altImages.find((src) => !target.src.includes(src));
+                    if (next) {
+                      target.src = next;
+                    }
+                  }}
+                />
               </div>
             ))}
           </div>
@@ -2851,7 +2789,7 @@ export default function HomePage() {
               <div className="pn-matrix-tag pn-mt-peach">Vetted & Curated</div>
               <h3 className="pn-matrix-title">Peach Network</h3>
               <div className="pn-matrix-price" style={{ color: "#E85D3F", fontWeight: 800 }}>
-                🪙 Flat Coins ($50 base) • 75% to Talent
+                🪙 Peach Coins ($50 base) • 75% to Talent
               </div>
               <ul className="pn-matrix-points">
                 <li className="pn-mp-item"><span className="pn-mp-pro">✓</span> <span><strong>Vetted Creatives You Can Trust</strong> at affordable rates</span></li>
@@ -2885,7 +2823,7 @@ export default function HomePage() {
               <div className="pn-brief-tags">
                 <span className="pn-b-tag">🏀 Sports & Event Design</span>
                 <span className="pn-b-tag">⚡ 24–48h Turnaround</span>
-                <span className="pn-b-tag">🪙 2 Coins ($100)</span>
+                <span className="pn-b-tag">🪙 2 Peach Coins ($100)</span>
               </div>
             </div>
 
@@ -2964,7 +2902,7 @@ export default function HomePage() {
               </div>
             ))}
 
-            {/* Duplicate for infinite loop */}
+            {/* Duplicate for seamless infinite loop */}
             {RECENT_PROJECTS.map((proj) => (
               <div key={`dup-${proj.id}`} className="pn-project-card">
                 <div className="pn-card-media" style={{ background: proj.bgGradient }}>
@@ -3263,6 +3201,13 @@ export default function HomePage() {
               Get Matched Today
             </Link>
           </div>
+
+          {/* SMOOTH BACK TO TOP BUTTON */}
+          <div className="pn-back-to-top-bar">
+            <button onClick={scrollToTop} className="pn-back-to-top-btn" aria-label="Back to Top">
+              ↑ Back to Top • Start a Project
+            </button>
+          </div>
         </div>
       </section>
 
@@ -3275,12 +3220,12 @@ export default function HomePage() {
           </div>
           <div className="pn-footer-right">
             <a
-              href="https://youtube.com/PeachNetwork"
+              href="https://www.youtube.com/@SweetAsapeachCS"
               target="_blank"
               rel="noopener noreferrer"
-              className="pn-footer-link"
+              className="pn-footer-link pn-footer-yt-link"
             >
-              ▶ YouTube: youtube.com/PeachNetwork
+              ▶ YouTube: @SweetAsapeachCS
             </a>
             <Link href="/about" className="pn-footer-link">About</Link>
             <Link href="/match" className="pn-footer-link">Find a Creative</Link>
@@ -3311,7 +3256,7 @@ export default function HomePage() {
             Recent Work
           </a>
           <a href="#creatives" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
-            Creatives in Action
+            Creatives in the Wild
           </a>
           <a href="#pricing" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
             Pricing
@@ -3320,14 +3265,14 @@ export default function HomePage() {
             Academy & Hub
           </a>
           <a
-            href="https://youtube.com/PeachNetwork"
+            href="https://www.youtube.com/@SweetAsapeachCS"
             target="_blank"
             rel="noopener noreferrer"
             className="pn-drawer-link"
             onClick={() => setMenuOpen(false)}
             style={{ color: "#DC2626" }}
           >
-            ▶ Watch YouTube
+            ▶ Watch @SweetAsapeachCS
           </a>
           <Link href="/apply" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
             Apply as a Creative
