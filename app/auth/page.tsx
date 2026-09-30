@@ -44,21 +44,7 @@ function AuthContent() {
         const { data: me } = await supabase.auth.getUser();
         if (!me.user) throw new Error("We could not load your account.");
 
-        const { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", me.user.id)
-          .single();
-
-        if (profileError) {
-          router.push("/account");
-        } else if (profile?.role === "creative") {
-          router.push("/creative");
-        } else if (profile?.role === "admin") {
-          router.push("/admin");
-        } else {
-          router.push("/business");
-        }
+        router.push("/account");
         router.refresh();
         return;
       }
