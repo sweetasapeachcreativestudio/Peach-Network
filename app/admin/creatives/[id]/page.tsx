@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect, notFound } from "next/navigation";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { notFound } from "next/navigation";
 import CreativeReviewActions from "./review-actions";
 
 export default async function CreativeReviewDetail({
@@ -8,18 +8,10 @@ export default async function CreativeReviewDetail({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params;
-  const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/auth");
-
-  const { data: me } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (me?.role !== "admin") redirect("/");
+  // Authentication/authorization is handled once by app/admin/layout.tsx.
+  // Use the server-only admin client for review data so RLS cannot bounce an
+  // already-authorized admin back to the public homepage.
+  const supabase = createAdminClient();
 
   const { data: creative } = await supabase
     .from("creatives")
