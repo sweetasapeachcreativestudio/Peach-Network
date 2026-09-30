@@ -1,132 +1,45 @@
 "use client";
+import {useMemo,useState} from "react";
+import {useRouter} from "next/navigation";
+import {SERVICE_GUIDE} from "@/lib/project-pricing";
 
-import { useMemo, useState, type ReactNode } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { SERVICE_GUIDE } from "@/lib/project-pricing";
-import { CameraIcon, GlobeIcon, PaletteIcon, PenIcon, SparkIcon, VideoIcon } from "../../components/icons";
+type ServiceKey=keyof typeof SERVICE_GUIDE;
+type Step="idea"|"format"|"style"|"details"|"timing"|"review";
 
-type ServiceKey = keyof typeof SERVICE_GUIDE;
+function inferService(text:string):ServiceKey{
+ const q=text.toLowerCase();
+ if(q.includes("flyer")||q.includes("poster"))return "flyer";
+ if(q.includes("logo"))return q.includes("refresh")?"logo_refresh":"new_logo";
+ if(q.includes("landing"))return "landing_page";
+ if(q.includes("website")||q.includes("web"))return "small_web_update";
+ if(q.includes("reel"))return "simple_reel";
+ if(q.includes("video"))return "promo_video";
+ if(q.includes("photo"))return "mini_photo";
+ if(q.includes("brochure"))return "brochure";
+ if(q.includes("presentation")||q.includes("pitch deck"))return "presentation";
+ if(q.includes("social"))return "social_graphic";
+ return "social_graphic";
+}
+function categoryFor(k:ServiceKey){if(String(k).includes("web")||k==="landing_page"||k==="homepage_refresh"||k==="multipage_refresh")return"Website";if(String(k).includes("video")||String(k).includes("reel")||String(k).includes("motion")||String(k).includes("animation"))return"Video & Motion";if(String(k).includes("photo"))return"Photography";if(String(k).includes("logo")||k==="illustration")return"Brand & Illustration";return"Design"}
 
-type CategoryKey = "design" | "web" | "brand" | "video" | "photo" | "not_sure";
-
-const CATEGORY_META: Record<CategoryKey, { label: string; icon: ReactNode; keys: ServiceKey[] }> = {
-  design: { label: "Design", icon: <PenIcon />, keys: ["social_graphic","flyer","business_card","banner","carousel","newsletter","brochure","presentation"] },
-  web: { label: "Website", icon: <GlobeIcon />, keys: ["small_web_update","landing_page","homepage_refresh","multipage_refresh"] },
-  brand: { label: "Brand & Illustration", icon: <PaletteIcon />, keys: ["logo_refresh","new_logo","illustration"] },
-  video: { label: "Video & Motion", icon: <VideoIcon />, keys: ["simple_reel","advanced_video","motion_graphic","logo_animation","promo_video"] },
-  photo: { label: "Photography", icon: <CameraIcon />, keys: ["mini_photo","brand_photo"] },
-  not_sure: { label: "Not Sure Yet", icon: <SparkIcon />, keys: [] },
-};
-
-export default function ProjectBuilder({ availableCoins }: { availableCoins: number }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const initialBrief = searchParams.get("brief") ?? "";
-  const [category, setCategory] = useState<CategoryKey>("design");
-  const [serviceKey, setServiceKey] = useState<ServiceKey>("flyer");
-  const [complexity, setComplexity] = useState<"standard"|"expanded">("standard");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState(initialBrief);
-  const [deadline, setDeadline] = useState("");
-  const [revisions, setRevisions] = useState(2);
-  const [busy, setBusy] = useState(false);
-  const [feedback, setFeedback] = useState("");
-
-  const service = SERVICE_GUIDE[serviceKey];
-  const estimate = useMemo(() => complexity === "expanded" ? service.max : service.min, [service, complexity]);
-  const isRange = service.min !== service.max;
-  const canAfford = availableCoins >= estimate;
-
-  function selectCategory(next: CategoryKey) {
-    setCategory(next);
-    if (next !== "not_sure" && CATEGORY_META[next].keys.length) {
-      setServiceKey(CATEGORY_META[next].keys[0]);
-    }
-  }
-
-  async function submit() {
-    setBusy(true); setFeedback("");
-    try {
-      if (!title.trim()) throw new Error("Give your project a short name.");
-      if (!description.trim()) throw new Error("Tell Peach a little about what you need.");
-      if (category === "not_sure") throw new Error("Choose the closest project category for now. You can explain the rest in the project details.");
-
-      const res = await fetch("/api/projects/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          serviceKey,
-          complexity,
-          title: title.trim(),
-          description: description.trim(),
-          category: CATEGORY_META[category].label,
-          dueAt: deadline ? new Date(`${deadline}T17:00:00`).toISOString() : null,
-          revisionRounds: revisions,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "We could not create the project.");
-      router.push(`/projects/${data.project.id}?created=1`);
-      router.refresh();
-    } catch (err) {
-      setFeedback(err instanceof Error ? err.message : "Something went wrong.");
-    } finally { setBusy(false); }
-  }
-
-  return <div className="project-builder">
-    <div className="builder-layout">
-      <div className="builder-form">
-        <section className="builder-block">
-          <h2>1. What are we making?</h2>
-          <p>Pick the closest category. Peach uses this to guide the scope and match.</p>
-          <div className="category-grid">
-            {(Object.entries(CATEGORY_META) as [CategoryKey, typeof CATEGORY_META[CategoryKey]][]).map(([key, item]) => <button type="button" key={key} className={`category-button ${category === key ? "active" : ""}`} onClick={() => selectCategory(key)}>{item.icon}<strong>{item.label}</strong></button>)}
-          </div>
-
-          {category !== "not_sure" && <div className="service-grid">
-            {CATEGORY_META[category].keys.map((key) => {
-              const item = SERVICE_GUIDE[key];
-              return <button type="button" className={`service-button ${serviceKey === key ? "active" : ""}`} key={key} onClick={() => setServiceKey(key)}><span>{item.label}</span><span>{item.min === item.max ? `${item.min} coin${item.min === 1 ? "" : "s"}` : `${item.min}–${item.max} coins`}</span></button>;
-            })}
-          </div>}
-        </section>
-
-        <section className="builder-block">
-          <h2>2. Tell Peach about it.</h2>
-          <p>Enough detail for a creative to understand the job — no giant brief required.</p>
-          <label><strong>Project name</strong><input className="field" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Example: Fall Menu Flyer" /></label>
-          <label><strong>What do you need?</strong><textarea className="field" value={description} onChange={e=>setDescription(e.target.value)} placeholder="Example: I need a fall menu flyer for Facebook and print. I already have the menu copy and logo." /></label>
-          <label><strong>How involved is this project?</strong>
-            <select className="field" value={complexity} onChange={e=>setComplexity(e.target.value as "standard"|"expanded")}>
-              <option value="standard">Standard — straightforward scope</option>
-              <option value="expanded">Expanded — more content, detail or complexity</option>
-            </select>
-          </label>
-        </section>
-
-        <section className="builder-block">
-          <h2>3. Timing & revisions.</h2>
-          <p>Peach will use these details when sending the opportunity to a matched creative.</p>
-          <div className="grid grid-2">
-            <label><strong>Ideal deadline</strong><input className="field" type="date" value={deadline} onChange={e=>setDeadline(e.target.value)} /></label>
-            <label><strong>Revision rounds</strong><select className="field" value={revisions} onChange={e=>setRevisions(Number(e.target.value))}><option value={1}>1 round</option><option value={2}>2 rounds</option><option value={3}>3 rounds</option></select></label>
-          </div>
-        </section>
-      </div>
-
-      <aside className="coin-summary">
-        <small>LIVE PEACH ESTIMATE</small>
-        <div className="coin-number">{estimate}</div>
-        <strong>Peach Coin{estimate === 1 ? "" : "s"}</strong>
-        <p>{service.label}{isRange ? ` normally falls between ${service.min}–${service.max} coins.` : " has a set starting coin value."}</p>
-        <hr/>
-        <div className="summary-line"><span>Your wallet</span><strong>{availableCoins} coins</strong></div>
-        <div className="summary-line"><span>After estimated hold</span><strong>{Math.max(0,availableCoins-estimate)} coins</strong></div>
-        <div className="summary-line"><span>Revisions</span><strong>{revisions} round{revisions===1?"":"s"}</strong></div>
-        {!canAfford && <div className="review-banner">You can still save the request, but you’ll need more Peach Coins before a project can be fully committed.</div>}
-        <button type="button" className="btn btn-soft btn-large" style={{width:"100%",marginTop:16}} onClick={submit} disabled={busy}>{busy ? "Creating…" : "Find My Creative →"}</button>
-        {feedback && <div className="submit-feedback" role="status">{feedback}</div>}
-      </aside>
-    </div>
-  </div>;
+export default function ProjectBuilder({availableCoins}:{availableCoins:number}){
+ const router=useRouter(); const[step,setStep]=useState<Step>("idea"); const[idea,setIdea]=useState(""); const[serviceKey,setServiceKey]=useState<ServiceKey>("flyer"); const[format,setFormat]=useState(""); const[style,setStyle]=useState(""); const[details,setDetails]=useState(""); const[deadline,setDeadline]=useState(""); const[busy,setBusy]=useState(false); const[msg,setMsg]=useState("");
+ const service=SERVICE_GUIDE[serviceKey]; const estimate=service.min; const progress={idea:16,format:34,style:52,details:70,timing:86,review:100}[step];
+ function begin(){if(!idea.trim()){setMsg("Tell Peach what you need first.");return}setServiceKey(inferService(idea));setMsg("");setStep("format")}
+ async function submit(){setBusy(true);setMsg("");try{const title=idea.trim().split(/[.!?]/)[0].slice(0,72)||service.label;const description=[idea,format&&`Format: ${format}`,style&&`Style: ${style}`,details&&`Details to print/use: ${details}`].filter(Boolean).join("\n\n");const r=await fetch("/api/projects/create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({serviceKey,complexity:"standard",title,description,category:categoryFor(serviceKey),dueAt:deadline?new Date(`${deadline}T17:00:00`).toISOString():null,revisionRounds:2})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not create project.");await fetch("/api/projects/ai-match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({projectId:d.project.id})});router.push(`/business/matches?project=${d.project.id}`);router.refresh()}catch(e){setMsg(e instanceof Error?e.message:"Something went wrong.")}finally{setBusy(false)}}
+ const summary=useMemo(()=>[{k:"Project",v:service.label},{k:"Format",v:format||"—"},{k:"Style",v:style||"—"},{k:"Deadline",v:deadline?new Date(deadline+"T12:00:00").toLocaleDateString():"Flexible"},{k:"Estimate",v:`${estimate} Peach Coin${estimate===1?"":"s"}`}],[service,format,style,deadline,estimate]);
+ return <div className="pn-ai-builder">
+  <section className="pn-ai-conversation">
+   <div className="pn-ai-progress"><span style={{width:`${progress}%`}}/></div>
+   <div className="pn-ai-person"><b>🍑</b><div><strong>Peach AI</strong><small>60-second project setup</small></div></div>
+   {step==="idea"&&<div className="pn-ai-step"><h2>What are we creating today?</h2><p>Just tell me normally. You don't need to know design terminology.</p><textarea className="field" autoFocus value={idea} onChange={e=>setIdea(e.target.value)} placeholder="Example: I need a flyer for my restaurant's grand opening next Saturday."/><button className="btn btn-primary btn-large" onClick={begin}>That’s it →</button></div>}
+   {step==="format"&&<div className="pn-ai-step"><h2>Got it. Where will people see it?</h2><p>I think this is closest to <strong>{service.label}</strong>. Pick the main format.</p><div className="pn-choice-grid">{["Instagram / Social","Print","Both print + social","Website / Digital","Not sure"].map(x=><button className={format===x?"active":""} onClick={()=>{setFormat(x);setStep("style")}} key={x}>{x}</button>)}</div></div>}
+   {step==="style"&&<div className="pn-ai-step"><h2>What should it feel like?</h2><p>This helps me find creatives whose work actually fits your project.</p><div className="pn-choice-grid">{["Bold + Fun","Clean + Modern","Luxury","Southern / Homegrown","Professional","I'll describe it"].map(x=><button key={x} className={style===x?"active":""} onClick={()=>{setStyle(x);setStep("details")}}>{x}</button>)}</div></div>}
+   {step==="details"&&<div className="pn-ai-step"><h2>What absolutely needs to be on it?</h2><p>Put names, dates, address, phone, prices, wording, QR instructions or anything the creative must use here.</p><textarea className="field" value={details} onChange={e=>setDetails(e.target.value)} placeholder="Grand opening October 12 · 123 Main St · 205-555-0123…"/><button className="btn btn-primary btn-large" onClick={()=>setStep("timing")}>Continue →</button></div>}
+   {step==="timing"&&<div className="pn-ai-step"><h2>When do you need it?</h2><p>If there's no hard deadline, you can leave this blank.</p><input className="field" type="date" value={deadline} onChange={e=>setDeadline(e.target.value)}/><button className="btn btn-primary btn-large" onClick={()=>setStep("review")}>Build my brief →</button></div>}
+   {step==="review"&&<div className="pn-ai-step"><span className="eyebrow">PEACH BUILT YOUR BRIEF</span><h2>Ready to find your Peach?</h2><p>I have enough to post this project and look for three creatives who fit the work.</p><button className="btn btn-primary btn-large" onClick={submit} disabled={busy}>{busy?"Posting + matching…":"Post Project & Find My Matches →"}</button></div>}
+   {msg&&<div className="submit-feedback">{msg}</div>}
+  </section>
+  <aside className="pn-ai-brief"><small>LIVE PROJECT BRIEF</small><h3>{idea.trim()?idea.trim().slice(0,55):"Your project"}</h3>{summary.map(x=><div className="summary-line" key={x.k}><span>{x.k}</span><strong>{x.v}</strong></div>)}<hr/><div className="pn-ai-wallet"><span>Your wallet</span><b>{availableCoins} coins</b></div><p>Peach will show scope, payout and deadline to matched creatives before they accept.</p></aside>
+ </div>
 }
