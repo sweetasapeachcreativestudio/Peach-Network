@@ -15,7 +15,8 @@ export async function POST(request:Request){
  const {projectId}=await request.json(); const admin=createAdminClient();
  const {data:project}=await admin.from("projects").select("id,title,description,category,business_id,due_at,revision_rounds,coin_amount").eq("id",projectId).single();
  if(!project)return NextResponse.json({error:"Project not found."},{status:404});
- const {data:business}=await admin.from("businesses").select("owner_user_id").eq("id",project.business_id).single();
+ const safeProject=project;
+ const {data:business}=await admin.from("businesses").select("owner_user_id").eq("id",safeProject.business_id).single();
  const {data:profile}=await admin.from("profiles").select("role").eq("id",user.id).single();
  if(business?.owner_user_id!==user.id&&profile?.role!=="admin")return NextResponse.json({error:"Project owner required."},{status:403});
  const [{data:demos},{data:realRows}]=await Promise.all([admin.from("demo_creatives").select("*").eq("available_for_projects",true),admin.from("creatives").select("id,user_id,primary_specialty,secondary_specialties,tools,industries,city,state,peach_level,bio,education,portfolio_url,remote,mentor_name,reliability_score,available_for_projects").eq("application_status","approved").eq("available_for_projects",true)]);
@@ -24,17 +25,17 @@ export async function POST(request:Request){
  const nameMap=new Map((realNames??[]).map((p:any)=>[p.id,p.full_name]));
  const real:DemoCreative[]=(realRows??[]).map((c:any)=>({id:c.id,name:nameMap.get(c.user_id)||"Peach Creative",peach_level:c.peach_level||"seed",headline:c.primary_specialty||"Multidisciplinary Creative",city:c.city,state:c.state,remote_available:c.remote!==false,specialties:[c.primary_specialty,...(c.secondary_specialties??[])].filter(Boolean),tools:c.tools??[],industries:c.industries??[],bio:c.bio,portfolio_highlights:(realWork??[]).filter((w:any)=>w.creative_id===c.id).map((w:any)=>[w.title,w.industry,w.role_detail,...(w.tags??[])].filter(Boolean).join(" · ")),certifications:(realCerts??[]).filter((x:any)=>x.creative_id===c.id).map((x:any)=>x.title),education:c.education||"",mentor_name:c.mentor_name,reliability_score:c.reliability_score??100,available_for_projects:c.available_for_projects,demo_only:false}));
  const pool=[...real,...((demos??[]) as DemoCreative[])];
- const fallback=rankDemoCreatives(`${project.category} ${project.title} ${project.description??""}`, pool);
+ const fallback=rankDemoCreatives(`${safeProject.category} ${safeProject.title} ${safeProject.description??""}`, pool);
 
  // Optional live AI reranking. The beta remains functional without a separate API key.
  const apiKey=process.env.OPENAI_API_KEY;
  async function saveShortlist(matches:any[],mode:string){
    const chosen=matches.filter((m:any)=>m.demo_only!==true).slice(0,3);
    if(!chosen.length)return NextResponse.json({ok:true,mode,matches:[]});
-   const {data:old}=await admin.from("project_match_shortlists").select("creative_id,batch_number").eq("project_id",project.id);
+   const {data:old}=await admin.from("project_match_shortlists").select("creative_id,batch_number").eq("project_id",safeProject.id);
    const used=new Set((old??[]).map((x:any)=>x.creative_id)); const fresh=chosen.filter((m:any)=>!used.has(m.id));
    const batch=Math.max(0,...(old??[]).map((x:any)=>x.batch_number||1))+1;
-   const rows=fresh.map((m:any)=>({project_id:project.id,creative_id:m.id,match_score:Math.round(m.score||80),match_reason:m.reason||"Strong fit for this project.",batch_number:batch,status:"candidate"}));
+   const rows=fresh.map((m:any)=>({project_id:safeProject.id,creative_id:m.id,match_score:Math.round(m.score||80),match_reason:m.reason||"Strong fit for this project.",batch_number:batch,status:"candidate"}));
    if(rows.length)await admin.from("project_match_shortlists").insert(rows);
    return NextResponse.json({ok:true,mode,matches:fresh.slice(0,3),batch});
  }
@@ -48,7 +49,7 @@ export async function POST(request:Request){
      ...pool.filter(d=>!fallback.some(f=>f.id===d.id)).slice(0,5),
    ];
    const compact=compactSource.map(c=>({id:c.id,name:c.name,level:c.peach_level,headline:c.headline,specialties:c.specialties,industries:c.industries,bio:c.bio,portfolio:c.portfolio_highlights,certifications:c.certifications,reliability:c.reliability_score,mentor:c.mentor_name}));
-   const prompt=`You are Peach Match, a fair creative matching assistant. Rank the best 3 creatives for this project. Weight verified relevant portfolio work, niche/industry fit, profile introduction, specialty, availability and reliability more heavily than self-declared generic skills. Do not automatically favor seniority. Seed creatives may be matched to appropriate work only when mentor-supported; Sapling creatives may work independently or with optional mentor support. Give emerging creatives a fair chance when their evidence fits. Return ONLY valid JSON in the shape {"matches":[{"id":"uuid","score":92,"reason":"short explanation"}]}.\nPROJECT:${JSON.stringify(project)}\nCREATIVES:${JSON.stringify(compact)}`;
+   const prompt=`You are Peach Match, a fair creative matching assistant. Rank the best 3 creatives for this project. Weight verified relevant portfolio work, niche/industry fit, profile introduction, specialty, availability and reliability more heavily than self-declared generic skills. Do not automatically favor seniority. Seed creatives may be matched to appropriate work only when mentor-supported; Sapling creatives may work independently or with optional mentor support. Give emerging creatives a fair chance when their evidence fits. Return ONLY valid JSON in the shape {"matches":[{"id":"uuid","score":92,"reason":"short explanation"}]}.\nPROJECT:${JSON.stringify(safeProject)}\nCREATIVES:${JSON.stringify(compact)}`;
    const r=await fetch("https://api.openai.com/v1/responses",{method:"POST",headers:{"Authorization":`Bearer ${apiKey}`,"Content-Type":"application/json"},body:JSON.stringify({model:"gpt-5.6-luna",input:prompt,reasoning:{effort:"low"},max_output_tokens:600})});
    if(!r.ok) throw new Error(`AI response ${r.status}`);
    const payload=await r.json(); const text=extractOutputText(payload).replace(/^```json\s*|```$/g,"").trim(); const parsed=JSON.parse(text);
