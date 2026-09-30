@@ -16,7 +16,9 @@ export async function POST(request:Request){
   const {data:business}=await admin.from("businesses").select("id").eq("owner_user_id",user.id).single();
   if(!business) return NextResponse.json({error:"Business account required."},{status:403});
 
-  const coins=recommendCoins(serviceKey,body.complexity==="expanded"?"expanded":"standard");
+  const guidedCoins=recommendCoins(serviceKey,body.complexity==="expanded"?"expanded":"standard");
+  const aiCoins=Number(body.aiCoins);
+  const coins=Number.isFinite(aiCoins)&&aiCoins>0?Math.max(1,Math.round(aiCoins)):guidedCoins;
 
   const {data:project,error}=await admin.from("projects").insert({
     business_id:business.id,
