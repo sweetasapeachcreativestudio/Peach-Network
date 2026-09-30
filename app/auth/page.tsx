@@ -44,8 +44,7 @@ function AuthContent() {
         const { data: me } = await supabase.auth.getUser();
         if (!me.user) throw new Error("We could not load your account.");
 
-        router.push("/account");
-        router.refresh();
+        window.location.href = "/account";
         return;
       }
 
