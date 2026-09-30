@@ -162,7 +162,7 @@ function AuthContent() {
                 <strong>Password</strong>
                 <input className="field" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="8+ characters" autoComplete={mode === "signin" ? "current-password" : "new-password"} />
               </label>
-              <button className="btn btn-primary btn-large" style={{width:"100%"}} onClick={submit} disabled={busy}>
+              {mode === "signin" && <div style={{textAlign:"right",marginTop:-6,marginBottom:14}}><Link href="/auth/forgot-password" className="text-link">Forgot password?</Link></div>}\n              <button className="btn btn-primary btn-large" style={{width:"100%"}} onClick={submit} disabled={busy}>
                 {busy ? "Working…" : mode === "signup" ? (role === "business" ? "Create Business Account" : "Apply to Peach Network") : "Sign In"}
               </button>
             </>
