@@ -32,7 +32,8 @@ function AuthContent() {
 
   async function googleSignIn() {
     setMessage("");
-    const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/account")}` } });
+    const googleNext = mode === "signup" && role === "creative" ? "/creative/apply" : "/account";
+    const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(googleNext)}&role=${role}`, queryParams: { access_type: "offline", prompt: "select_account" } } });
     if (error) setMessage(error.message);
   }
 
