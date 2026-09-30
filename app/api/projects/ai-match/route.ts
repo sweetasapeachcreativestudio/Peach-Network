@@ -28,7 +28,17 @@ export async function POST(request:Request){
 
  // Optional live AI reranking. The beta remains functional without a separate API key.
  const apiKey=process.env.OPENAI_API_KEY;
- if(!apiKey) return NextResponse.json({ok:true,mode:"smart-beta",matches:fallback});
+ async function saveShortlist(matches:any[],mode:string){
+   const chosen=matches.filter((m:any)=>m.demo_only!==true).slice(0,3);
+   if(!chosen.length)return NextResponse.json({ok:true,mode,matches:[]});
+   const {data:old}=await admin.from("project_match_shortlists").select("creative_id,batch_number").eq("project_id",project.id);
+   const used=new Set((old??[]).map((x:any)=>x.creative_id)); const fresh=chosen.filter((m:any)=>!used.has(m.id));
+   const batch=Math.max(0,...(old??[]).map((x:any)=>x.batch_number||1))+1;
+   const rows=fresh.map((m:any)=>({project_id:project.id,creative_id:m.id,match_score:Math.round(m.score||80),match_reason:m.reason||"Strong fit for this project.",batch_number:batch,status:"candidate"}));
+   if(rows.length)await admin.from("project_match_shortlists").insert(rows);
+   return NextResponse.json({ok:true,mode,matches:fresh.slice(0,3),batch});
+ }
+ if(!apiKey) return saveShortlist(fallback,"smart-beta");
  try{
    // Build the AI candidate list as the shared base type first. `fallback` contains
    // scored match objects, while `pool` contains DemoCreative objects; concatenating
@@ -44,7 +54,7 @@ export async function POST(request:Request){
    const payload=await r.json(); const text=extractOutputText(payload).replace(/^```json\s*|```$/g,"").trim(); const parsed=JSON.parse(text);
    const byId=new Map(pool.map(c=>[c.id,c]));
    const aiMatches=(parsed.matches??[]).map((m:any)=>{const c=byId.get(m.id);return c?{...c,score:Math.max(50,Math.min(99,Number(m.score)||80)),reason:String(m.reason||"Strong fit for the project."),hits:[]}:null}).filter(Boolean).slice(0,3);
-   if(aiMatches.length) return NextResponse.json({ok:true,mode:"ai",matches:aiMatches});
+   if(aiMatches.length) return saveShortlist(aiMatches,"ai");
  }catch(error){console.error("Peach AI fallback",error)}
- return NextResponse.json({ok:true,mode:"smart-beta",matches:fallback});
+ return saveShortlist(fallback,"smart-beta");
 }
