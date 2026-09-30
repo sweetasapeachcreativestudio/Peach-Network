@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type PeachLevel = "seed" | "sapling" | "tree" | "blossom" | "root";
 
@@ -17,6 +18,7 @@ export default function CreativeReviewActions({
   currentStatus: string;
   existingNotes: string;
 }) {
+  const router = useRouter();
   const [level, setLevel] = useState<PeachLevel>(currentLevel ?? "sapling");
   const [notes, setNotes] = useState(existingNotes);
   const [message, setMessage] = useState("");
@@ -49,7 +51,8 @@ export default function CreativeReviewActions({
     if (action === "approve") {
       setMessage(`Approved as Peach ${level[0].toUpperCase() + level.slice(1)}.`);
     } else if (action === "needs_more_work") {
-      setMessage("Marked as Needs More Work.");
+      router.push(`/admin/creatives/${creativeId}/mentor`);
+      return;
     } else {
       setMessage("Application rejected.");
     }
@@ -94,7 +97,7 @@ export default function CreativeReviewActions({
           Approve Creative
         </button>
         <button className="btn btn-outline" onClick={() => act("needs_more_work")} disabled={busy}>
-          Needs More Work
+          Assign Mentor
         </button>
         <button className="btn btn-outline" onClick={() => act("reject")} disabled={busy}>
           Reject
