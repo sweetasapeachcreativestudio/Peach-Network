@@ -105,7 +105,7 @@ export default function AdminDashboardPage() {
 
     const cleanEmail = adminEmailInput.trim().toLowerCase();
     
-    // Unlocks for your email or master passcode peach2026
+    // Unlocks for kantana0495@gmail.com or passcode peach2026
     if (cleanEmail === "kantana0495@gmail.com" || adminPasscodeInput.trim() === "peach2026") {
       setIsAdminAuthenticated(true);
       if (typeof window !== "undefined") {
@@ -185,7 +185,7 @@ export default function AdminDashboardPage() {
       t.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Secure Gate Screen (Never auto-redirects)
+  // Secure Gate Screen (Zero auto-redirects)
   if (!isAdminAuthenticated) {
     return (
       <div className="pn-admin-gate">
@@ -208,6 +208,14 @@ export default function AdminDashboardPage() {
             padding: 36px 32px;
             box-shadow: 0 24px 60px rgba(0,0,0,0.4);
             border: 2px solid #E85D3F;
+          }
+          .pn-gate-center {
+            text-align: center;
+            margin-bottom: 16px;
+          }
+          .pn-gate-logo {
+            height: 46px;
+            width: auto;
           }
           .pn-gate-title {
             font-size: 22px;
@@ -242,9 +250,16 @@ export default function AdminDashboardPage() {
             padding: 0 14px;
             font-size: 14.5px;
             outline: none;
+            box-sizing: border-box;
           }
           .pn-gate-input:focus {
             border-color: #E85D3F;
+          }
+          .pn-gate-hint {
+            display: block;
+            font-size: 11px;
+            color: #64748B;
+            margin-top: 2px;
           }
           .pn-gate-btn {
             width: 100%;
@@ -259,6 +274,16 @@ export default function AdminDashboardPage() {
             box-shadow: 0 8px 20px rgba(232, 93, 63, 0.35);
             margin-top: 8px;
           }
+          .pn-gate-return {
+            margin-top: 18px;
+            text-align: center;
+          }
+          .pn-gate-link {
+            color: #E85D3F;
+            font-size: 12.5px;
+            font-weight: 700;
+            text-decoration: none;
+          }
           .pn-error-box {
             background: #FEF2F2;
             border: 1px solid #FECACA;
@@ -270,17 +295,17 @@ export default function AdminDashboardPage() {
           }
         `}</style>
         <div className="pn-gate-card">
-          <div style={{ textAlign: "center", marginBottom: "16px" }}>
-            <img src="/peach-app-logo.png" alt="Peach Network" style={{ height: "46px" }} />
+          <div className="pn-gate-center">
+            <img src="/peach-app-logo.png" alt="Peach Network" className="pn-gate-logo" />
           </div>
           <h1 className="pn-gate-title">
-            <span>🛡️️</span> Peach Super Admin
+            <span>🛡</span> Peach Super Admin
           </h1>
           <p className="pn-gate-sub">
             Direct executive access for <strong>kantana0495@gmail.com</strong>. Manage Peach Coins, customer refunds, and platform deliverables.
           </p>
 
-          {authError && <div className="pn-error-box">⚠️️ {authError}</div>}
+          {authError && <div className="pn-error-box">⚠ {authError}</div>}
 
           <form onSubmit={handleAdminLogin}>
             <div className="pn-gate-field">
@@ -303,7 +328,7 @@ export default function AdminDashboardPage() {
                 value={adminPasscodeInput}
                 onChange={(e) => setAdminPasscodeInput(e.target.value)}
               />
-              <span style={{ display: "block", fontSize: "11px", color: "#64748B", marginTop: 2 }}>
+              <span className="pn-gate-hint">
                 Default unlock key: <code>peach2026</code>
               </span>
             </div>
@@ -313,8 +338,8 @@ export default function AdminDashboardPage() {
             </button>
           </form>
 
-          <div style={{ marginTop: "18px", textAlign: "center" }}>
-            <Link href="/" style={{ color: "#E85D3F", fontSize: "12.5px", fontWeight: 700, textDecoration: "none" }}>
+          <div className="pn-gate-return">
+            <Link href="/" className="pn-gate-link">
               ← Return to Main Homepage
             </Link>
           </div>
@@ -373,6 +398,12 @@ export default function AdminDashboardPage() {
           padding: 6px 14px;
           border-radius: 99px;
           color: #FFA585;
+          font-weight: 700;
+        }
+        .pn-live-link {
+          color: #E2ECE5;
+          text-decoration: none;
+          font-size: 13px;
           font-weight: 700;
         }
         .pn-logout-btn {
@@ -537,6 +568,16 @@ export default function AdminDashboardPage() {
           color: #B91C1C;
         }
 
+        .pn-refund-notice-box {
+          background: #FEF2F2;
+          border: 1px solid #FECACA;
+          padding: 12px;
+          border-radius: 10px;
+          font-size: 13px;
+          color: #991B1B;
+          margin-bottom: 14px;
+        }
+
         .pn-toast {
           position: fixed;
           bottom: 24px;
@@ -598,6 +639,17 @@ export default function AdminDashboardPage() {
           border: none;
           cursor: pointer;
         }
+        .pn-m-btn-danger {
+          flex: 1;
+          height: 44px;
+          border-radius: 99px;
+          background: #DC2626;
+          color: #FFFFFF;
+          font-size: 14px;
+          font-weight: 800;
+          border: none;
+          cursor: pointer;
+        }
         .pn-m-btn-cancel {
           height: 44px;
           padding: 0 20px;
@@ -609,20 +661,86 @@ export default function AdminDashboardPage() {
           border: none;
           cursor: pointer;
         }
+
+        .pn-status-badge {
+          display: inline-block;
+          padding: 3px 10px;
+          border-radius: 99px;
+          font-size: 11.5px;
+          font-weight: 800;
+        }
+        .pn-status-paid {
+          background: #ECFDF5;
+          color: #065F46;
+        }
+        .pn-status-refunded {
+          background: #FEF2F2;
+          color: #991B1B;
+        }
+        .pn-status-approved {
+          background: #ECFDF5;
+          color: #065F46;
+        }
+        .pn-status-review {
+          background: #FEF3C7;
+          color: #92400E;
+        }
+        .pn-status-active {
+          background: #EFF6FF;
+          color: #1E40AF;
+        }
+
+        .pn-modal-form-fields {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .pn-modal-field-label {
+          font-size: 12.5px;
+          font-weight: 800;
+          display: block;
+          margin-bottom: 4px;
+        }
+        .pn-modal-input {
+          width: 100%;
+          height: 44px;
+          border-radius: 10px;
+          border: 1.5px solid #CBD5E1;
+          padding: 0 12px;
+          font-size: 15px;
+          box-sizing: border-box;
+        }
+        .pn-modal-select {
+          width: 100%;
+          height: 44px;
+          border-radius: 10px;
+          border: 1.5px solid #CBD5E1;
+          padding: 0 12px;
+          font-size: 14px;
+          box-sizing: border-box;
+          background: #FFFFFF;
+        }
+        .pn-checkbox-label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          cursor: pointer;
+        }
       `}</style>
 
       {/* Top Navbar */}
       <header className="pn-admin-nav">
         <div className="pn-admin-brand">
           <Link href="/">
-            <img src="/peach-app-logo.png" alt="Peach Network" style={{ height: "36px" }} />
+            <img src="/peach-app-logo.png" alt="Peach Network" style={{ height: "36px", width: "auto" }} />
           </Link>
           <span className="pn-admin-tag">Command Center</span>
         </div>
 
         <div className="pn-admin-user-pill">
           <span className="pn-admin-badge">👑 Super Admin: kantana0495@gmail.com</span>
-          <Link href="/" style={{ color: "#E2ECE5", textDecoration: "none", fontSize: "13px", fontWeight: 700 }}>
+          <Link href="/" className="pn-live-link">
             Live Site ↗
           </Link>
           <button className="pn-logout-btn" onClick={handleAdminLogout}>
@@ -793,15 +911,9 @@ export default function AdminDashboardPage() {
                     <td>{tx.date}</td>
                     <td>
                       <span
-                        style={{
-                          display: "inline-block",
-                          padding: "3px 10px",
-                          borderRadius: "99px",
-                          fontSize: "11.5px",
-                          fontWeight: 800,
-                          background: tx.status === "completed" ? "#ECFDF5" : "#FEF2F2",
-                          color: tx.status === "completed" ? "#065F46" : "#991B1B",
-                        }}
+                        className={`pn-status-badge ${
+                          tx.status === "completed" ? "pn-status-paid" : "pn-status-refunded"
+                        }`}
                       >
                         {tx.status === "completed" ? "✓ Paid" : "↩ Refunded"}
                       </span>
@@ -856,25 +968,13 @@ export default function AdminDashboardPage() {
                     <td>{b.dueIn}</td>
                     <td>
                       <span
-                        style={{
-                          display: "inline-block",
-                          padding: "3px 10px",
-                          borderRadius: "99px",
-                          fontSize: "11.5px",
-                          fontWeight: 800,
-                          background:
-                            b.status === "approved"
-                              ? "#ECFDF5"
-                              : b.status === "review"
-                              ? "#FEF3C7"
-                              : "#EFF6FF",
-                          color:
-                            b.status === "approved"
-                              ? "#065F46"
-                              : b.status === "review"
-                              ? "#92400E"
-                              : "#1E40AF",
-                        }}
+                        className={`pn-status-badge ${
+                          b.status === "approved"
+                            ? "pn-status-approved"
+                            : b.status === "review"
+                            ? "pn-status-review"
+                            : "pn-status-active"
+                        }`}
                       >
                         {b.status === "approved"
                           ? "✓ Delivered & Approved"
@@ -950,21 +1050,21 @@ export default function AdminDashboardPage() {
               Current balance: <strong>{selectedUser.coins} Peach Coins</strong> ({selectedUser.email})
             </p>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div className="pn-modal-form-fields">
               <div>
-                <label style={{ fontSize: "12.5px", fontWeight: 800 }}>Coins to Add (use minus to deduct)</label>
+                <label className="pn-modal-field-label">Coins to Add (use minus to deduct)</label>
                 <input
                   type="number"
-                  style={{ width: "100%", height: 44, borderRadius: 10, border: "1.5px solid #CBD5E1", padding: "0 12px", fontSize: "16px", marginTop: 4 }}
+                  className="pn-modal-input"
                   value={coinsToAdd}
                   onChange={(e) => setCoinsToAdd(parseInt(e.target.value) || 0)}
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: "12.5px", fontWeight: 800 }}>Reason for adjustment</label>
+                <label className="pn-modal-field-label">Reason for adjustment</label>
                 <select
-                  style={{ width: "100%", height: 44, borderRadius: 10, border: "1.5px solid #CBD5E1", padding: "0 12px", fontSize: "14px", marginTop: 4 }}
+                  className="pn-modal-select"
                   value={coinReason}
                   onChange={(e) => setCoinReason(e.target.value)}
                 >
@@ -998,11 +1098,11 @@ export default function AdminDashboardPage() {
               Original Transaction ID: <code>{selectedTx.id}</code>
             </p>
 
-            <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", padding: "12px", borderRadius: "10px", fontSize: "1px solid #FECACA", padding: "12px", borderRadius: "10px", fontSize: "13px", color: "#991B1B", marginBottom: 14 }}>
+            <div className="pn-refund-notice-box">
               Issuing this refund will mark the transaction as refunded in your accounting ledger.
             </div>
 
-            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "13px", cursor: "pointer" }}>
+            <label className="pn-checkbox-label">
               <input
                 type="checkbox"
                 checked={revokeCoins}
@@ -1016,8 +1116,7 @@ export default function AdminDashboardPage() {
                 Cancel
               </button>
               <button
-                className="pn-m-btn-confirm"
-                style={{ background: "#DC2626" }}
+                className="pn-m-btn-danger"
                 onClick={handleProcessRefund}
               >
                 Confirm Full Refund
