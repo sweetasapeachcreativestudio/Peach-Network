@@ -85,14 +85,20 @@ function AuthContent() {
 
   return (
     <main className="auth-page">
-      <section className="auth-brand-panel">
+      <section className="auth-brand-panel auth-impact-panel">
         <PeachBrand full />
-        <div className="auth-brand-copy">
-          <span className="eyebrow" style={{color:"#ffd1ba"}}>WELCOME TO THE NETWORK</span>
-          <h1>{mode === "signin" ? "Come back in." : "Creative work belongs in the right hands."}</h1>
-          <p>{mode === "signin" ? "Your projects, matches, messages and Peach Coins are waiting." : "Businesses find vetted creative talent. Creatives find real work and room to grow."}</p>
+        <div className="impact-visual">
+          <span className="impact-badge">✦ Client Impact Spotlight • Birmingham, AL</span>
+          <span className="impact-sticker">🍑 Design that moves communities</span>
+          <img className="impact-image" src="/lillian-project.jpg" alt="Empower Her Heart client project spotlight"/>
+          <div className="impact-glass">
+            <small>REAL CLIENT • REAL IMPACT</small>
+            <h2>Empower Her Heart • Mobile UI &amp; Web Portal</h2>
+            <p>Lillian Hewitt, CEO (Black Women&apos;s Heart Health, LLC)</p>
+            <span>10 Peach Coins • Delivered in 5 Days</span>
+          </div>
         </div>
-        <img className="v12-auth-human" src="/brand/login-creative.jpg" alt="Creative professional at work"/><div className="auth-side-note">Powered by Sweet As A Peach Creative Agency</div>
+        <div className="auth-side-note">Powered by Sweet As A Peach Creative Agency</div>
       </section>
 
       <section className="auth-form-wrap">
@@ -102,8 +108,12 @@ function AuthContent() {
 
         <div className="auth-card">
           <span className="eyebrow">{mode === "signin" ? "RETURNING MEMBER" : "JOIN PEACH NETWORK"}</span>
-          <h2>{mode === "signin" ? "Welcome back." : "Let’s get you in the right place."}</h2>
-          <p>{mode === "signin" ? "Sign in with the email you used to join Peach Network." : "Choose how you’re joining, then create your account."}</p>
+          <h2>Where Southern creativity creates real impact.</h2>
+          <p>{mode === "signin" ? "Welcome back. Sign in to continue to your Peach workspace." : "Choose your side of the network and create your account."}</p>
+          <div className="auth-role-segment" aria-label="Peach Network role">
+            <button type="button" className={role==="business"?"active":""} onClick={()=>setRole("business")}>🏢 Peach Partner</button>
+            <button type="button" className={role==="creative"?"active":""} onClick={()=>setRole("creative")}>🎨 Peach Creative</button>
+          </div>
 
           <div className="auth-tabs" role="tablist" aria-label="Account action">
             <button type="button" className={mode === "signup" ? "active" : ""} onClick={() => { setMode("signup"); setCheckEmail(false); setMessage(""); }}>Create Account</button>
@@ -112,17 +122,6 @@ function AuthContent() {
 
           {mode === "signup" && !checkEmail && (
             <>
-              <div className="role-selector">
-                <button type="button" className={`role-option ${role === "business" ? "active" : ""}`} onClick={() => setRole("business")}>
-                  <strong>I’m a business owner</strong>
-                  <span>I need creative help.</span>
-                </button>
-                <button type="button" className={`role-option ${role === "creative" ? "active" : ""}`} onClick={() => setRole("creative")}>
-                  <strong>I’m a creative</strong>
-                  <span>I want matched opportunities.</span>
-                </button>
-              </div>
-
               <label>
                 <strong>Your name</strong>
                 <input className="field" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Full name" autoComplete="name" />
@@ -147,7 +146,8 @@ function AuthContent() {
                 <strong>Password</strong>
                 <input className="field" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="8+ characters" autoComplete={mode === "signin" ? "current-password" : "new-password"} />
               </label>
-              {mode === "signin" && <div style={{textAlign:"right",marginTop:-6,marginBottom:14}}><Link href="/auth/forgot-password" className="text-link">Forgot password?</Link></div>}\n              <button className="btn btn-primary btn-large" style={{width:"100%"}} onClick={submit} disabled={busy}>
+              {mode === "signin" && <div style={{textAlign:"right",marginTop:-6,marginBottom:14}}><Link href="/auth/forgot-password" className="text-link">Forgot password?</Link></div>}
+              <button className="btn btn-primary btn-large" style={{width:"100%"}} onClick={submit} disabled={busy}>
                 {busy ? "Working…" : mode === "signup" ? (role === "business" ? "Create Business Account" : "Apply to Peach Network") : "Sign In"}
               </button>
             </>
