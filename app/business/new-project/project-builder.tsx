@@ -42,4 +42,4 @@ export default function ProjectBuilder({availableCoins}:{availableCoins:number})
   </section>
   <aside className="pn-ai-brief"><small>LIVE PROJECT BRIEF</small><h3>{idea.trim()?idea.trim().slice(0,55):"Your project"}</h3>{summary.map(x=><div className="summary-line" key={x.k}><span>{x.k}</span><strong>{x.v}</strong></div>)}<hr/><div className="pn-ai-wallet"><span>Your wallet</span><b>{availableCoins} coins</b></div><p>Peach will show scope, payout and deadline to matched creatives before they accept.</p></aside>
  </div></>
-}}
+}
