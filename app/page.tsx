@@ -2568,7 +2568,7 @@ export default function HomePage() {
         </nav>
 
         <div className="pn-header-right">
-          <Link href="/signin" className="pn-top-signin-btn">
+          <Link href="/auth?mode=signin" className="pn-top-signin-btn">
             Sign In
           </Link>
 
@@ -2611,7 +2611,7 @@ export default function HomePage() {
           </div>
 
           <div className="pn-hero-actions">
-            <Link href="/match" className="pn-btn-hero-primary">
+            <Link href="/auth?role=business&mode=signup" className="pn-btn-hero-primary">
               <span>⚡</span> Start a Project (From $50)
             </Link>
             <a href="#creatives" className="pn-btn-hero-secondary">
@@ -3038,7 +3038,7 @@ export default function HomePage() {
                 No bidding wars, no pay-to-work fees, and no race to the bottom. Apply today and join the premier creative network of the South.
               </p>
             </div>
-            <Link href="/apply" className="pn-eco-apply-btn">
+            <Link href="/auth?role=creative&mode=signup" className="pn-eco-apply-btn">
               <span>🍑</span> Apply as a Creative
             </Link>
           </div>
@@ -3061,7 +3061,7 @@ export default function HomePage() {
               </p>
             </div>
             <div className="pn-ad-action-box">
-              <Link href="/match" className="pn-tap-btn">
+              <Link href="/auth?role=business&mode=signup" className="pn-tap-btn">
                 <span>⚡</span> Tap to Start a Project
               </Link>
               <span className="pn-ad-tagline-sub">Vetted Talent • 24–48h Turnaround • 75% Creative Payout</span>
@@ -3133,7 +3133,7 @@ export default function HomePage() {
                   </div>
 
                   <Link
-                    href="/match"
+                    href="/auth?role=business&mode=signup"
                     className={`pn-card-order-btn ${item.popular ? "pn-btn-card-peach" : "pn-btn-card-primary"}`}
                   >
                     {item.cta}
@@ -3179,7 +3179,7 @@ export default function HomePage() {
                   </div>
 
                   <Link
-                    href="/match"
+                    href="/auth?role=business&mode=signup"
                     className={`pn-card-order-btn ${tier.popular ? "pn-btn-card-peach" : "pn-btn-card-primary"}`}
                   >
                     {tier.cta}
@@ -3197,7 +3197,7 @@ export default function HomePage() {
                 Every project includes 2 revision rounds and direct art-direction oversight. Best of all: 75% of your investment stays directly in the hands of Southern creators.
               </p>
             </div>
-            <Link href="/match" className="pn-guarantee-btn">
+            <Link href="/auth?role=business&mode=signup" className="pn-guarantee-btn">
               Get Matched Today
             </Link>
           </div>
@@ -3227,10 +3227,10 @@ export default function HomePage() {
             >
               ▶ YouTube: @SweetAsapeachCS
             </a>
-            <Link href="/about" className="pn-footer-link">About</Link>
-            <Link href="/match" className="pn-footer-link">Find a Creative</Link>
-            <Link href="/apply" className="pn-footer-link">Apply</Link>
-            <Link href="/signin" className="pn-footer-link">Sign In</Link>
+            <Link href="/#ecosystem" className="pn-footer-link">About</Link>
+            <Link href="/auth?role=business&mode=signup" className="pn-footer-link">Find a Creative</Link>
+            <Link href="/auth?role=creative&mode=signup" className="pn-footer-link">Apply</Link>
+            <Link href="/auth?mode=signin" className="pn-footer-link">Sign In</Link>
           </div>
         </div>
       </footer>
@@ -3274,10 +3274,10 @@ export default function HomePage() {
           >
             ▶ Watch @SweetAsapeachCS
           </a>
-          <Link href="/apply" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
+          <Link href="/auth?role=creative&mode=signup" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
             Apply as a Creative
           </Link>
-          <Link href="/signin" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
+          <Link href="/auth?mode=signin" className="pn-drawer-link" onClick={() => setMenuOpen(false)}>
             Sign In
           </Link>
         </nav>
