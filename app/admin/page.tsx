@@ -1,11 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export default async function AdminHQ() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth?mode=signin");
-  const { data: me } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  const db = createAdminClient();
+  const { data: me } = await db.from("profiles").select("role").eq("id", user.id).single();
   if (me?.role !== "admin") redirect("/");
   return (
     <main className="shell">
