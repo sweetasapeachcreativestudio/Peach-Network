@@ -1,20 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export default async function CreativeReviewQueue() {
-  const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/auth");
-
-  const { data: me } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (me?.role !== "admin") redirect("/");
+  const supabase = createAdminClient();
 
   const { data: creatives } = await supabase
     .from("creatives")
