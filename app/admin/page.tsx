@@ -3,6 +3,13 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
+// 🔒 SUPER ADMIN PRIVATE CONFIGURATION
+// Only this exact email and this exact secret password can enter.
+// Testers are strictly locked out.
+// You can change "PeachAdmin2026!" to whatever private password you want!
+const SUPER_ADMIN_EMAIL = "kantana0495@gmail.com";
+const SUPER_ADMIN_PASSWORD = "PeachAdmin2026!";
+
 interface UserAccount {
   id: string;
   name: string;
@@ -82,11 +89,11 @@ export default function AdminDashboardPage() {
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
   const [revokeCoins, setRevokeCoins] = useState<boolean>(true);
 
-  // Persistent session
+  // Check persistent session in sessionStorage (clears when tab closes)
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("peach_super_admin");
-      if (stored === "kantana0495@gmail.com") {
+      const stored = sessionStorage.getItem("peach_super_admin");
+      if (stored === SUPER_ADMIN_EMAIL) {
         setIsAdminAuthenticated(true);
       }
     }
@@ -99,28 +106,29 @@ export default function AdminDashboardPage() {
     }, 4000);
   };
 
+  // STRICT PASSWORD CHECK: Both email AND secret password must match!
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
 
     const cleanEmail = adminEmailInput.trim().toLowerCase();
-    
-    // Unlocks for kantana0495@gmail.com or passcode peach2026
-    if (cleanEmail === "kantana0495@gmail.com" || adminPasscodeInput.trim() === "peach2026") {
+    const cleanPass = adminPasscodeInput.trim();
+
+    if (cleanEmail === SUPER_ADMIN_EMAIL && cleanPass === SUPER_ADMIN_PASSWORD) {
       setIsAdminAuthenticated(true);
       if (typeof window !== "undefined") {
-        localStorage.setItem("peach_super_admin", "kantana0495@gmail.com");
+        sessionStorage.setItem("peach_super_admin", SUPER_ADMIN_EMAIL);
       }
-      triggerToast("Welcome, Super Admin Kantana! Admin access unlocked.");
+      triggerToast("Super Admin verified. Welcome back, Kantana!");
     } else {
-      setAuthError("Unauthorized. Please verify your admin email or enter the master passcode.");
+      setAuthError("Access Denied: Invalid email or secret password. This portal is strictly restricted to platform administrators.");
     }
   };
 
   const handleAdminLogout = () => {
     setIsAdminAuthenticated(false);
     if (typeof window !== "undefined") {
-      localStorage.removeItem("peach_super_admin");
+      sessionStorage.removeItem("peach_super_admin");
     }
   };
 
@@ -185,7 +193,7 @@ export default function AdminDashboardPage() {
       t.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Secure Gate Screen (Zero auto-redirects)
+  // Secure Gate Screen (Strictly locked)
   if (!isAdminAuthenticated) {
     return (
       <div className="pn-admin-gate">
@@ -263,7 +271,7 @@ export default function AdminDashboardPage() {
           }
           .pn-gate-btn {
             width: 100%;
-            height: 50px;
+            height: 52px;
             border-radius: 99px;
             background: linear-gradient(135deg, #E85D3F 0%, #D44B2D 100%);
             color: #FFFFFF;
@@ -309,7 +317,7 @@ export default function AdminDashboardPage() {
 
           <form onSubmit={handleAdminLogin}>
             <div className="pn-gate-field">
-              <label className="pn-gate-label">Admin Email Address</label>
+              <label className="pn-gate-label">Super Admin Email</label>
               <input
                 type="email"
                 required
@@ -320,21 +328,22 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="pn-gate-field">
-              <label className="pn-gate-label">Master Passcode or PIN</label>
+              <label className="pn-gate-label">Secret Master Password</label>
               <input
                 type="password"
-                placeholder="Enter passcode (default: peach2026)"
+                required
+                placeholder="Enter secret password"
                 className="pn-gate-input"
                 value={adminPasscodeInput}
                 onChange={(e) => setAdminPasscodeInput(e.target.value)}
               />
               <span className="pn-gate-hint">
-                Default unlock key: <code>peach2026</code>
+                Strictly restricted to kantana0495@gmail.com with secret key.
               </span>
             </div>
 
             <button type="submit" className="pn-gate-btn">
-              Unlock Admin Command Center
+              🔒 Authenticate & Unlock Command Center
             </button>
           </form>
 
