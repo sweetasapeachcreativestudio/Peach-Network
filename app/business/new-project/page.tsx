@@ -19,7 +19,7 @@ export default async function NewProject() {
   return <main className="app-shell">
     <AppHeader name={profile?.full_name} role="business" coinCount={wallet?.available_coins ?? 0}/>
     <div className="builder-top"><Link className="back-link" href="/business">← Back to Dashboard</Link></div>
-    <div className="builder-heading"><span className="eyebrow">START A PROJECT</span><h1>Tell Peach what you need.</h1><p>Build the project visually. Your Peach Coin estimate updates as you choose the service and scope.</p></div>
+    <div className="builder-heading"><span className="eyebrow">START A PROJECT · PEACH AI</span><h1>From idea to project in about 60 seconds.</h1><p>Talk to Peach like a person. We’ll turn your answers into a clean brief and find creatives who fit.</p></div>
     <ProjectBuilder availableCoins={wallet?.available_coins ?? 0}/>
     <BottomNav role="business" active="projects"/>
   </main>;
