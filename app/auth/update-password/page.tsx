@@ -1,0 +1,11 @@
+"use client";
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { PeachBrand } from "../../components/brand";
+
+export default function UpdatePassword(){
+ const supabase=useMemo(()=>createClient(),[]);const router=useRouter();const[p1,setP1]=useState("");const[p2,setP2]=useState("");const[msg,setMsg]=useState("");const[busy,setBusy]=useState(false);
+ async function save(){if(p1.length<8){setMsg("Use at least 8 characters.");return}if(p1!==p2){setMsg("Those passwords don’t match.");return}setBusy(true);setMsg("");const{error}=await supabase.auth.updateUser({password:p1});if(error){setMsg(error.message);setBusy(false);return}await supabase.auth.signOut();router.replace("/auth?mode=signin&reset=success");router.refresh();}
+ return <main className="auth-page"><section className="auth-brand-panel"><PeachBrand full/><div className="auth-brand-copy"><span className="eyebrow" style={{color:"#ffd1ba"}}>ACCOUNT SECURITY</span><h1>Choose a fresh password.</h1><p>Once it’s saved, we’ll send you back to Peach sign in.</p></div><img className="v12-auth-human" src="/brand/login-creative.jpg" alt="Creative professional at work"/><div className="auth-side-note">Powered by Sweet As A Peach Creative Agency</div></section><section className="auth-form-wrap"><div className="auth-card"><span className="eyebrow">NEW PASSWORD</span><h2>Reset your password.</h2><p>Choose at least 8 characters.</p><label><strong>New password</strong><input className="field" type="password" value={p1} onChange={e=>setP1(e.target.value)} autoComplete="new-password"/></label><label><strong>Confirm password</strong><input className="field" type="password" value={p2} onChange={e=>setP2(e.target.value)} autoComplete="new-password"/></label><button className="btn btn-primary btn-large" style={{width:"100%"}} onClick={save} disabled={busy}>{busy?"Saving…":"Save New Password"}</button>{msg&&<div className="auth-message" role="status">{msg}</div>}</div></section></main>
+}
