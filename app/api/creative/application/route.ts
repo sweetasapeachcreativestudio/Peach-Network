@@ -30,6 +30,9 @@ export async function POST(request: Request) {
     experience: body.experience?.trim() || null,
     tools: body.tools?.trim() || null,
     portfolio_url: body.portfolioUrl?.trim() || null,
+    work_sample_urls: String(body.workSamples ?? "").split(/\r?\n/).map((v:string)=>v.trim()).filter(Boolean),
+    contact_phone: body.phone?.trim() || null,
+    social_url: body.socialUrl?.trim() || null,
     submitted_at: new Date().toISOString(),
   });
   if (appError) return NextResponse.json({ error: appError.message }, { status: 400 });
