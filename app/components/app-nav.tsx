@@ -13,7 +13,7 @@ export function AppHeader({ name, role, coinCount }: { name?: string | null; rol
           <Link className="wallet-chip" href="/business/wallet"><span className="peach-dot" />{coinCount} Coins</Link>
         )}
         <Link className="round-action" href="/notifications" aria-label="Notifications"><BellIcon /></Link>
-        <Link className="profile-chip" href="/account" aria-label="Profile">
+        <form action="/auth/signout" method="post" style={{margin:0}}><button type="submit" className="pn-network-link" style={{background:"none",border:0,cursor:"pointer"}}>Log Out</button></form>\n        <Link className="profile-chip" href="/account" aria-label="Profile">
           <span className="profile-avatar">{(name?.trim()?.[0] ?? "P").toUpperCase()}</span>
         </Link>
       </div>
