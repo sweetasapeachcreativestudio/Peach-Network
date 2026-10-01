@@ -13,7 +13,7 @@ export function AppHeader({ name, role, coinCount }: { name?: string | null; rol
           <Link className="wallet-chip" href="/business/wallet"><span className="peach-dot" />{coinCount} Coins</Link>
         )}
         <Link className="round-action" href="/notifications" aria-label="Notifications"><BellIcon /></Link>
-        <form action="/auth/signout" method="post" style={{margin:0}}><button type="submit" className="pn-network-link" style={{background:"none",border:0,cursor:"pointer"}}>Log Out</button></form>\n        <Link className="profile-chip" href="/account" aria-label="Profile">
+        <form action="/auth/signout" method="post" style={{margin:0}}><button type="submit" className="pn-network-link" style={{background:"none",border:0,cursor:"pointer"}}>Log Out</button></form>\n        <Link className="profile-chip" href="/account?edit=1" aria-label="Profile">
           <span className="profile-avatar">{(name?.trim()?.[0] ?? "P").toUpperCase()}</span>
         </Link>
       </div>
@@ -28,7 +28,7 @@ export function BottomNav({ role, active }: { role: "business" | "creative"; act
         ["projects", "/business/projects", "Projects", <FolderIcon key="i" />],
         ["messages", "/business/messages", "Messages", <MessageIcon key="i" />],
         ["wallet", "/business/wallet", "Wallet", <WalletIcon key="i" />],
-        ["profile", "/account", "Profile", <UserIcon key="i" />],
+        ["profile", "/account?edit=1", "Profile", <UserIcon key="i" />],
       ]
     : [
         ["home", "/creative", "Home", <HomeIcon key="i" />],
