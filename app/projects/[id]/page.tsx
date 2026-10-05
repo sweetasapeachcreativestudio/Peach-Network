@@ -40,6 +40,9 @@ export default async function ProjectWorkspace({ params, searchParams }: { param
     admin.from("project_client_requests").select("id,request_type,note,status,created_at").eq("project_id",id).eq("status","open").order("created_at",{ascending:false}),
   ]);
 
+  const canViewVault = isBusiness || isAdmin || !["completed","cancelled"].includes(project.status);
+  const {data:brandAssets} = canViewVault ? await admin.from("business_brand_assets").select("id,label,value,notes,storage_path,original_name").eq("business_id",project.business_id).order("kind") : {data:[]};
+
   const senderIds = [...new Set((messages ?? []).map((m:any)=>m.sender_user_id).filter(Boolean))];
   const senderMap = new Map<string,string>();
   if (senderIds.length) {
@@ -88,6 +91,7 @@ export default async function ProjectWorkspace({ params, searchParams }: { param
       </div>
 
       <aside className="side-stack">
+        {canViewVault&&<details className="action-card"><summary style={{cursor:"pointer",fontWeight:800}}>Brand Vault · {brandAssets?.length??0} saved assets</summary><p>Reusable assets from {business?.name}. Use these throughout the project.</p><div className="file-list">{(brandAssets??[]).map(asset=><div key={asset.id} className="file-row"><div><strong>{asset.label}</strong><span>{asset.value||asset.original_name}</span>{asset.notes&&<span>{asset.notes}</span>}</div>{asset.storage_path&&<a href={`/api/brand-vault/${asset.id}?project=${id}`}>Download</a>}</div>)}{!brandAssets?.length&&<span className="muted">No saved brand assets yet.</span>}</div>{isBusiness&&<Link href="/business/vault" className="text-link">Manage your Brand Vault →</Link>}</details>}
         <div className="action-card"><span className="eyebrow">SCOPE</span><h3>{project.coin_amount} Peach Coin{project.coin_amount===1?"":"s"}</h3><p>{project.revision_rounds} revision round{project.revision_rounds===1?"":"s"} included in the current scope.</p></div>
         <div className="action-card" id="proofs"><span className="eyebrow">FILES + DELIVERY</span><h3>{files?.length ?? 0} files attached</h3><p>Assets, proofs and final delivery stay with the project.</p><div className="file-list">{(files??[]).map((f:any)=><a key={f.id} href={`/api/projects/files/${f.id}/download`} className={`file-row ${f.file_kind}`}><div><strong>{f.original_name}</strong><span>{f.file_kind.replaceAll("_"," ")}{f.note?` · ${f.note}`:""}</span></div><b>Download</b></a>)}{(!files||files.length===0)&&<span className="muted">No files yet.</span>}</div></div>
         {project.status === "waiting_on_client" && <div className="action-card" style={{background:"#fff0de"}}><h3>Waiting on client</h3><p>The creative has marked this project as blocked while they wait for client information.</p></div>}

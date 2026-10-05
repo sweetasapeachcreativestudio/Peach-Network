@@ -8,7 +8,7 @@ const businessNav = [
   ["new", "/business/new-project", "Start a Project"],
   ["projects", "/business/projects", "Projects"],
   ["messages", "/business/messages", "Messages"],
-  ["vault", "/business#brand-vault", "Brand Vault"],
+  ["vault", "/business/vault", "Brand Vault"],
   ["wallet", "/business/wallet", "Wallet & Billing"],
   ["account", "/account?edit=1", "Account"],
 ] as const;
