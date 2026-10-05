@@ -5,11 +5,13 @@ import { redirect, notFound } from "next/navigation";
 import WorkspaceClient from "./workspace-client";
 import { AppHeader, BottomNav } from "../../components/app-nav";
 import { ProjectProgress, projectPercent } from "../../components/project-progress";
+import BusinessProjectRoom from "./business-project-room";
+import { PeachAppShell } from "../../components/peach-app-shell";
 import MatchShortlist from "./match-shortlist";
 
-export default async function ProjectWorkspace({ params, searchParams }: { params: Promise<{id:string}>; searchParams: Promise<{created?:string}> }) {
+export default async function ProjectWorkspace({ params, searchParams }: { params: Promise<{id:string}>; searchParams: Promise<{created?:string;view?:string}> }) {
   const { id } = await params;
-  const { created } = await searchParams;
+  const { created, view } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth?mode=signin");
@@ -19,11 +21,11 @@ export default async function ProjectWorkspace({ params, searchParams }: { param
   if (!profile) redirect("/auth?mode=signin");
 
   const { data: project } = await admin.from("projects")
-    .select("id,title,description,status,coin_amount,due_at,revision_rounds,business_id,assigned_creative_id,waiting_on_client_since,created_at")
+    .select("id,title,description,category,current_revision_round,status,coin_amount,due_at,revision_rounds,business_id,assigned_creative_id,waiting_on_client_since,created_at")
     .eq("id", id).single();
   if (!project) notFound();
 
-  const { data: business } = await admin.from("businesses").select("owner_user_id,name").eq("id", project.business_id).single();
+  const { data: business } = await admin.from("businesses").select("owner_user_id,name,logo_url").eq("id", project.business_id).single();
   const { data: assignedCreative } = project.assigned_creative_id ? await admin.from("creatives").select("id,user_id,primary_specialty,peach_level").eq("id", project.assigned_creative_id).single() : { data: null } as any;
   const isBusiness = business?.owner_user_id === user.id;
   const isCreative = assignedCreative?.user_id === user.id;
@@ -35,7 +37,7 @@ export default async function ProjectWorkspace({ params, searchParams }: { param
     admin.from("project_updates").select("id,stage,progress_percent,note,evidence_path,created_at,creative_id").eq("project_id",id).order("created_at",{ascending:false}),
     admin.from("project_messages").select("id,message,created_at,sender_user_id").eq("project_id",id).order("created_at",{ascending:true}),
     isBusiness ? admin.from("coin_wallets").select("available_coins").eq("business_id",project.business_id).maybeSingle() : Promise.resolve({data:null}),
-    assignedCreative ? admin.from("profiles").select("full_name").eq("id",assignedCreative.user_id).maybeSingle() : Promise.resolve({data:null}),
+    assignedCreative ? admin.from("profiles").select("full_name,avatar_url").eq("id",assignedCreative.user_id).maybeSingle() : Promise.resolve({data:null}),
     admin.from("project_files").select("id,file_kind,original_name,mime_type,size_bytes,note,created_at,uploaded_by").eq("project_id",id).order("created_at",{ascending:false}),
     admin.from("project_client_requests").select("id,request_type,note,status,created_at").eq("project_id",id).eq("status","open").order("created_at",{ascending:false}),
   ]);
@@ -50,9 +52,19 @@ export default async function ProjectWorkspace({ params, searchParams }: { param
     (senders ?? []).forEach((s:any)=>senderMap.set(s.id,s.full_name ?? "Project member"));
   }
 
+  const latestImageProof = (files??[]).find(f=>f.file_kind==="proof"&&["image/png","image/jpeg","image/webp"].includes(f.mime_type??""));
+  const {data:proofPreview}=isBusiness&&latestImageProof?await admin.storage.from("project-files").createSignedUrl((await admin.from("project_files").select("storage_path").eq("id",latestImageProof.id).single()).data?.storage_path??"",120):{data:null};
+
   const days = project.due_at ? Math.ceil((new Date(project.due_at).getTime()-Date.now())/86400000) : null;
   const appRole = role === "creative" ? "creative" : "business";
   const headerName = profile.full_name;
+
+  if(isBusiness) return <PeachAppShell role="business" active="projects" name={profile.full_name} businessName={business?.name} logoUrl={business?.logo_url} coinCount={wallet?.available_coins??0}>
+    {created === "1" && <p className="auth-message">Project created. Your brief is ready while matching begins.</p>}
+    {!project.assigned_creative_id && ["matching","offer_sent","draft"].includes(project.status) && <MatchShortlist projectId={id}/>}
+    <BusinessProjectRoom proofThumbnail={proofPreview?.signedUrl??null} project={project} businessName={business?.name??"Your business"} creative={assignedCreative?{name:creativeProfile?.full_name??"Your creative",avatar:creativeProfile?.avatar_url??null,specialty:assignedCreative.primary_specialty}:null} files={files??[]} assets={brandAssets??[]} requests={requests??[]} initialBrief={view==="brief"} messages={(messages??[]).map(m=>({...m,sender:m.sender_user_id===user.id?"You":senderMap.get(m.sender_user_id)??"Project member"}))}/>
+    <style>{`.peach-business-workspace .peach-workspace-content{max-width:1750px;padding:22px 26px 40px}.peach-business-workspace .peach-workspace-topbar{height:52px}@media(max-width:700px){.peach-business-workspace .peach-workspace-content{padding:18px 14px 90px}}`}</style>
+  </PeachAppShell>;
 
   return <main className="app-shell">
     <AppHeader name={headerName} role={appRole} coinCount={isBusiness ? (wallet as any)?.available_coins ?? 0 : undefined}/>

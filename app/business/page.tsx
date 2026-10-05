@@ -1,8 +1,10 @@
+import {ProjectRefresh} from "@/app/components/project-refresh";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PeachAppShell } from "../components/peach-app-shell";
+import { AcceptedProject } from "../components/accepted-project";
 import { ProjectProgress } from "../components/project-progress";
 
 const reviewStatuses = ["proof_uploaded", "submitted", "waiting_on_client"];
@@ -35,10 +37,11 @@ export default async function BusinessDashboard() {
   if (!business) redirect("/auth?role=business&mode=signup");
   const [{data:wallet},{data:projects},{data:brandAssets}] = await Promise.all([
     admin.from("coin_wallets").select("available_coins,held_coins").eq("business_id",business.id).maybeSingle(),
-    admin.from("projects").select("id,title,category,status,coin_amount,due_at,created_at,assigned_creative_id").eq("business_id",business.id).order("created_at",{ascending:false}),
+    admin.from("projects").select("id,title,category,status,coin_amount,due_at,created_at,assigned_creative_id,revision_rounds").eq("business_id",business.id).order("created_at",{ascending:false}),
     admin.from("business_brand_assets").select("id,kind,label,value,original_name").eq("business_id",business.id)
   ]);
   const active = (projects??[]).filter(p=>!["completed","cancelled"].includes(p.status));
+  const accepted = active.find(p=>p.status==="accepted");
   const attention = active.find(p=>reviewStatuses.includes(p.status));
   const lead = attention ?? active[0];
   const first = profile?.full_name?.trim().split(" ")[0] || business.name;
@@ -67,8 +70,9 @@ export default async function BusinessDashboard() {
   }
 
   return <PeachAppShell role="business" active="home" name={profile?.full_name} coinCount={coins} businessName={business.name} logoUrl={business.logo_url}>
-    <main className="bd-dashboard">
+    <ProjectRefresh/><main className="bd-dashboard">
       <header className="bd-heading"><div><h1>Welcome back, {first}</h1><p>Here is what needs your review today across your active design requests.</p></div><Link href="/business/new-project" className="bd-button">+ Start a Project</Link></header>
+      {accepted&&<AcceptedProject project={accepted} creativeName={creativeMap.get(accepted.assigned_creative_id)?.full_name} assetCount={brandAssets?.length??0}/>}
       <div className="bd-layout"><div className="bd-main">
         <section className="bd-attention"><div className="bd-meta"><span className="bd-attention-label">{attention?"NEEDS YOUR ATTENTION":active.length?"PROJECTS IN MOTION":"YOUR NEXT BIG IDEA"}</span><span className="bd-status">{lead?statusLabel(lead.status):"Ready when you are"}</span>{lead&&<span>{dueText(lead.due_at)}</span>}</div><h2>{lead?.title ?? "Good work starts with a clear idea."}</h2><p>{lead?`${lead.coin_amount} Peach Coins · ${nextStep(lead.status)}`:"Tell us what you need. Peach connects your business with a vetted creative."}</p><div className="bd-actions"><Link href={lead?`/projects/${lead.id}`:"/business/new-project"} className="bd-button peach">{attention?"Review project":lead?"Open Project Room":"Find my creative"} →</Link>{lead&&<Link href="/business/projects" className="bd-button secondary">View all projects</Link>}</div></section>
         <div className="bd-section-heading"><h2>Active Projects <span>({active.length})</span></h2><Link href="/business/projects" className="bd-text-link">All Projects & Archive →</Link></div>
