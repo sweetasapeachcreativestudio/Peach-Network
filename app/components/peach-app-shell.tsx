@@ -30,18 +30,22 @@ export function PeachAppShell({
   active,
   name,
   coinCount,
+  businessName,
+  logoUrl,
   children,
 }: {
   role: Role;
   active: string;
   name?: string | null;
   coinCount?: number | null;
+  businessName?: string | null;
+  logoUrl?: string | null;
   children: ReactNode;
 }) {
   const nav = role === "business" ? businessNav : creativeNav;
   const first = name?.trim()?.split(" ")[0] || (role === "business" ? "Partner" : "Creative");
 
-  return <div className="peach-workspace">
+  return <div className={`peach-workspace ${role === "business" ? "peach-business-workspace" : ""}`}>
     <aside className="peach-sidebar">
       <Link href={role === "business" ? "/business" : "/creative"} className="peach-sidebar-brand" aria-label="Peach Network home">
         <img src="/brand/peach-wordmark.png" alt="Peach Network"/>
@@ -51,7 +55,7 @@ export function PeachAppShell({
         {nav.map(([key, href, label]) => <Link key={key} href={href} className={active === key ? "active" : ""}><span className="peach-nav-dot"/>{label}</Link>)}
       </nav>
       <div className="peach-sidebar-bottom">
-        <div className="peach-user-badge"><span>{first[0]?.toUpperCase()}</span><div><strong>{name || first}</strong><small>{role === "business" ? "Business account" : "Peach creative"}</small></div></div>
+        <Link href="/account?edit=1" className="peach-user-badge" aria-label="Edit your business or profile"><span>{logoUrl ? <img src={logoUrl} alt=""/> : (businessName || first)[0]?.toUpperCase()}</span><div><strong>{businessName || name || first}</strong><small>{role === "business" ? `${first} · Edit business profile` : "Peach creative"}</small></div></Link>
         <form action="/auth/signout" method="post"><button type="submit">Log out</button></form>
       </div>
     </aside>
@@ -83,6 +87,13 @@ export function PeachAppShell({
       .peach-workspace-main{margin-left:248px;min-height:100vh}.peach-workspace-topbar{height:70px;border-bottom:1px solid #e4e5df;background:rgba(248,246,240,.94);display:flex;align-items:center;justify-content:flex-end;padding:0 34px;position:sticky;top:0;z-index:30;backdrop-filter:blur(12px)}
       .peach-mobile-brand{display:none}.peach-topbar-actions{display:flex;align-items:center;gap:10px}.peach-coin-chip,.peach-topbar-button{border:1px solid #d9ded9;background:#fff;color:#244235;text-decoration:none;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:800}.peach-coin-chip span{display:inline-block;width:7px;height:7px;border-radius:50%;background:#f37a59;margin-right:5px}
       .peach-workspace-content{max-width:1280px;margin:0 auto;padding:30px 34px 70px}.peach-mobile-nav{display:none}
+      .peach-user-badge{text-decoration:none;color:inherit}.peach-user-badge>span{overflow:hidden}.peach-user-badge img{width:100%;height:100%;object-fit:contain;background:white;padding:3px}
+      .peach-business-workspace .peach-sidebar{background:#fff0e7;color:#263f36;border-right:1px solid #efdfd4}
+      .peach-business-workspace .peach-sidebar-role{color:#a84c32}
+      .peach-business-workspace .peach-sidebar-nav a{color:#52645d;font-size:14px}
+      .peach-business-workspace .peach-sidebar-nav a:hover{background:#ffe1d0;color:#263f36}
+      .peach-business-workspace .peach-sidebar-nav a.active{background:#fff;color:#263f36;box-shadow:0 2px 8px #a85a2e0a;border:1px solid #efd7c8}
+      .peach-business-workspace .peach-sidebar-bottom{border-color:#e7d7cc}.peach-business-workspace .peach-user-badge small{color:#65766e}.peach-business-workspace .peach-sidebar-bottom button{color:#a84c32}
       @media(max-width:900px){.peach-sidebar{display:none}.peach-workspace-main{margin-left:0}.peach-workspace-topbar{height:62px;padding:0 16px;justify-content:space-between}.peach-mobile-brand{display:block}.peach-mobile-brand img{width:100px;max-height:34px;object-fit:contain}.peach-topbar-button{display:none}.peach-workspace-content{padding:20px 16px 88px}.peach-mobile-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:60;background:#fff;border-top:1px solid #dde2dd;padding:7px 4px calc(7px + env(safe-area-inset-bottom))}.peach-mobile-nav a{display:grid;justify-items:center;gap:4px;text-decoration:none;color:#738078;font-size:9px;font-weight:750;text-align:center}.peach-mobile-nav a.active{color:#173328}.peach-mobile-nav a.active .peach-nav-dot{background:#f37a59;border-color:#f37a59}}
     `}</style>
   </div>;

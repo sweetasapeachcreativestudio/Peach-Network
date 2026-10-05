@@ -16,22 +16,28 @@ export default async function BusinessDashboard(){
     admin.from("memberships").select("plan_name,monthly_coins,coin_cap,current_period_end,status").eq("business_id",business.id).eq("status","active").maybeSingle(),
     admin.from("projects").select("id,title,category,status,coin_amount,due_at,created_at,assigned_creative_id").eq("business_id",business.id).order("created_at",{ascending:false}).limit(5)
   ]);
-  const list=projects??[];const active=list.filter((p:any)=>!["completed","cancelled"].includes(p.status));const unread=active.filter((p:any)=>["proof_uploaded","submitted","revisions"].includes(p.status)).length;const first=(profile?.full_name?.split(" ")?.[0]??business.name);const coins=wallet?.available_coins??0;
+  const list=projects??[];const active=list.filter((p:any)=>!["completed","cancelled"].includes(p.status));const first=(profile?.full_name?.split(" ")?.[0]??business.name);const coins=wallet?.available_coins??0;
   const lead=active[0];
-  return <PeachAppShell role="business" active="home" name={profile?.full_name} coinCount={coins}>
+  const attention=active.find((p:any)=>["proof_uploaded","submitted","final_delivered"].includes(p.status));
+  return <PeachAppShell role="business" active="home" name={profile?.full_name} coinCount={coins} businessName={business.name} logoUrl={business.logo_url}>
     <main className="app-shell pn-app-shell">
 
     <section className="pn-dashboard-hero">
-      <div className="pn-dashboard-copy"><span className="eyebrow">GOOD MORNING</span><h1>Good morning, {first}. 👋</h1><p>Big ideas. Brighter futures. Peach is here to help you find the right creative and keep the work moving.</p>
+      <div className="pn-dashboard-copy"><span className="eyebrow">YOUR BUSINESS WORKSPACE</span><h1>Welcome back, {first}.</h1><p>A fresh idea, a trusted creative, your next big thing. Let’s keep {business.name} moving.</p>
         <Link href="/business/new-project" className="pn-find-card"><span className="pn-find-image"><img src="/brand/business-owner.jpg" alt="Creative workspace"/></span><div><small>FIND A CREATIVE</small><strong>Post a project and get matched with vetted talent.</strong></div><b>›</b></Link>
       </div>
       <div className="pn-dashboard-photo"><img src="/brand/business-owner.jpg" alt="Business owner working"/><div className="pn-photo-caption"><small>PEACH NETWORK</small><strong>Support creative people.</strong></div></div>
     </section>
 
+    <section className="business-brand-strip" aria-label="Your business brand">
+      <Link href="/account?edit=1" className="business-brand-identity"><span className="business-logo-tile">{business.logo_url?<img src={business.logo_url} alt={`${business.name} logo`}/>:business.name[0]?.toUpperCase()}</span><div><small>MAKE YOURSELF AT HOME</small><strong>{business.name}</strong><span>{business.logo_url?"Your brand belongs here.":"Add your logo to make this workspace yours."}</span></div></Link>
+      <Link href="/account?edit=1" className="btn btn-outline btn-small">{business.logo_url?"Edit business profile":"Add your logo"} →</Link>
+    </section>
+    {attention&&<section className="business-attention"><div><span className="eyebrow">READY FOR YOUR REVIEW</span><h2>{attention.title}</h2><p>Your creative has submitted work. Open the project to review it and share your feedback.</p></div><Link href={`/projects/${attention.id}`} className="btn btn-primary">Review project →</Link></section>}
     <section className="pn-dashboard-stat-grid">
       <Link href="/business/projects"><span>▣</span><strong>{active.length}</strong><small>Projects</small><em>{active.length?"active":"ready"}</em></Link>
-      <Link href="/business/messages"><span>✉</span><strong>{unread}</strong><small>Messages</small><em>{unread?"need attention":"caught up"}</em></Link>
-      <Link href="/business/wallet"><span>◫</span><strong>{coins}</strong><small>Wallet</small><em>Peach Coins</em></Link>
+      <Link href="/business/messages"><span>✉</span><strong>Chat</strong><small>Messages</small><em>Talk to your creative</em></Link>
+      <Link href="/business/wallet"><span>◫</span><strong>{coins}</strong><small>Available coins</small><em>{wallet?.held_coins??0} committed to projects</em></Link>
       <Link href="/notifications"><span>⌁</span><strong>Events</strong><small>Network</small><em>news + opportunities</em></Link>
     </section>
 
@@ -41,7 +47,7 @@ export default async function BusinessDashboard(){
 
     <div className="section-row pn-section-row"><div><span className="eyebrow">YOUR WORK</span><h2>Projects in motion.</h2><p>See who is working, what happens next and where each project stands.</p></div><Link href="/business/projects" className="text-link">View all</Link></div>
     <section className="pn-dashboard-projects">
-      {lead?<article className="pn-feature-project"><div className="pn-project-avatar"><img src="/brand/hero-creative.jpg" alt="Creative assigned to project"/></div><div className="pn-feature-project-main"><div className="pn-project-topline"><div><small>{lead.category}</small><h3>{lead.title}</h3></div><span className={`status-label ${lead.status}`}>{lead.status.replaceAll("_"," ")}</span></div><p>{lead.assigned_creative_id?"Your creative is connected to this project.":"Peach Match is finding the right creative."} · {lead.coin_amount} coins · {dueText(lead.due_at)}</p><ProjectProgress status={lead.status} compact/><div className="pn-project-footer"><Link href={`/projects/${lead.id}`} className="btn btn-primary btn-small">Open Project</Link><span>{lead.status==="matching"?"🍑 Matching in progress":"Good work is growing."}</span></div></div></article>:
+      {active.length?active.slice(0,4).map((lead:any)=><article key={lead.id} className="pn-feature-project"><div className="pn-project-avatar" aria-hidden="true"><span style={{display:"grid",placeItems:"center",height:"100%",minHeight:100,background:"#edf4fa",fontSize:32,fontWeight:800}}>{lead.title[0]?.toUpperCase()}</span></div><div className="pn-feature-project-main"><div className="pn-project-topline"><div><small>{lead.category}</small><h3>{lead.title}</h3></div><span className={`status-label ${lead.status}`}>{lead.status.replaceAll("_"," ")}</span></div><p>{lead.assigned_creative_id?"Your creative is connected to this project.":"Peach Match is finding the right creative."} · {lead.coin_amount} coins · {dueText(lead.due_at)}</p><ProjectProgress status={lead.status} compact/><div className="pn-project-footer"><Link href={`/projects/${lead.id}`} className="btn btn-primary btn-small">Open Project</Link><span>{lead.status==="matching"?"🍑 Matching in progress":"Good work is growing."}</span></div></div></article>):
       <div className="pn-friendly-empty"><span>🍑</span><div><h3>Nothing active yet.</h3><p>Tell Peach what you need and we’ll help turn the idea into a clear project.</p><Link href="/business/new-project" className="btn btn-primary btn-small">Start a Project</Link></div></div>}
     </section>
 
@@ -49,6 +55,12 @@ export default async function BusinessDashboard(){
       <article><span className="eyebrow">AROUND THE NETWORK</span><h3>Peach Creative Mixer</h3><p>Meet creatives, business owners and collaborators from around the Network.</p><small>Events + hub news will appear here as they are published.</small></article>
       <article className="peach"><span className="eyebrow">PEACH PULSE</span><h3>What’s happening at Peach.</h3><p>Applications, workshops, creative spotlights and new tools — without leaving the app.</p><Link href="/notifications" className="text-link">See updates →</Link></article>
     </section>
+    <style>{`
+      .business-brand-strip{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 24px;background:#edf4fa;border:1px solid #dce7ef;border-radius:22px;margin:0 0 24px}
+      .business-brand-identity{display:flex;align-items:center;gap:16px;text-decoration:none;color:#263f36;min-width:0}.business-logo-tile{width:64px;height:64px;border-radius:16px;display:grid;place-items:center;background:#fff;border:1px solid #dce7ef;font-size:28px;font-weight:800;flex-shrink:0;overflow:hidden}.business-logo-tile img{width:100%;height:100%;object-fit:contain;padding:7px}.business-brand-identity div{display:grid;gap:3px;min-width:0}.business-brand-identity small{font-size:10px;letter-spacing:.1em;color:#546e80;font-weight:800}.business-brand-identity strong{font-size:20px;overflow-wrap:anywhere}.business-brand-identity div>span{font-size:13px;color:#566b65}
+      .business-attention{display:flex;align-items:center;justify-content:space-between;gap:24px;background:#fff4ee;border:1px solid #efc1aa;border-left:5px solid #e85d3f;border-radius:20px;padding:24px;margin-bottom:24px}.business-attention h2{font-size:23px;margin:8px 0}.business-attention p{font-size:14px;color:#596b62;margin:0}.business-attention .btn{flex-shrink:0}
+      @media(max-width:600px){.business-brand-strip,.business-attention{align-items:flex-start;flex-direction:column;padding:18px}.business-brand-identity strong{font-size:18px}.business-logo-tile{width:52px;height:52px}.business-brand-strip .btn,.business-attention .btn{width:100%}}
+    `}</style>
   </main>
   </PeachAppShell>
 }
