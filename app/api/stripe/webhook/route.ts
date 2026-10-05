@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { MEMBERSHIP_PLANS, PEACH_PACKS, ONE_TIME_WALLET_CAP } from "@/lib/peach-catalog";
 
@@ -70,6 +70,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Stripe webhook is not configured." }, { status: 400 });
   }
 
+  const stripe = getStripe();
   const raw = await request.text();
 
   let event;

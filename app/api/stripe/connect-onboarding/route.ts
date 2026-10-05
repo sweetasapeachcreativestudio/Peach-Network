@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 export async function POST() {
   const supabase = await createClient();
@@ -36,6 +36,7 @@ export async function POST() {
     return NextResponse.json({ error: "Peach approval is required before payout setup." }, { status: 403 });
   }
 
+  const stripe = getStripe();
   let accountId = creative.stripe_connect_account_id;
 
   if (!accountId) {

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { MEMBERSHIP_PLANS, PEACH_PACKS, ONE_TIME_WALLET_CAP } from "@/lib/peach-catalog";
 
 export async function POST(request: Request) {
@@ -31,6 +31,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Business account required." }, { status: 403 });
   }
 
+  const stripe = getStripe();
   let customerId = business.stripe_customer_id;
 
   if (!customerId) {

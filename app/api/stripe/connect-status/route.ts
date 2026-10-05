@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 export async function GET(){
   const supabase=await createClient();
@@ -15,6 +15,7 @@ export async function GET(){
   if(!creative?.stripe_connect_account_id)
     return NextResponse.json({status:"not_started",ready:false});
 
+  const stripe = getStripe();
   const account=await stripe.accounts.retrieve(creative.stripe_connect_account_id);
   const ready=Boolean(account.details_submitted && account.payouts_enabled && account.charges_enabled !== false);
 

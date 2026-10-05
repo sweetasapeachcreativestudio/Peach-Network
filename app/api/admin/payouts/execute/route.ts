@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -41,6 +41,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Creative has not completed payout setup." }, { status: 400 });
   }
 
+  const stripe = getStripe();
   const account = await stripe.accounts.retrieve(creative.stripe_connect_account_id);
 
   if (!account.payouts_enabled || !account.details_submitted) {
