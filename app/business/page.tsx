@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { AppHeader, BottomNav } from "../components/app-nav";
+import { PeachAppShell } from "../components/peach-app-shell";
 import { ProjectProgress } from "../components/project-progress";
 
 function dueText(dueAt:string|null){if(!dueAt)return"Deadline not set";const d=Math.ceil((new Date(dueAt).getTime()-Date.now())/86400000);if(d<0)return`${Math.abs(d)} days overdue`;if(d===0)return"Due today";return`Due in ${d} day${d===1?"":"s"}`}
@@ -18,8 +18,8 @@ export default async function BusinessDashboard(){
   ]);
   const list=projects??[];const active=list.filter((p:any)=>!["completed","cancelled"].includes(p.status));const unread=active.filter((p:any)=>["proof_uploaded","submitted","revisions"].includes(p.status)).length;const first=(profile?.full_name?.split(" ")?.[0]??business.name);const coins=wallet?.available_coins??0;
   const lead=active[0];
-  return <main className="app-shell pn-app-shell">
-    <AppHeader name={profile?.full_name} role="business" coinCount={coins}/>
+  return <PeachAppShell role="business" active="home" name={profile?.full_name} coinCount={coins}>
+    <main className="app-shell pn-app-shell">
 
     <section className="pn-dashboard-hero">
       <div className="pn-dashboard-copy"><span className="eyebrow">GOOD MORNING</span><h1>Good morning, {first}. 👋</h1><p>Big ideas. Brighter futures. Peach is here to help you find the right creative and keep the work moving.</p>
@@ -49,6 +49,6 @@ export default async function BusinessDashboard(){
       <article><span className="eyebrow">AROUND THE NETWORK</span><h3>Peach Creative Mixer</h3><p>Meet creatives, business owners and collaborators from around the Network.</p><small>Events + hub news will appear here as they are published.</small></article>
       <article className="peach"><span className="eyebrow">PEACH PULSE</span><h3>What’s happening at Peach.</h3><p>Applications, workshops, creative spotlights and new tools — without leaving the app.</p><Link href="/notifications" className="text-link">See updates →</Link></article>
     </section>
-    <BottomNav role="business" active="home"/>
   </main>
+  </PeachAppShell>
 }
