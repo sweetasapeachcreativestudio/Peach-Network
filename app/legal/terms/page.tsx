@@ -23,7 +23,7 @@ export default function Terms() {
         <p>Project messages, progress check-ins and uploaded files may be used to resolve cancellations, missed deadlines and disputes.</p>
 
         <h2>6. Cancellations and disputes</h2>
-        <p>Once work has begun, cancellation does not automatically guarantee a full return of Peach Coins. Peach may review project evidence and determine whether a project continues, credits are returned in full or part, or a creative is compensated for completed work.</p>
+        <p>Once work has started, a business that changes its mind may request an administrative review, but a refund is not guaranteed. Changing one's mind alone does not establish refund eligibility. Peach may review the approved scope, progress updates, project messages, submitted files, revision history and other relevant evidence before deciding whether the project continues, Peach Coins are returned in full or part, or the creative is compensated for work performed. AI tools may assist with organizing evidence but do not automatically decide refunds or payouts.</p>
 
         <h2>7. Payments and payouts</h2>
         <p>Business payments are processed through third-party payment providers. Eligible creative payouts are sent through Stripe Connect after the applicable project is approved or otherwise resolved by Peach.</p>
