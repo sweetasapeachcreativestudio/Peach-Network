@@ -63,9 +63,13 @@ If overdue:
 - Request cancellation
 - Contact Peach Support
 
-## Disputes
-Initial disputes are manually reviewed by Peach.
-AI should not automatically decide refunds or payouts in MVP.
+## Cancellations and disputes
+- Before work starts, cancellation eligibility follows the applicable project cancellation and payment rules.
+- Once work has started, a business that changes its mind may request admin review.
+- A refund is not guaranteed after work starts; changing one's mind alone does not establish refund eligibility.
+- Peach reviews project scope, progress updates, messages, submitted files, revision history and other relevant evidence before deciding the appropriate resolution.
+- Depending on the evidence and work performed, Peach may continue the project, return coins in full or part, or compensate the creative for completed work.
+- AI may assist with organizing evidence, but it must not automatically decide refunds or payouts.
 
 ## Payout
 Business approval does not mean the business pays the creative directly.
