@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { PeachAppShell } from "../components/peach-app-shell";
 import { AcceptedProject } from "../components/accepted-project";
 import { ProjectProgress } from "../components/project-progress";
+import { DemoPersonas } from "../components/demo-personas";
 
 const reviewStatuses = ["proof_uploaded", "submitted", "waiting_on_client"];
 function statusLabel(status: string) {
@@ -72,6 +73,7 @@ export default async function BusinessDashboard() {
   return <PeachAppShell role="business" active="home" name={profile?.full_name} coinCount={coins} businessName={business.name} logoUrl={business.logo_url}>
     <ProjectRefresh/><main className="bd-dashboard">
       <header className="bd-heading"><div><h1>Welcome back, {first}</h1><p>Here is what needs your review today across your active design requests.</p></div><Link href="/business/new-project" className="bd-button">+ Start a Project</Link></header>
+      <DemoPersonas />
       {accepted&&<AcceptedProject project={accepted} creativeName={creativeMap.get(accepted.assigned_creative_id)?.full_name} assetCount={brandAssets?.length??0}/>}
       <div className="bd-layout"><div className="bd-main">
         <section className="bd-attention"><div className="bd-meta"><span className="bd-attention-label">{attention?"NEEDS YOUR ATTENTION":active.length?"PROJECTS IN MOTION":"YOUR NEXT BIG IDEA"}</span><span className="bd-status">{lead?statusLabel(lead.status):"Ready when you are"}</span>{lead&&<span>{dueText(lead.due_at)}</span>}</div><h2>{lead?.title ?? "Good work starts with a clear idea."}</h2><p>{lead?`${lead.coin_amount} Peach Coins · ${nextStep(lead.status)}`:"Tell us what you need. Peach connects your business with a vetted creative."}</p><div className="bd-actions"><Link href={lead?`/projects/${lead.id}`:"/business/new-project"} className="bd-button peach">{attention?"Review project":lead?"Open Project Room":"Find my creative"} →</Link>{lead&&<Link href="/business/projects" className="bd-button secondary">View all projects</Link>}</div></section>
