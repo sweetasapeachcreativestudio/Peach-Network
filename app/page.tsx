@@ -90,37 +90,38 @@ const DISCIPLINES = [
     role: "Photographers",
     headline: "Showcase your work. Get hired.",
     image: "/Creative5.jpg",
-    accent: "bg-coral"
+    tag: "Photography"
   },
   {
     role: "Designers",
     headline: "Create. Collaborate. Grow.",
     image: "/hero-bg.png",
-    accent: "bg-peach"
+    tag: "Brand & Graphic"
   },
   {
     role: "Video Editors",
     headline: "Turn your talent into opportunity.",
     image: "/Creative 3.jpg",
-    accent: "bg-blue"
+    tag: "Video & Motion"
   },
   {
     role: "Writers",
     headline: "Your words matter here.",
     image: "/Creative 4.jpg",
-    accent: "bg-green"
+    tag: "Copy & Story"
   },
   {
     role: "Businesses",
     headline: "Find the right creative. Get it done.",
     image: "/brand/business-owner.jpg",
-    accent: "bg-peach"
+    tag: "Birmingham Merchants"
   }
 ];
 
 export default function HomePage() {
   const [selected, setSelected] = useState<ProjectItem | null>(null);
-  const [pricingMode, setPricingMode] = useState<"project" | "membership">("project");
+  const [pricingTab, setPricingTab] = useState<"project" | "membership">("project");
+  const [canvasTab, setCanvasTab] = useState<"brief" | "matches" | "vault">("brief");
 
   return (
     <main className="ph">
@@ -130,21 +131,23 @@ export default function HomePage() {
         :root {
           --ph-green: #0d2f24;
           --ph-green-mid: #173c2a;
-          --ph-green-soft: #eaf3ed;
+          --ph-green-soft: #f0f7f3;
           --ph-orange: #f08a62;
           --ph-orange-deep: #e85d3f;
           --ph-coral: #e54307;
-          --ph-coral-soft: #ffece5;
+          --ph-coral-soft: #fff1eb;
           --ph-peach: #fed7aa;
-          --ph-peach-soft: #fff2e8;
+          --ph-peach-soft: #fff6ee;
           --ph-cream: #fffaf5;
           --ph-blue-light: #70eaff;
-          --ph-blue-soft: #e5f9fd;
+          --ph-blue-soft: #eafaff;
           --ph-blue-accent: #0284c7;
           --ph-ink: #17271e;
-          --ph-muted: #586760;
-          --ph-border: #ebdcd3;
-          --ph-border-soft: #f4eae3;
+          --ph-muted: #55675e;
+          --ph-border: #e8dbd2;
+          --ph-border-soft: #f4ebe4;
+          --ph-shadow: 0 16px 40px rgba(13, 47, 36, 0.07);
+          --ph-shadow-sm: 0 4px 16px rgba(13, 47, 36, 0.04);
         }
 
         * {
@@ -160,7 +163,7 @@ export default function HomePage() {
           line-height: 1.5;
         }
 
-        /* Top Announcement Strip */
+        /* Top Announcement Ribbon */
         .ph-topbar {
           background: var(--ph-green);
           color: #f7ede6;
@@ -178,7 +181,7 @@ export default function HomePage() {
         /* Nav Header */
         .ph-nav {
           min-height: 116px;
-          max-width: 1220px;
+          max-width: 1240px;
           margin: auto;
           padding: 12px 24px;
           display: flex;
@@ -239,83 +242,90 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          box-shadow: 0 4px 12px rgba(112, 234, 255, 0.3);
-          transition: transform 0.15s ease, box-shadow 0.15s ease;
+          box-shadow: 0 4px 14px rgba(112, 234, 255, 0.35);
+          transition: all 0.2s ease;
         }
 
         .ph-pill:hover {
           transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(112, 234, 255, 0.45);
+          box-shadow: 0 6px 18px rgba(112, 234, 255, 0.45);
         }
 
-        /* Hero Section */
-        .ph-hero {
-          max-width: 1220px;
-          margin: auto;
-          padding: 28px 24px 48px;
+        /* Hero Section (AppThink & Zoom Notes Combo) */
+        .ph-hero-sec {
+          max-width: 1240px;
+          margin: 0 auto 56px;
+          padding: 24px 24px 0;
+        }
+
+        .ph-hero-grid {
           display: grid;
           grid-template-columns: 1.05fr 0.95fr;
-          gap: 44px;
+          gap: 48px;
           align-items: center;
+          margin-bottom: 40px;
         }
 
-        .ph-kicker {
+        .ph-live-badge {
           display: inline-flex;
           align-items: center;
-          font-size: 12px;
-          font-weight: 900;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: var(--ph-coral);
-          background: var(--ph-coral-soft);
-          padding: 6px 14px;
+          gap: 8px;
+          background: #ffffff;
+          border: 1px solid var(--ph-border);
           border-radius: 999px;
-          border: 1px solid #ffd3c4;
-          margin-bottom: 14px;
+          padding: 6px 16px;
+          font-size: 11.5px;
+          font-weight: 850;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--ph-green);
+          box-shadow: var(--ph-shadow-sm);
+          margin-bottom: 16px;
         }
 
-        .ph-hero h1 {
-          font-size: clamp(38px, 4.4vw, 58px);
+        .ph-live-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #22c55e;
+          box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+
+        .ph-hero-title {
+          font-size: clamp(38px, 4.2vw, 56px);
           line-height: 1.08;
           letter-spacing: -0.035em;
-          margin: 0 0 16px;
           color: var(--ph-green);
           font-weight: 900;
+          margin: 0 0 16px;
         }
 
-        .ph-hero h1 em {
+        .ph-hero-title em {
           font-family: Georgia, serif;
-          font-weight: 400;
           font-style: italic;
+          font-weight: 400;
           color: var(--ph-coral);
         }
 
-        .ph-heart {
-          display: inline-block;
-          font-style: normal;
-          color: var(--ph-orange);
-          margin-left: 4px;
-        }
-
-        .ph-sub {
+        .ph-hero-sub {
           font-size: 17px;
           line-height: 1.55;
           color: var(--ph-muted);
-          max-width: 560px;
-          margin: 0 0 24px;
+          max-width: 540px;
+          margin: 0 0 28px;
         }
 
-        .ph-hero-btns {
+        .ph-hero-actions {
           display: flex;
           gap: 12px;
           flex-wrap: wrap;
           align-items: center;
-          margin-bottom: 24px;
+          margin-bottom: 32px;
         }
 
         .ph-btn-primary {
           min-height: 50px;
-          padding: 0 26px;
+          padding: 0 28px;
           border-radius: 999px;
           display: inline-flex;
           align-items: center;
@@ -345,7 +355,7 @@ export default function HomePage() {
           font-size: 15px;
           background: #ffffff;
           color: var(--ph-coral);
-          border: 1.5px solid #ffcaa6;
+          border: 1.5px solid #ffcca8;
           text-decoration: none;
           transition: all 0.2s ease;
         }
@@ -355,102 +365,327 @@ export default function HomePage() {
           border-color: var(--ph-orange);
         }
 
-        /* Hero Image Card */
-        .ph-hero-visual {
-          position: relative;
-          padding: 6px;
-          border-radius: 28px;
-          background: linear-gradient(145deg, #fed7aa, #bae6fd);
-          box-shadow: 0 20px 45px rgba(13, 47, 36, 0.1);
+        /* AppThink / Zoom Stats Strip */
+        .ph-hero-stats {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+          padding-top: 20px;
+          border-top: 1px solid var(--ph-border);
         }
 
-        .ph-hero-img {
-          width: 100%;
-          aspect-ratio: 4/3.7;
-          object-fit: cover;
+        .ph-stat-item strong {
           display: block;
-          border-radius: 22px;
+          font-size: 16px;
+          font-weight: 900;
+          color: var(--ph-green);
         }
 
-        .ph-badge-float {
-          position: absolute;
-          left: 16px;
-          bottom: 16px;
-          right: 16px;
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(12px);
-          border-radius: 16px;
+        .ph-stat-item span {
+          font-size: 12px;
+          color: var(--ph-muted);
+        }
+
+        /* Interactive Canvas Demo (Zoom Notes / AppThink Widget) */
+        .ph-canvas-card {
+          background: #ffffff;
+          border: 1.5px solid var(--ph-border);
+          border-radius: 24px;
+          overflow: hidden;
+          box-shadow: var(--ph-shadow);
+          display: flex;
+          flex-direction: column;
+        }
+
+        .ph-canvas-header {
+          background: #faf6f0;
           padding: 12px 18px;
+          border-bottom: 1px solid var(--ph-border);
           display: flex;
           align-items: center;
           justify-content: space-between;
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          box-shadow: 0 6px 20px rgba(13, 47, 36, 0.08);
         }
 
-        .ph-badge-title {
+        .ph-window-dots {
+          display: flex;
+          gap: 6px;
+        }
+
+        .ph-window-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: #e2d7ce;
+        }
+
+        .ph-canvas-title {
+          font-size: 12px;
+          font-weight: 850;
+          color: var(--ph-green);
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+        }
+
+        .ph-canvas-tabs {
+          display: flex;
+          background: #ffffff;
+          border-bottom: 1px solid var(--ph-border);
+          padding: 6px 12px 0;
+          gap: 6px;
+        }
+
+        .ph-canvas-tab-btn {
+          padding: 8px 16px;
+          border: none;
+          background: transparent;
+          font-size: 12.5px;
+          font-weight: 750;
+          color: var(--ph-muted);
+          border-bottom: 2.5px solid transparent;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+
+        .ph-canvas-tab-btn.active {
+          color: var(--ph-coral);
+          border-bottom-color: var(--ph-coral);
+        }
+
+        .ph-canvas-body {
+          padding: 20px;
+          min-height: 290px;
+          background: #ffffff;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+
+        /* Brief Canvas View */
+        .ph-brief-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-bottom: 12px;
+          border-bottom: 1px solid var(--ph-border-soft);
+          margin-bottom: 14px;
+        }
+
+        .ph-brief-name {
+          font-size: 15px;
+          font-weight: 850;
+          color: var(--ph-green);
+        }
+
+        .ph-brief-tag {
+          background: var(--ph-coral-soft);
+          color: var(--ph-coral);
+          font-size: 11px;
+          font-weight: 900;
+          padding: 4px 10px;
+          border-radius: 999px;
+        }
+
+        .ph-checklist {
+          list-style: none;
+          padding: 0;
+          margin: 0 0 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .ph-check-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 13px;
+          color: var(--ph-ink);
+        }
+
+        .ph-check-icon {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: #dcfce7;
+          color: #166534;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          font-weight: 900;
+          flex-shrink: 0;
+        }
+
+        /* Matching Canvas View */
+        .ph-match-cards {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .ph-match-card-item {
+          background: #faf7f2;
+          border: 1px solid var(--ph-border);
+          border-radius: 14px;
+          padding: 10px 14px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .ph-match-card-item.selected {
+          border-color: var(--ph-coral);
+          background: #fff8f5;
+        }
+
+        .ph-match-name {
           font-size: 13px;
           font-weight: 850;
           color: var(--ph-green);
         }
 
-        .ph-badge-sub {
+        .ph-match-spec {
           font-size: 11.5px;
           color: var(--ph-muted);
-          font-weight: 600;
         }
 
-        .ph-badge-tag {
-          background: var(--ph-coral-soft);
-          color: var(--ph-coral);
-          padding: 5px 12px;
+        .ph-match-score {
+          font-size: 11px;
+          font-weight: 900;
+          color: #166534;
+          background: #dcfce7;
+          padding: 3px 8px;
           border-radius: 999px;
+        }
+
+        /* Vault Canvas View */
+        .ph-vault-files {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+
+        .ph-vault-file {
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 10px 12px;
+          font-size: 12px;
+        }
+
+        .ph-vault-file strong {
+          color: var(--ph-green);
+          display: block;
+          font-size: 12.5px;
+        }
+
+        .ph-vault-file span {
+          color: #64748b;
+          font-size: 11px;
+        }
+
+        .ph-canvas-footer {
+          background: #fbf8f4;
+          border-top: 1px solid var(--ph-border);
+          padding: 10px 16px;
+          font-size: 12px;
+          color: var(--ph-muted);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .ph-canvas-footer strong {
+          color: var(--ph-coral);
+        }
+
+        /* 4-Step Process Bar (Zoom / AppThink Style) */
+        .ph-process-sec {
+          max-width: 1240px;
+          margin: 0 auto 56px;
+          padding: 0 24px;
+        }
+
+        .ph-process-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 14px;
+        }
+
+        .ph-process-card {
+          background: #ffffff;
+          border: 1px solid var(--ph-border);
+          border-radius: 18px;
+          padding: 22px 18px;
+          box-shadow: var(--ph-shadow-sm);
+          position: relative;
+        }
+
+        .ph-step-num {
           font-size: 12px;
           font-weight: 900;
+          color: var(--ph-coral);
+          background: var(--ph-coral-soft);
+          padding: 3px 8px;
+          border-radius: 6px;
+          display: inline-block;
+          margin-bottom: 10px;
         }
 
-        /* Section Headings */
+        .ph-process-card h4 {
+          margin: 0 0 6px;
+          font-size: 15px;
+          font-weight: 850;
+          color: var(--ph-green);
+        }
+
+        .ph-process-card p {
+          margin: 0;
+          font-size: 12.5px;
+          color: var(--ph-muted);
+          line-height: 1.45;
+        }
+
+        /* 5 Creative Disciplines */
+        .ph-disciplines-sec {
+          max-width: 1240px;
+          margin: 0 auto 56px;
+          padding: 0 24px;
+        }
+
         .ph-section-header {
           text-align: center;
           max-width: 680px;
-          margin: 0 auto 32px;
+          margin: 0 auto 28px;
           padding: 0 16px;
         }
 
         .ph-section-header h2 {
-          font-size: clamp(26px, 3.2vw, 38px);
+          font-size: clamp(26px, 3.2vw, 36px);
           font-weight: 900;
           color: var(--ph-green);
           letter-spacing: -0.025em;
-          margin: 8px 0 10px;
+          margin: 0 0 8px;
         }
 
         .ph-section-header p {
           color: var(--ph-muted);
-          font-size: 15.5px;
+          font-size: 15px;
           margin: 0;
-          line-height: 1.5;
-        }
-
-        /* 5 Creative Disciplines Grid */
-        .ph-disciplines-sec {
-          max-width: 1220px;
-          margin: 0 auto 56px;
-          padding: 0 24px;
         }
 
         .ph-disciplines-grid {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
-          gap: 14px;
+          gap: 12px;
         }
 
         .ph-discipline-card {
           background: #ffffff;
           border: 1px solid var(--ph-border);
-          border-radius: 20px;
+          border-radius: 18px;
           overflow: hidden;
-          box-shadow: 0 6px 18px rgba(13, 47, 36, 0.04);
+          box-shadow: var(--ph-shadow-sm);
           display: flex;
           flex-direction: column;
           transition: transform 0.2s ease;
@@ -463,8 +698,8 @@ export default function HomePage() {
         .ph-discipline-img-wrap {
           width: 100%;
           height: 150px;
-          overflow: hidden;
           background: #f1ede8;
+          overflow: hidden;
         }
 
         .ph-discipline-img {
@@ -476,15 +711,15 @@ export default function HomePage() {
         }
 
         .ph-discipline-body {
-          padding: 14px;
+          padding: 12px 14px;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
           flex: 1;
+          justify-content: space-between;
         }
 
         .ph-discipline-body h4 {
-          margin: 0 0 4px;
+          margin: 0 0 3px;
           font-size: 14px;
           font-weight: 850;
           color: var(--ph-green);
@@ -492,14 +727,14 @@ export default function HomePage() {
 
         .ph-discipline-body p {
           margin: 0;
-          font-size: 12px;
+          font-size: 11.5px;
           color: var(--ph-muted);
           line-height: 1.35;
         }
 
-        /* Why Businesses Love Peach Coins */
+        /* Why Businesses Love Peach Coins (Clear, Trustworthy Value) */
         .ph-reasons-sec {
-          max-width: 1220px;
+          max-width: 1240px;
           margin: 0 auto 56px;
           padding: 0 24px;
         }
@@ -514,8 +749,8 @@ export default function HomePage() {
           background: #ffffff;
           border: 1px solid var(--ph-border);
           border-radius: 18px;
-          padding: 22px 20px;
-          box-shadow: 0 4px 14px rgba(13, 47, 36, 0.03);
+          padding: 20px;
+          box-shadow: var(--ph-shadow-sm);
           border-top: 4px solid var(--ph-orange);
         }
 
@@ -561,26 +796,26 @@ export default function HomePage() {
         .ph-pricing-header {
           text-align: center;
           max-width: 660px;
-          margin: 0 auto 28px;
+          margin: 0 auto 24px;
         }
 
         .ph-pricing-header h2 {
-          font-size: clamp(28px, 3.4vw, 40px);
+          font-size: clamp(28px, 3.4vw, 38px);
           font-weight: 900;
           letter-spacing: -0.025em;
-          margin: 6px 0 10px;
+          margin: 0 0 8px;
         }
 
         .ph-pricing-header p {
           color: #d1ded8;
-          font-size: 16px;
+          font-size: 15.5px;
           margin: 0;
         }
 
         .ph-switch-wrap {
           display: flex;
           justify-content: center;
-          margin-bottom: 28px;
+          margin-bottom: 24px;
         }
 
         .ph-switch {
@@ -613,15 +848,15 @@ export default function HomePage() {
         .ph-price-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 14px;
-          margin-bottom: 24px;
+          gap: 12px;
+          margin-bottom: 20px;
         }
 
         .ph-compact-card {
           background: rgba(255, 255, 255, 0.08);
           border: 1px solid rgba(255, 255, 255, 0.16);
           border-radius: 18px;
-          padding: 20px;
+          padding: 18px;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
@@ -630,7 +865,6 @@ export default function HomePage() {
         .ph-compact-card.featured {
           background: rgba(255, 255, 255, 0.14);
           border-color: var(--ph-peach);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
 
         .ph-compact-tag {
@@ -645,11 +879,11 @@ export default function HomePage() {
           font-size: 26px;
           font-weight: 900;
           color: #ffffff;
-          margin: 4px 0 2px;
+          margin: 2px 0;
         }
 
         .ph-compact-title {
-          font-size: 14.5px;
+          font-size: 14px;
           font-weight: 850;
           margin: 4px 0 6px;
         }
@@ -658,11 +892,11 @@ export default function HomePage() {
           font-size: 12px;
           color: #c7d6cf;
           line-height: 1.45;
-          margin: 0 0 12px;
+          margin: 0 0 10px;
         }
 
         .ph-compact-meta {
-          padding-top: 10px;
+          padding-top: 8px;
           border-top: 1px solid rgba(255, 255, 255, 0.12);
           font-size: 11px;
           color: #9cb3a8;
@@ -673,15 +907,15 @@ export default function HomePage() {
         .ph-membership-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-          margin-bottom: 24px;
+          gap: 14px;
+          margin-bottom: 20px;
         }
 
         .ph-membership-card {
           background: rgba(255, 255, 255, 0.08);
           border: 1px solid rgba(255, 255, 255, 0.16);
           border-radius: 20px;
-          padding: 24px;
+          padding: 22px;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
@@ -696,7 +930,7 @@ export default function HomePage() {
         .ph-pop-tag {
           position: absolute;
           top: -10px;
-          right: 18px;
+          right: 16px;
           background: var(--ph-peach);
           color: #7c2d12;
           font-size: 10px;
@@ -714,9 +948,9 @@ export default function HomePage() {
         }
 
         .ph-plan-price {
-          font-size: 32px;
+          font-size: 30px;
           font-weight: 900;
-          margin: 6px 0;
+          margin: 4px 0;
         }
 
         .ph-plan-price span {
@@ -729,11 +963,11 @@ export default function HomePage() {
           font-size: 13px;
           font-weight: 800;
           color: var(--ph-peach);
-          margin-bottom: 12px;
+          margin-bottom: 10px;
         }
 
         .ph-plan-desc {
-          font-size: 12.5px;
+          font-size: 12px;
           color: #c7d6cf;
           line-height: 1.45;
           margin: 0;
@@ -743,7 +977,7 @@ export default function HomePage() {
           background: rgba(255, 255, 255, 0.07);
           border: 1px solid rgba(255, 255, 255, 0.14);
           border-radius: 16px;
-          padding: 16px 22px;
+          padding: 14px 20px;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -758,7 +992,7 @@ export default function HomePage() {
 
         /* Work Showcase */
         .ph-work-sec {
-          max-width: 1220px;
+          max-width: 1240px;
           margin: 0 auto 56px;
           padding: 0 24px;
         }
@@ -767,7 +1001,7 @@ export default function HomePage() {
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
-          margin-bottom: 20px;
+          margin-bottom: 18px;
         }
 
         .ph-workhead h2 {
@@ -802,7 +1036,7 @@ export default function HomePage() {
           cursor: pointer;
           text-align: left;
           padding: 0;
-          box-shadow: 0 6px 18px rgba(13, 47, 36, 0.05);
+          box-shadow: var(--ph-shadow-sm);
           transition: transform 0.2s ease;
         }
 
@@ -812,7 +1046,7 @@ export default function HomePage() {
 
         .ph-card img {
           width: 100%;
-          height: 200px;
+          height: 190px;
           object-fit: cover;
           display: block;
         }
@@ -830,7 +1064,7 @@ export default function HomePage() {
         }
 
         .ph-card h3 {
-          font-size: 15.5px;
+          font-size: 15px;
           font-weight: 850;
           color: var(--ph-green);
           margin: 4px 0;
@@ -864,7 +1098,7 @@ export default function HomePage() {
 
         /* Skyline Banner */
         .ph-skyline-banner {
-          max-width: 1220px;
+          max-width: 1240px;
           margin: 0 auto 56px;
           padding: 0 24px;
         }
@@ -1031,7 +1265,7 @@ export default function HomePage() {
         }
 
         .ph-footer-inner {
-          max-width: 1220px;
+          max-width: 1240px;
           margin: auto;
           display: flex;
           justify-content: space-between;
@@ -1062,7 +1296,7 @@ export default function HomePage() {
           color: var(--ph-coral);
         }
 
-        /* Mobile Optimization: Tight, Compact, Zero Endless Scrolling */
+        /* Mobile Optimization */
         @media (max-width: 900px) {
           .ph-nav {
             min-height: 90px;
@@ -1082,14 +1316,20 @@ export default function HomePage() {
             display: none;
           }
 
-          .ph-hero {
+          .ph-hero-grid {
             grid-template-columns: 1fr;
-            padding: 18px 16px 36px;
             gap: 28px;
+            margin-bottom: 24px;
           }
 
-          .ph-hero-img {
-            aspect-ratio: 4/3;
+          .ph-hero-stats {
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+          }
+
+          .ph-process-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
           }
 
           .ph-disciplines-grid {
@@ -1159,48 +1399,212 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="ph-hero">
-        <div>
-          <span className="ph-kicker">
-            BIRMINGHAM&rsquo;S CREATIVE MARKETPLACE
-          </span>
-          <h1>
-            The right creative. <br />
-            <em>Right when you need them.</em>
-            <span className="ph-heart">&hearts;</span>
-          </h1>
-          <p className="ph-sub">
-            Stop searching for one person to do everything. We connect Birmingham businesses with vetted Southern creatives specializing in design, websites, photography, and video &mdash; all with zero bidding wars and clear Peach Coin pricing.
-          </p>
-
-          <div className="ph-hero-btns">
-            <Link href="/auth?mode=signup" className="ph-btn-primary">
-              Hire Creative Talent &rarr;
-            </Link>
-            <Link href="/apply" className="ph-btn-secondary">
-              Join the Creative Network
-            </Link>
-          </div>
-        </div>
-
-        <div className="ph-hero-visual">
-          <img
-            src="/hero-bg.png"
-            alt="Southern creative talent working at desk"
-            className="ph-hero-img"
-          />
-          <div className="ph-badge-float">
-            <div>
-              <div className="ph-badge-title">Good ideas grow here. &hearts;</div>
-              <div className="ph-badge-sub">Birmingham &amp; Across the South</div>
+      {/* Hero Section (AppThink + Zoom Notes Combo) */}
+      <section className="ph-hero-sec">
+        <div className="ph-hero-grid">
+          <div>
+            <div className="ph-live-badge">
+              <span className="ph-live-dot"></span>
+              Birmingham&rsquo;s Creative Marketplace
             </div>
-            <span className="ph-badge-tag">2 Coins &bull; $100</span>
+
+            <h1 className="ph-hero-title">
+              Real creative talent. <br />
+              <em>Right when you need them.</em>
+            </h1>
+
+            <p className="ph-hero-sub">
+              The structured creative marketplace and digital coin engine built for Birmingham. Businesses get agency-grade marketing deliverables with zero bidding wars, while Southern creatives earn protected 75% payouts.
+            </p>
+
+            <div className="ph-hero-actions">
+              <Link href="/auth?mode=signup" className="ph-btn-primary">
+                Hire Creative Talent &rarr;
+              </Link>
+              <Link href="/apply" className="ph-btn-secondary">
+                Join the Creative Network
+              </Link>
+            </div>
+
+            {/* AppThink-Style Key Metrics */}
+            <div className="ph-hero-stats">
+              <div className="ph-stat-item">
+                <strong>1 Coin = $50</strong>
+                <span>Predictable Value</span>
+              </div>
+              <div className="ph-stat-item">
+                <strong>3 Curated</strong>
+                <span>Zero Bidding Wars</span>
+              </div>
+              <div className="ph-stat-item">
+                <strong>75% Direct</strong>
+                <span>Creator Take-Home</span>
+              </div>
+              <div className="ph-stat-item">
+                <strong>100% Escrow</strong>
+                <span>Payment Protected</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Interactive Live Canvas Demo (Zoom Notes / AppThink Style) */}
+          <div className="ph-canvas-card">
+            <div className="ph-canvas-header">
+              <div className="ph-window-dots">
+                <span className="ph-window-dot"></span>
+                <span className="ph-window-dot"></span>
+                <span className="ph-window-dot"></span>
+              </div>
+              <div className="ph-canvas-title">Peach Project Canvas</div>
+              <span style={{ fontSize: "11px", color: "#166534", fontWeight: "700" }}>● Active Brief</span>
+            </div>
+
+            <div className="ph-canvas-tabs">
+              <button
+                className={`ph-canvas-tab-btn ${canvasTab === "brief" ? "active" : ""}`}
+                onClick={() => setCanvasTab("brief")}
+              >
+                1. Scoped Brief
+              </button>
+              <button
+                className={`ph-canvas-tab-btn ${canvasTab === "matches" ? "active" : ""}`}
+                onClick={() => setCanvasTab("matches")}
+              >
+                2. Curated 3-Match
+              </button>
+              <button
+                className={`ph-canvas-tab-btn ${canvasTab === "vault" ? "active" : ""}`}
+                onClick={() => setCanvasTab("vault")}
+              >
+                3. Brand Vault
+              </button>
+            </div>
+
+            <div className="ph-canvas-body">
+              {canvasTab === "brief" && (
+                <div>
+                  <div className="ph-brief-row">
+                    <div>
+                      <div className="ph-brief-name">Event Campaign Kit</div>
+                      <div style={{ fontSize: "12px", color: "var(--ph-muted)" }}>Flagship Deliverable Package</div>
+                    </div>
+                    <span className="ph-brief-tag">2 Coins &bull; $100</span>
+                  </div>
+
+                  <ul className="ph-checklist">
+                    <li className="ph-check-item">
+                      <span className="ph-check-icon">&check;</span>
+                      <span>1 Commercial Print Flyer (8.5&times;11, 300 DPI CMYK Bleeds)</span>
+                    </li>
+                    <li className="ph-check-item">
+                      <span className="ph-check-icon">&check;</span>
+                      <span>1 Instagram Square Post (1080&times;1080)</span>
+                    </li>
+                    <li className="ph-check-item">
+                      <span className="ph-check-icon">&check;</span>
+                      <span>1 Instagram Story Graphic (1080&times;1920)</span>
+                    </li>
+                    <li className="ph-check-item">
+                      <span className="ph-check-icon">&check;</span>
+                      <span>2 Included Revision Rounds &bull; 48-Hour SLA</span>
+                    </li>
+                  </ul>
+                </div>
+              )}
+
+              {canvasTab === "matches" && (
+                <div>
+                  <div style={{ fontSize: "12px", color: "var(--ph-muted)", marginBottom: "10px" }}>
+                    Algorithm returns exactly 3 vetted local creatives (Zero bidding wars):
+                  </div>
+                  <div className="ph-match-cards">
+                    <div className="ph-match-card-item selected">
+                      <div>
+                        <div className="ph-match-name">Stephanie W. &bull; Brand &amp; Packaging</div>
+                        <div className="ph-match-spec">Verified Pro &bull; 18 Completed &bull; 100% On-Time</div>
+                      </div>
+                      <span className="ph-match-score">98% Match</span>
+                    </div>
+                    <div className="ph-match-card-item">
+                      <div>
+                        <div className="ph-match-name">Andre V. &bull; Editorial &amp; Typography</div>
+                        <div className="ph-match-spec">Verified Pro &bull; 14 Completed &bull; 4.9 Rating</div>
+                      </div>
+                      <span className="ph-match-score">94% Match</span>
+                    </div>
+                    <div className="ph-match-card-item">
+                      <div>
+                        <div className="ph-match-name">Elena R. &bull; Social &amp; Motion Visuals</div>
+                        <div className="ph-match-spec">Verified Pro &bull; 21 Completed &bull; 5.0 Rating</div>
+                      </div>
+                      <span className="ph-match-score">91% Match</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {canvasTab === "vault" && (
+                <div>
+                  <div style={{ fontSize: "12px", color: "var(--ph-muted)", marginBottom: "10px" }}>
+                    Persistent client assets saved forever (No print shop rejections):
+                  </div>
+                  <div className="ph-vault-files">
+                    <div className="ph-vault-file">
+                      <strong>Brand Logo Vector</strong>
+                      <span>.SVG / .AI &bull; Transparent</span>
+                    </div>
+                    <div className="ph-vault-file">
+                      <strong>Press-Ready PDF</strong>
+                      <span>300 DPI CMYK &bull; With Bleeds</span>
+                    </div>
+                    <div className="ph-vault-file">
+                      <strong>Color Codes &amp; Fonts</strong>
+                      <span>HEX, RGB &bull; Type Kit</span>
+                    </div>
+                    <div className="ph-vault-file">
+                      <strong>Social Assets Kit</strong>
+                      <span>High-Res PNGs &bull; Ready</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="ph-canvas-footer">
+                <span>Status: <strong>Funds Protected in Escrow</strong></span>
+                <span style={{ color: "var(--ph-green)", fontWeight: "700" }}>Payout on Sign-off</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 5 Disciplines Showcase */}
+      {/* 4-Step Process Bar (Zoom / AppThink Style) */}
+      <section className="ph-process-sec">
+        <div className="ph-process-grid">
+          <div className="ph-process-card">
+            <span className="ph-step-num">Step 01</span>
+            <h4>Drop in Peach Coins</h4>
+            <p>1 Coin = $50. Simple fixed packages with zero hourly surprises or haggling.</p>
+          </div>
+          <div className="ph-process-card">
+            <span className="ph-step-num">Step 02</span>
+            <h4>Curated 3-Match</h4>
+            <p>We present 3 vetted local specialists with clear styles. No 40+ generic cut-and-paste bids.</p>
+          </div>
+          <div className="ph-process-card">
+            <span className="ph-step-num">Step 03</span>
+            <h4>Collaborate in Canvas</h4>
+            <p>Review draft proofs, check 300 DPI print standards, and get 2 included revision rounds.</p>
+          </div>
+          <div className="ph-process-card">
+            <span className="ph-step-num">Step 04</span>
+            <h4>Approve &amp; Vault</h4>
+            <p>Funds release upon your final approval. Source vectors are permanently stored in your Brand Vault.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 5 Creative Disciplines */}
       <section className="ph-disciplines-sec">
         <div className="ph-section-header">
           <h2>Creative Support for Your Business</h2>
@@ -1224,7 +1628,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why Businesses Love Peach Coins (Clear, Trustworthy Value) */}
+      {/* Why Businesses Love Peach Coins (AppThink Feature Comparison) */}
       <section className="ph-reasons-sec">
         <div className="ph-section-header">
           <h2>Why Businesses Love Peach Coins</h2>
@@ -1262,21 +1666,21 @@ export default function HomePage() {
           <div className="ph-switch-wrap">
             <div className="ph-switch">
               <button
-                className={`ph-switch-btn ${pricingMode === "project" ? "active" : ""}`}
-                onClick={() => setPricingMode("project")}
+                className={`ph-switch-btn ${pricingTab === "project" ? "active" : ""}`}
+                onClick={() => setPricingTab("project")}
               >
                 By the Project (Pay-As-You-Go)
               </button>
               <button
-                className={`ph-switch-btn ${pricingMode === "membership" ? "active" : ""}`}
-                onClick={() => setPricingMode("membership")}
+                className={`ph-switch-btn ${pricingTab === "membership" ? "active" : ""}`}
+                onClick={() => setPricingTab("membership")}
               >
                 Monthly Memberships
               </button>
             </div>
           </div>
 
-          {pricingMode === "project" ? (
+          {pricingTab === "project" ? (
             <div className="ph-price-grid">
               <div className="ph-compact-card">
                 <div>
@@ -1290,7 +1694,7 @@ export default function HomePage() {
 
               <div className="ph-compact-card featured">
                 <div>
-                  <div className="ph-compact-tag" style={{ color: "#fdba74" }}>Most Popular</div>
+                  <div className="ph-compact-tag" style={{ color: "var(--ph-peach)" }}>Most Popular</div>
                   <div className="ph-compact-price">$100</div>
                   <div className="ph-compact-title">2 Peach Coins</div>
                   <p className="ph-compact-desc">Event Flyer Kit: Print-ready 8.5x11 flyer (300 DPI) + matching Instagram square &amp; story.</p>
