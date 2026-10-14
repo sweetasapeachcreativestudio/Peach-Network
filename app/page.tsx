@@ -355,31 +355,6 @@ export default function HomePage() {
           border-color: var(--ph-orange);
         }
 
-        .ph-trust-pills {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-        }
-
-        .ph-trust-pill {
-          font-size: 12.5px;
-          font-weight: 700;
-          color: var(--ph-green);
-          background: var(--ph-green-soft);
-          padding: 5px 12px;
-          border-radius: 999px;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .ph-trust-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: var(--ph-coral);
-        }
-
         /* Hero Image Card */
         .ph-hero-visual {
           position: relative;
@@ -1206,18 +1181,6 @@ export default function HomePage() {
             <Link href="/apply" className="ph-btn-secondary">
               Join the Creative Network
             </Link>
-          </div>
-
-          <div className="ph-trust-pills">
-            <span className="ph-trust-pill">
-              <span className="ph-trust-dot"></span> Vetted Creatives
-            </span>
-            <span className="ph-trust-pill">
-              <span className="ph-trust-dot"></span> Simple Peach Coin Pricing
-            </span>
-            <span className="ph-trust-pill">
-              <span className="ph-trust-dot"></span> Powered by Sweet As A Peach
-            </span>
           </div>
         </div>
 
