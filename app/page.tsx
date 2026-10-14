@@ -23,7 +23,7 @@ const PROJECTS: ProjectItem[] = [
     client: "Lillian Hewitt, Black Women's Heart Health, LLC",
     category: "Mobile UI & Web Experience",
     coins: 10,
-    turnaround: "5 Days",
+    turnaround: "5–7 Days",
     image: "/lillian-project.jpg",
     description: "A responsive digital experience and mobile health prototype created for a Birmingham founder.",
     specs: ["Responsive Web Portal", "Mobile App UI Prototype", "Custom Interface Assets", "Launch-ready design handoff"]
@@ -34,7 +34,7 @@ const PROJECTS: ProjectItem[] = [
     client: "Runa Streetwear Apparel",
     category: "Brand Identity & Apparel",
     coins: 6,
-    turnaround: "3 Days",
+    turnaround: "4–5 Days",
     image: "/project 7.jpg",
     description: "A distinctive crescent-moon identity system and apparel artwork built around the brand's visual story.",
     specs: ["Primary & Submark Logos", "Apparel Vector Artwork", "Typography System", "Print-ready files"]
@@ -52,7 +52,7 @@ const PROJECTS: ProjectItem[] = [
   },
   {
     id: 4,
-    title: "Lawson State Student Campaign",
+    title: "Student Campaign & Announcement Suite",
     client: "Lawson State Community College",
     category: "Social Media Campaign",
     coins: 3,
@@ -63,7 +63,7 @@ const PROJECTS: ProjectItem[] = [
   },
   {
     id: 5,
-    title: "New Joy Fellowship Program Suite",
+    title: "Church Program & Civic Event Suite",
     client: "New Joy Fellowship Baptist Church",
     category: "Editorial & Print Design",
     coins: 4,
@@ -74,14 +74,14 @@ const PROJECTS: ProjectItem[] = [
   },
   {
     id: 6,
-    title: "Grand Opening Campaign Kit",
-    client: "Woodlawn Bakehouse & Artisan Market",
+    title: "Custom Event Flyer Kit",
+    client: "Local Culinary & Artisan Market",
     category: "Print & Social Launch Kit",
     coins: 2,
-    turnaround: "3–4 Days",
+    turnaround: "48 Hours",
     image: "/Project 2.png",
-    description: "Pre-scoped flagship campaign kit: 1 high-res print flyer with 300 DPI press bleeds + 2 promotional social assets.",
-    specs: ["1 Commercial Print Flyer (CMYK)", "1 Instagram Square (1080x1080)", "1 Instagram Story (1080x1920)", "Stored in client Brand Vault"]
+    description: "Pre-scoped event kit: 1 high-res print flyer with 300 DPI press bleeds + matching Instagram square and story.",
+    specs: ["1 Commercial Print Flyer (CMYK)", "1 Instagram Square (1080x1080)", "1 Instagram Story (1080x1920)", "Stored in Brand Vault"]
   }
 ];
 
@@ -90,73 +90,37 @@ const DISCIPLINES = [
     role: "Photographers",
     headline: "Showcase your work. Get hired.",
     image: "/Creative5.jpg",
-    tag: "Photography"
+    accent: "bg-coral"
   },
   {
-    role: "Designers & Brand",
+    role: "Designers",
     headline: "Create. Collaborate. Grow.",
     image: "/hero-bg.png",
-    tag: "Brand & Graphic"
+    accent: "bg-peach"
   },
   {
-    role: "Video Creators",
+    role: "Video Editors",
     headline: "Turn your talent into opportunity.",
     image: "/Creative 3.jpg",
-    tag: "Video & Motion"
+    accent: "bg-blue"
   },
   {
-    role: "Writers & Storytellers",
+    role: "Writers",
     headline: "Your words matter here.",
     image: "/Creative 4.jpg",
-    tag: "Copy & Story"
+    accent: "bg-green"
   },
   {
-    role: "Local Businesses",
+    role: "Businesses",
     headline: "Find the right creative. Get it done.",
     image: "/brand/business-owner.jpg",
-    tag: "Birmingham Merchants"
-  }
-];
-
-const PACKAGES = [
-  {
-    name: "Quick Graphic / Menu Insert",
-    coins: "1 Coin",
-    price: "$50",
-    payout: "$37.50 creative net",
-    turnaround: "24–48 Hours",
-    description: "Perfect for single event flyers, menu updates, specials, or social story promotions."
-  },
-  {
-    name: "Grand Opening Campaign Kit (Flagship)",
-    coins: "2 Coins",
-    price: "$100",
-    payout: "$75.00 creative net",
-    turnaround: "3–4 Days",
-    description: "Our most popular package: 1 print-ready flyer (300 DPI CMYK) + 2 matched social media assets.",
-    highlight: true
-  },
-  {
-    name: "Complete Brand Identity Starter",
-    coins: "4 Coins",
-    price: "$200",
-    payout: "$150.00 creative net",
-    turnaround: "5–7 Days",
-    description: "Primary logo, mark, typography pairings, color palette, and vector brand file packaging."
-  },
-  {
-    name: "Full Packaging & Storefront Suite",
-    coins: "8 Coins",
-    price: "$400",
-    payout: "$300.00 creative net",
-    turnaround: "10–12 Days",
-    description: "Complete packaging layout, retail window graphics, branded merchandise, and print production prep."
+    accent: "bg-peach"
   }
 ];
 
 export default function HomePage() {
   const [selected, setSelected] = useState<ProjectItem | null>(null);
-  const [audienceTab, setAudienceTab] = useState<"business" | "creative">("business");
+  const [pricingMode, setPricingMode] = useState<"project" | "membership">("project");
 
   return (
     <main className="ph">
@@ -165,19 +129,22 @@ export default function HomePage() {
       <style>{`
         :root {
           --ph-green: #0d2f24;
-          --ph-green-light: #173c2a;
-          --ph-green-soft: #23523c;
+          --ph-green-mid: #173c2a;
+          --ph-green-soft: #eaf3ed;
           --ph-orange: #f08a62;
           --ph-orange-deep: #e85d3f;
-          --ph-peach-soft: #fff2e9;
+          --ph-coral: #e54307;
+          --ph-coral-soft: #ffece5;
+          --ph-peach: #fed7aa;
+          --ph-peach-soft: #fff2e8;
           --ph-cream: #fffaf5;
-          --ph-cream-card: #ffffff;
+          --ph-blue-light: #70eaff;
+          --ph-blue-soft: #e5f9fd;
+          --ph-blue-accent: #0284c7;
           --ph-ink: #17271e;
-          --ph-muted: #56685f;
+          --ph-muted: #586760;
           --ph-border: #ebdcd3;
-          --ph-border-soft: #f3e9e2;
-          --ph-cyan: #70eaff;
-          --ph-burnt-orange: #e54307;
+          --ph-border-soft: #f4eae3;
         }
 
         * {
@@ -197,20 +164,15 @@ export default function HomePage() {
         .ph-topbar {
           background: var(--ph-green);
           color: #f7ede6;
-          padding: 9px 18px;
+          padding: 8px 16px;
           font-size: 13px;
           font-weight: 600;
           text-align: center;
           letter-spacing: 0.02em;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .ph-topbar strong {
-          color: #fed7aa;
+          color: var(--ph-peach);
         }
 
         /* Nav Header */
@@ -262,62 +224,61 @@ export default function HomePage() {
         }
 
         .ph-link:hover {
-          color: var(--ph-orange-deep);
+          color: var(--ph-coral);
         }
 
         .ph-pill {
-          padding: 11px 22px;
+          padding: 10px 20px;
           border: 1px solid var(--ph-border);
           border-radius: 999px;
-          background-color: var(--ph-cyan);
-          color: var(--ph-burnt-orange);
+          background-color: var(--ph-blue-light);
+          color: var(--ph-coral);
           font-weight: 850;
           font-size: 14px;
           text-decoration: none;
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          transition: all 0.2s ease;
-          box-shadow: 0 4px 14px rgba(112, 234, 255, 0.35);
+          box-shadow: 0 4px 12px rgba(112, 234, 255, 0.3);
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
 
         .ph-pill:hover {
           transform: translateY(-1px);
-          box-shadow: 0 6px 18px rgba(112, 234, 255, 0.45);
+          box-shadow: 0 6px 16px rgba(112, 234, 255, 0.45);
         }
 
         /* Hero Section */
         .ph-hero {
           max-width: 1220px;
           margin: auto;
-          padding: 36px 24px 64px;
+          padding: 28px 24px 48px;
           display: grid;
           grid-template-columns: 1.05fr 0.95fr;
-          gap: 56px;
+          gap: 44px;
           align-items: center;
         }
 
         .ph-kicker {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
           font-size: 12px;
           font-weight: 900;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
-          color: #c2410c;
-          background: #ffedd5;
+          color: var(--ph-coral);
+          background: var(--ph-coral-soft);
           padding: 6px 14px;
           border-radius: 999px;
-          border: 1px solid #fed7aa;
-          margin-bottom: 16px;
+          border: 1px solid #ffd3c4;
+          margin-bottom: 14px;
         }
 
         .ph-hero h1 {
-          font-size: clamp(40px, 4.8vw, 64px);
-          line-height: 1.05;
-          letter-spacing: -0.04em;
-          margin: 0 0 18px;
+          font-size: clamp(38px, 4.4vw, 58px);
+          line-height: 1.08;
+          letter-spacing: -0.035em;
+          margin: 0 0 16px;
           color: var(--ph-green);
           font-weight: 900;
         }
@@ -326,7 +287,7 @@ export default function HomePage() {
           font-family: Georgia, serif;
           font-weight: 400;
           font-style: italic;
-          color: var(--ph-orange-deep);
+          color: var(--ph-coral);
         }
 
         .ph-heart {
@@ -337,23 +298,24 @@ export default function HomePage() {
         }
 
         .ph-sub {
-          font-size: 18px;
-          line-height: 1.6;
+          font-size: 17px;
+          line-height: 1.55;
           color: var(--ph-muted);
-          max-width: 580px;
-          margin: 0 0 28px;
+          max-width: 560px;
+          margin: 0 0 24px;
         }
 
-        .ph-actions {
+        .ph-hero-btns {
           display: flex;
-          gap: 14px;
+          gap: 12px;
           flex-wrap: wrap;
           align-items: center;
+          margin-bottom: 24px;
         }
 
-        .ph-primary {
-          min-height: 52px;
-          padding: 0 28px;
+        .ph-btn-primary {
+          min-height: 50px;
+          padding: 0 26px;
           border-radius: 999px;
           display: inline-flex;
           align-items: center;
@@ -363,18 +325,17 @@ export default function HomePage() {
           background: var(--ph-green);
           color: #ffffff;
           text-decoration: none;
-          box-shadow: 0 10px 24px rgba(13, 47, 36, 0.22);
+          box-shadow: 0 8px 20px rgba(13, 47, 36, 0.2);
           transition: all 0.2s ease;
         }
 
-        .ph-primary:hover {
-          background: var(--ph-green-light);
+        .ph-btn-primary:hover {
+          background: var(--ph-green-mid);
           transform: translateY(-1px);
-          box-shadow: 0 14px 28px rgba(13, 47, 36, 0.3);
         }
 
-        .ph-secondary {
-          min-height: 52px;
+        .ph-btn-secondary {
+          min-height: 50px;
           padding: 0 24px;
           border-radius: 999px;
           display: inline-flex;
@@ -383,49 +344,73 @@ export default function HomePage() {
           font-weight: 800;
           font-size: 15px;
           background: #ffffff;
-          color: var(--ph-green);
-          border: 1.5px solid var(--ph-border);
+          color: var(--ph-coral);
+          border: 1.5px solid #ffcaa6;
           text-decoration: none;
           transition: all 0.2s ease;
         }
 
-        .ph-secondary:hover {
+        .ph-btn-secondary:hover {
+          background: var(--ph-peach-soft);
           border-color: var(--ph-orange);
-          color: var(--ph-orange-deep);
-          background: #fff8f3;
         }
 
-        /* Hero Visual Card */
+        .ph-trust-pills {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        .ph-trust-pill {
+          font-size: 12.5px;
+          font-weight: 700;
+          color: var(--ph-green);
+          background: var(--ph-green-soft);
+          padding: 5px 12px;
+          border-radius: 999px;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .ph-trust-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: var(--ph-coral);
+        }
+
+        /* Hero Image Card */
         .ph-hero-visual {
           position: relative;
-          padding: 8px;
-          border-radius: 32px;
+          padding: 6px;
+          border-radius: 28px;
           background: linear-gradient(145deg, #fed7aa, #bae6fd);
-          box-shadow: 0 24px 50px rgba(13, 47, 36, 0.12);
+          box-shadow: 0 20px 45px rgba(13, 47, 36, 0.1);
         }
 
         .ph-hero-img {
           width: 100%;
-          aspect-ratio: 4/4;
+          aspect-ratio: 4/3.7;
           object-fit: cover;
           display: block;
-          border-radius: 26px;
+          border-radius: 22px;
         }
 
         .ph-badge-float {
           position: absolute;
-          left: 20px;
-          bottom: 20px;
-          right: 20px;
-          background: rgba(255, 255, 255, 0.94);
-          backdrop-filter: blur(14px);
-          border-radius: 18px;
-          padding: 16px 20px;
+          left: 16px;
+          bottom: 16px;
+          right: 16px;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(12px);
+          border-radius: 16px;
+          padding: 12px 18px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          border: 1px solid rgba(255, 255, 255, 0.6);
-          box-shadow: 0 8px 24px rgba(13, 47, 36, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.8);
+          box-shadow: 0 6px 20px rgba(13, 47, 36, 0.08);
         }
 
         .ph-badge-title {
@@ -435,208 +420,47 @@ export default function HomePage() {
         }
 
         .ph-badge-sub {
-          font-size: 11px;
-          color: #64748b;
+          font-size: 11.5px;
+          color: var(--ph-muted);
           font-weight: 600;
         }
 
-        .ph-coin-pill {
-          background: #fff0e6;
-          color: var(--ph-burnt-orange);
-          padding: 6px 12px;
+        .ph-badge-tag {
+          background: var(--ph-coral-soft);
+          color: var(--ph-coral);
+          padding: 5px 12px;
           border-radius: 999px;
           font-size: 12px;
           font-weight: 900;
-          border: 1px solid #ffd8c4;
         }
 
-        /* Value Props Ribbon */
-        .ph-ribbon {
-          max-width: 1220px;
-          margin: 0 auto 56px;
-          padding: 0 24px;
-        }
-
-        .ph-ribbon-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-          background: #ffffff;
-          padding: 24px;
-          border-radius: 24px;
-          border: 1px solid var(--ph-border);
-          box-shadow: 0 10px 30px rgba(13, 47, 36, 0.04);
-        }
-
-        .ph-prop {
-          display: flex;
-          align-items: flex-start;
-          gap: 14px;
-        }
-
-        .ph-prop-icon {
-          width: 44px;
-          height: 44px;
-          border-radius: 14px;
-          background: #fff2e9;
-          color: var(--ph-orange-deep);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 20px;
-          flex-shrink: 0;
-          border: 1px solid #fed7aa;
-        }
-
-        .ph-prop h3 {
-          margin: 0 0 3px;
-          font-size: 15px;
-          font-weight: 850;
-          color: var(--ph-green);
-        }
-
-        .ph-prop p {
-          margin: 0;
-          font-size: 12.5px;
-          color: var(--ph-muted);
-          line-height: 1.45;
-        }
-
-        /* Dual Audience Section */
-        .ph-audience-sec {
-          max-width: 1220px;
-          margin: 0 auto 72px;
-          padding: 0 24px;
-        }
-
+        /* Section Headings */
         .ph-section-header {
           text-align: center;
-          max-width: 720px;
-          margin: 0 auto 36px;
+          max-width: 680px;
+          margin: 0 auto 32px;
+          padding: 0 16px;
         }
 
         .ph-section-header h2 {
-          font-size: clamp(28px, 3.5vw, 42px);
+          font-size: clamp(26px, 3.2vw, 38px);
           font-weight: 900;
           color: var(--ph-green);
-          letter-spacing: -0.03em;
-          margin: 8px 0 12px;
+          letter-spacing: -0.025em;
+          margin: 8px 0 10px;
         }
 
         .ph-section-header p {
           color: var(--ph-muted);
-          font-size: 16px;
+          font-size: 15.5px;
           margin: 0;
-        }
-
-        .ph-tabs {
-          display: inline-flex;
-          background: #efe4dc;
-          padding: 5px;
-          border-radius: 999px;
-          margin-bottom: 32px;
-        }
-
-        .ph-tab-btn {
-          padding: 10px 24px;
-          border-radius: 999px;
-          border: none;
-          background: transparent;
-          font-weight: 850;
-          font-size: 14px;
-          color: var(--ph-muted);
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .ph-tab-btn.active {
-          background: var(--ph-green);
-          color: #ffffff;
-          box-shadow: 0 4px 12px rgba(13, 47, 36, 0.18);
-        }
-
-        .ph-audience-card {
-          background: #ffffff;
-          border: 1.5px solid var(--ph-border);
-          border-radius: 28px;
-          padding: 36px;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 40px;
-          box-shadow: 0 16px 40px rgba(13, 47, 36, 0.05);
-        }
-
-        .ph-features-list {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-
-        .ph-feature-item {
-          display: flex;
-          align-items: flex-start;
-          gap: 12px;
-        }
-
-        .ph-check {
-          width: 22px;
-          height: 22px;
-          border-radius: 50%;
-          background: #dcfce7;
-          color: #166534;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 12px;
-          font-weight: 900;
-          flex-shrink: 0;
-          margin-top: 2px;
-        }
-
-        .ph-feature-item strong {
-          color: var(--ph-green);
-          font-size: 14px;
-          display: block;
-        }
-
-        .ph-feature-item span {
-          color: var(--ph-muted);
-          font-size: 13px;
-        }
-
-        .ph-quote-box {
-          background: var(--ph-peach-soft);
-          border: 1px solid #ffd8c4;
-          border-radius: 20px;
-          padding: 24px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-        }
-
-        .ph-quote-box blockquote {
-          margin: 0 0 16px;
-          font-size: 15px;
-          font-style: italic;
-          color: #4a2e23;
-          line-height: 1.6;
-        }
-
-        .ph-quote-author {
-          font-size: 12px;
-          font-weight: 850;
-          color: var(--ph-burnt-orange);
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
+          line-height: 1.5;
         }
 
         /* 5 Creative Disciplines Grid */
         .ph-disciplines-sec {
           max-width: 1220px;
-          margin: 0 auto 72px;
+          margin: 0 auto 56px;
           padding: 0 24px;
         }
 
@@ -651,43 +475,41 @@ export default function HomePage() {
           border: 1px solid var(--ph-border);
           border-radius: 20px;
           overflow: hidden;
-          box-shadow: 0 8px 22px rgba(13, 47, 36, 0.04);
+          box-shadow: 0 6px 18px rgba(13, 47, 36, 0.04);
           display: flex;
           flex-direction: column;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          transition: transform 0.2s ease;
         }
 
         .ph-discipline-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 14px 30px rgba(13, 47, 36, 0.09);
+          transform: translateY(-3px);
+        }
+
+        .ph-discipline-img-wrap {
+          width: 100%;
+          height: 150px;
+          overflow: hidden;
+          background: #f1ede8;
         }
 
         .ph-discipline-img {
           width: 100%;
-          height: 140px;
+          height: 100%;
           object-fit: cover;
+          object-position: center 25%;
           display: block;
         }
 
         .ph-discipline-body {
-          padding: 16px;
+          padding: 14px;
           display: flex;
           flex-direction: column;
-          flex: 1;
           justify-content: space-between;
-        }
-
-        .ph-discipline-tag {
-          font-size: 10px;
-          font-weight: 900;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: var(--ph-orange-deep);
-          margin-bottom: 4px;
+          flex: 1;
         }
 
         .ph-discipline-body h4 {
-          margin: 0 0 6px;
+          margin: 0 0 4px;
           font-size: 14px;
           font-weight: 850;
           color: var(--ph-green);
@@ -695,55 +517,195 @@ export default function HomePage() {
 
         .ph-discipline-body p {
           margin: 0;
-          font-size: 11.5px;
+          font-size: 12px;
           color: var(--ph-muted);
-          line-height: 1.4;
+          line-height: 1.35;
         }
 
-        /* Peach Coins Section */
-        .ph-coins-sec {
+        /* Why Businesses Love Peach Coins */
+        .ph-reasons-sec {
+          max-width: 1220px;
+          margin: 0 auto 56px;
+          padding: 0 24px;
+        }
+
+        .ph-reasons-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 14px;
+        }
+
+        .ph-reason-card {
+          background: #ffffff;
+          border: 1px solid var(--ph-border);
+          border-radius: 18px;
+          padding: 22px 20px;
+          box-shadow: 0 4px 14px rgba(13, 47, 36, 0.03);
+          border-top: 4px solid var(--ph-orange);
+        }
+
+        .ph-reason-card:nth-child(2) {
+          border-top-color: var(--ph-blue-light);
+        }
+
+        .ph-reason-card:nth-child(3) {
+          border-top-color: var(--ph-green);
+        }
+
+        .ph-reason-card:nth-child(4) {
+          border-top-color: var(--ph-coral);
+        }
+
+        .ph-reason-card h4 {
+          margin: 0 0 6px;
+          font-size: 15px;
+          font-weight: 850;
+          color: var(--ph-green);
+        }
+
+        .ph-reason-card p {
+          margin: 0;
+          font-size: 13px;
+          color: var(--ph-muted);
+          line-height: 1.45;
+        }
+
+        /* Peach Coin Pricing (Simplified & Compact) */
+        .ph-pricing-sec {
           background: var(--ph-green);
           color: #ffffff;
-          padding: 72px 24px;
-          margin-bottom: 72px;
+          padding: 56px 24px;
+          margin-bottom: 56px;
         }
 
-        .ph-coins-inner {
-          max-width: 1220px;
+        .ph-pricing-inner {
+          max-width: 1100px;
           margin: auto;
         }
 
-        .ph-coins-header {
+        .ph-pricing-header {
           text-align: center;
-          max-width: 740px;
-          margin: 0 auto 48px;
+          max-width: 660px;
+          margin: 0 auto 28px;
         }
 
-        .ph-coins-header h2 {
-          font-size: clamp(30px, 3.8vw, 44px);
+        .ph-pricing-header h2 {
+          font-size: clamp(28px, 3.4vw, 40px);
           font-weight: 900;
-          letter-spacing: -0.03em;
-          margin: 10px 0 14px;
+          letter-spacing: -0.025em;
+          margin: 6px 0 10px;
         }
 
-        .ph-coins-header p {
+        .ph-pricing-header p {
           color: #d1ded8;
-          font-size: 17px;
+          font-size: 16px;
           margin: 0;
-          line-height: 1.6;
         }
 
-        .ph-pkg-grid {
+        .ph-switch-wrap {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 28px;
+        }
+
+        .ph-switch {
+          display: inline-flex;
+          background: rgba(255, 255, 255, 0.12);
+          padding: 4px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .ph-switch-btn {
+          padding: 8px 22px;
+          border-radius: 999px;
+          border: none;
+          background: transparent;
+          color: #e2ede8;
+          font-weight: 800;
+          font-size: 13.5px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+
+        .ph-switch-btn.active {
+          background: #ffffff;
+          color: var(--ph-green);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Project Cards */
+        .ph-price-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
-          margin-bottom: 40px;
+          gap: 14px;
+          margin-bottom: 24px;
         }
 
-        .ph-pkg-card {
-          background: rgba(255, 255, 255, 0.07);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          border-radius: 22px;
+        .ph-compact-card {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          border-radius: 18px;
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+
+        .ph-compact-card.featured {
+          background: rgba(255, 255, 255, 0.14);
+          border-color: var(--ph-peach);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .ph-compact-tag {
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.06em;
+          color: var(--ph-peach);
+          text-transform: uppercase;
+        }
+
+        .ph-compact-price {
+          font-size: 26px;
+          font-weight: 900;
+          color: #ffffff;
+          margin: 4px 0 2px;
+        }
+
+        .ph-compact-title {
+          font-size: 14.5px;
+          font-weight: 850;
+          margin: 4px 0 6px;
+        }
+
+        .ph-compact-desc {
+          font-size: 12px;
+          color: #c7d6cf;
+          line-height: 1.45;
+          margin: 0 0 12px;
+        }
+
+        .ph-compact-meta {
+          padding-top: 10px;
+          border-top: 1px solid rgba(255, 255, 255, 0.12);
+          font-size: 11px;
+          color: #9cb3a8;
+          font-weight: 600;
+        }
+
+        /* Membership Grid */
+        .ph-membership-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          margin-bottom: 24px;
+        }
+
+        .ph-membership-card {
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          border-radius: 20px;
           padding: 24px;
           display: flex;
           flex-direction: column;
@@ -751,17 +713,16 @@ export default function HomePage() {
           position: relative;
         }
 
-        .ph-pkg-card.highlight {
-          background: rgba(255, 255, 255, 0.12);
-          border-color: #fed7aa;
-          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+        .ph-membership-card.featured {
+          background: rgba(255, 255, 255, 0.14);
+          border-color: var(--ph-peach);
         }
 
-        .ph-pkg-badge {
+        .ph-pop-tag {
           position: absolute;
-          top: -11px;
+          top: -10px;
           right: 18px;
-          background: #fdba74;
+          background: var(--ph-peach);
           color: #7c2d12;
           font-size: 10px;
           font-weight: 900;
@@ -771,70 +732,59 @@ export default function HomePage() {
           border-radius: 999px;
         }
 
-        .ph-pkg-coins {
-          font-size: 13px;
-          font-weight: 900;
-          letter-spacing: 0.08em;
-          color: #fed7aa;
-          text-transform: uppercase;
+        .ph-plan-name {
+          font-size: 16px;
+          font-weight: 850;
+          color: #ffffff;
         }
 
-        .ph-pkg-price {
+        .ph-plan-price {
           font-size: 32px;
           font-weight: 900;
-          color: #ffffff;
-          margin: 4px 0;
+          margin: 6px 0;
         }
 
-        .ph-pkg-card h3 {
-          font-size: 16px;
+        .ph-plan-price span {
+          font-size: 13px;
+          font-weight: 600;
+          color: #a4beaf;
+        }
+
+        .ph-plan-coins {
+          font-size: 13px;
           font-weight: 800;
-          margin: 8px 0;
-          line-height: 1.3;
+          color: var(--ph-peach);
+          margin-bottom: 12px;
         }
 
-        .ph-pkg-desc {
+        .ph-plan-desc {
           font-size: 12.5px;
           color: #c7d6cf;
-          line-height: 1.5;
-          margin: 0 0 16px;
+          line-height: 1.45;
+          margin: 0;
         }
 
-        .ph-pkg-meta {
-          padding-top: 12px;
-          border-top: 1px solid rgba(255, 255, 255, 0.12);
-          font-size: 11px;
-          color: #9cb3a8;
-          display: flex;
-          justify-content: space-between;
-        }
-
-        .ph-split-banner {
-          background: rgba(255, 255, 255, 0.06);
+        .ph-pricing-footer {
+          background: rgba(255, 255, 255, 0.07);
           border: 1px solid rgba(255, 255, 255, 0.14);
-          border-radius: 18px;
-          padding: 20px 28px;
+          border-radius: 16px;
+          padding: 16px 22px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           flex-wrap: wrap;
-          gap: 16px;
+          gap: 12px;
         }
 
-        .ph-split-text {
-          font-size: 13.5px;
+        .ph-pricing-footer-text {
+          font-size: 13px;
           color: #e2ede8;
-          max-width: 800px;
-        }
-
-        .ph-split-text strong {
-          color: #fed7aa;
         }
 
         /* Work Showcase */
         .ph-work-sec {
           max-width: 1220px;
-          margin: 0 auto 72px;
+          margin: 0 auto 56px;
           padding: 0 24px;
         }
 
@@ -842,78 +792,88 @@ export default function HomePage() {
           display: flex;
           justify-content: space-between;
           align-items: flex-end;
-          gap: 20px;
-          margin-bottom: 28px;
+          margin-bottom: 20px;
+        }
+
+        .ph-workhead h2 {
+          font-size: clamp(24px, 3vw, 34px);
+          font-weight: 900;
+          color: var(--ph-green);
+          margin: 0 0 4px;
+        }
+
+        .ph-workhead p {
+          color: var(--ph-muted);
+          font-size: 14.5px;
+          margin: 0;
         }
 
         .ph-track {
           display: flex;
-          gap: 20px;
+          gap: 16px;
           overflow-x: auto;
           scroll-snap-type: x mandatory;
-          padding: 6px 2px 24px;
+          padding: 4px 2px 18px;
           -webkit-overflow-scrolling: touch;
         }
 
         .ph-card {
-          flex: 0 0 340px;
+          flex: 0 0 320px;
           scroll-snap-align: start;
           border: 1px solid var(--ph-border);
-          border-radius: 24px;
+          border-radius: 20px;
           overflow: hidden;
           background: #ffffff;
           cursor: pointer;
           text-align: left;
           padding: 0;
-          box-shadow: 0 8px 24px rgba(13, 47, 36, 0.06);
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          box-shadow: 0 6px 18px rgba(13, 47, 36, 0.05);
+          transition: transform 0.2s ease;
         }
 
         .ph-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 16px 36px rgba(13, 47, 36, 0.1);
+          transform: translateY(-3px);
         }
 
         .ph-card img {
           width: 100%;
-          height: 230px;
+          height: 200px;
           object-fit: cover;
           display: block;
         }
 
         .ph-cardbody {
-          padding: 18px;
+          padding: 16px;
         }
 
         .ph-cat {
-          font-size: 11px;
+          font-size: 10.5px;
           font-weight: 900;
-          color: #0284c7;
+          color: var(--ph-blue-accent);
           text-transform: uppercase;
           letter-spacing: 0.05em;
         }
 
         .ph-card h3 {
-          font-size: 17px;
+          font-size: 15.5px;
           font-weight: 850;
           color: var(--ph-green);
-          margin: 6px 0 4px;
+          margin: 4px 0;
           line-height: 1.3;
         }
 
         .ph-card-client {
-          font-size: 12px;
+          font-size: 11.5px;
           color: #64748b;
-          font-weight: 600;
-          margin-bottom: 12px;
+          margin-bottom: 10px;
         }
 
         .ph-meta {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          font-size: 12px;
-          padding-top: 12px;
+          font-size: 11.5px;
+          padding-top: 10px;
           border-top: 1px solid var(--ph-border-soft);
         }
 
@@ -923,26 +883,35 @@ export default function HomePage() {
         }
 
         .ph-price {
-          color: var(--ph-burnt-orange);
+          color: var(--ph-coral);
           font-weight: 900;
-          font-size: 13px;
         }
 
         /* Skyline Banner */
         .ph-skyline-banner {
           max-width: 1220px;
-          margin: 0 auto 72px;
+          margin: 0 auto 56px;
           padding: 0 24px;
         }
 
         .ph-skyline-card {
-          background: linear-gradient(180deg, #fff2e9 0%, #ffdecb 100%);
-          border: 1px solid #fed7aa;
-          border-radius: 32px;
-          padding: 44px 36px 0;
+          background: linear-gradient(180deg, #fff2e8 0%, #ffd8c4 100%);
+          border: 1.5px solid #fed7aa;
+          border-radius: 28px;
+          padding: 38px 28px 0;
           overflow: hidden;
           text-align: center;
           position: relative;
+        }
+
+        .ph-agency-tag {
+          font-size: 11.5px;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          color: var(--ph-coral);
+          margin-bottom: 8px;
+          display: block;
         }
 
         .ph-skyline-title {
@@ -950,67 +919,66 @@ export default function HomePage() {
           font-weight: 900;
           color: var(--ph-green);
           margin: 0 0 10px;
-          letter-spacing: -0.03em;
+          letter-spacing: -0.025em;
         }
 
         .ph-skyline-title span {
-          color: var(--ph-burnt-orange);
+          color: var(--ph-coral);
           font-family: Georgia, serif;
           font-style: italic;
           font-weight: 400;
         }
 
         .ph-skyline-sub {
-          font-size: 16px;
-          color: #6c4e41;
-          max-width: 640px;
-          margin: 0 auto 28px;
-          line-height: 1.6;
+          font-size: 15.5px;
+          color: #624b40;
+          max-width: 600px;
+          margin: 0 auto 24px;
+          line-height: 1.55;
         }
 
         .ph-skyline-actions {
           display: flex;
           justify-content: center;
-          gap: 14px;
+          gap: 12px;
           flex-wrap: wrap;
-          margin-bottom: 32px;
+          margin-bottom: 26px;
         }
 
         .ph-skyline-svg {
           width: 100%;
-          max-height: 140px;
+          max-height: 120px;
           object-fit: cover;
           display: block;
-          opacity: 0.95;
         }
 
-        /* Modal */
+        /* Modal Dialog */
         .ph-modal {
           position: fixed;
           inset: 0;
           z-index: 120;
-          background: rgba(11, 24, 18, 0.78);
-          backdrop-filter: blur(8px);
+          background: rgba(13, 47, 36, 0.75);
+          backdrop-filter: blur(6px);
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 18px;
+          padding: 16px;
         }
 
         .ph-dialog {
-          width: min(900px, 100%);
+          width: min(840px, 100%);
           max-height: 90vh;
           overflow: auto;
           background: #ffffff;
-          border-radius: 26px;
+          border-radius: 24px;
           display: grid;
           grid-template-columns: 1fr 1fr;
           position: relative;
-          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
         }
 
         .ph-dialog-media {
-          background: #13251c;
+          background: #11281e;
           padding: 20px;
           display: flex;
           align-items: center;
@@ -1019,13 +987,13 @@ export default function HomePage() {
 
         .ph-dialog-media img {
           width: 100%;
-          max-height: 540px;
+          max-height: 480px;
           object-fit: contain;
-          border-radius: 16px;
+          border-radius: 14px;
         }
 
         .ph-dialog-info {
-          padding: 36px 32px;
+          padding: 30px 26px;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
@@ -1036,8 +1004,8 @@ export default function HomePage() {
           border: 0;
           background: #f1f5f9;
           border-radius: 50%;
-          width: 36px;
-          height: 36px;
+          width: 34px;
+          height: 34px;
           cursor: pointer;
           font-size: 18px;
           font-weight: bold;
@@ -1048,35 +1016,35 @@ export default function HomePage() {
         }
 
         .ph-dialog-info h2 {
-          font-size: 24px;
+          font-size: 21px;
           font-weight: 850;
           color: var(--ph-green);
-          margin: 16px 0 4px;
+          margin: 14px 0 4px;
           line-height: 1.3;
         }
 
         .ph-dialog-info p {
           color: var(--ph-muted);
-          line-height: 1.6;
-          font-size: 14px;
+          line-height: 1.55;
+          font-size: 13.5px;
         }
 
         .ph-specs {
           padding-left: 18px;
           color: #334155;
-          line-height: 1.8;
-          font-size: 13px;
-          margin: 16px 0;
+          line-height: 1.7;
+          font-size: 12.5px;
+          margin: 14px 0;
         }
 
         .ph-dialog-price {
-          padding: 14px 18px;
+          padding: 12px 16px;
           background: #fff7ed;
-          border-radius: 14px;
+          border-radius: 12px;
           color: #9a3412;
           font-weight: 900;
-          margin: 16px 0 20px;
-          font-size: 14px;
+          margin: 14px 0 18px;
+          font-size: 13.5px;
           border: 1px solid #fed7aa;
         }
 
@@ -1084,7 +1052,7 @@ export default function HomePage() {
         .ph-footer {
           border-top: 1px solid var(--ph-border);
           background: #ffffff;
-          padding: 48px 24px 36px;
+          padding: 36px 24px;
         }
 
         .ph-footer-inner {
@@ -1094,23 +1062,17 @@ export default function HomePage() {
           justify-content: space-between;
           align-items: center;
           flex-wrap: wrap;
-          gap: 24px;
-        }
-
-        .ph-footer-left {
-          display: flex;
-          align-items: center;
-          gap: 14px;
+          gap: 18px;
         }
 
         .ph-footer-copy {
-          font-size: 13px;
+          font-size: 12.5px;
           color: #64748b;
         }
 
         .ph-footer-links {
           display: flex;
-          gap: 20px;
+          gap: 18px;
           font-size: 13px;
           font-weight: 700;
           color: var(--ph-green);
@@ -1122,10 +1084,10 @@ export default function HomePage() {
         }
 
         .ph-footer-links a:hover {
-          color: var(--ph-orange-deep);
+          color: var(--ph-coral);
         }
 
-        /* Responsive Breakpoints */
+        /* Mobile Optimization: Tight, Compact, Zero Endless Scrolling */
         @media (max-width: 900px) {
           .ph-nav {
             min-height: 90px;
@@ -1138,7 +1100,7 @@ export default function HomePage() {
           }
 
           .ph-navlinks {
-            right: 16px;
+            right: 14px;
           }
 
           .ph-navlinks .ph-link {
@@ -1147,30 +1109,32 @@ export default function HomePage() {
 
           .ph-hero {
             grid-template-columns: 1fr;
-            padding: 24px 18px 48px;
-            gap: 36px;
+            padding: 18px 16px 36px;
+            gap: 28px;
           }
 
           .ph-hero-img {
-            aspect-ratio: 4/3.2;
-          }
-
-          .ph-ribbon-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
-          }
-
-          .ph-audience-card {
-            grid-template-columns: 1fr;
-            padding: 24px;
+            aspect-ratio: 4/3;
           }
 
           .ph-disciplines-grid {
             grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
           }
 
-          .ph-pkg-grid {
+          .ph-reasons-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+          }
+
+          .ph-price-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+          }
+
+          .ph-membership-grid {
             grid-template-columns: 1fr;
+            gap: 12px;
           }
 
           .ph-dialog {
@@ -1178,25 +1142,25 @@ export default function HomePage() {
           }
 
           .ph-dialog-media {
-            max-height: 40vh;
+            max-height: 35vh;
           }
 
           .ph-dialog-info {
-            padding: 24px;
+            padding: 20px;
           }
 
           .ph-card {
-            flex-basis: 86vw;
+            flex-basis: 82vw;
           }
         }
       `}</style>
 
-      {/* Top Banner Ribbon */}
+      {/* Top Announcement Strip */}
       <div className="ph-topbar">
-        <span>🍑 Birmingham Creative Guild &bull; Curated Matching &bull; <strong>1 Peach Coin = $50</strong></span>
+        Birmingham&rsquo;s Creative Marketplace &bull; <strong>1 Peach Coin = $50</strong> &bull; Clear Project Value
       </div>
 
-      {/* Navigation Header */}
+      {/* Nav Header */}
       <header className="ph-nav">
         <Link href="/" className="ph-logo-link">
           <img
@@ -1224,7 +1188,7 @@ export default function HomePage() {
       <section className="ph-hero">
         <div>
           <span className="ph-kicker">
-            <span>🍑</span> Birmingham&rsquo;s Vetted Creative Guild
+            BIRMINGHAM&rsquo;S CREATIVE MARKETPLACE
           </span>
           <h1>
             The right creative. <br />
@@ -1232,19 +1196,28 @@ export default function HomePage() {
             <span className="ph-heart">&hearts;</span>
           </h1>
           <p className="ph-sub">
-            Stop searching for one person to do everything. We connect Birmingham businesses with vetted Southern creatives who specialize in design, websites, photography, and video &mdash; all with zero bidding wars, pre-scoped Peach Coin pricing, and protected payouts.
+            Stop searching for one person to do everything. We connect Birmingham businesses with vetted Southern creatives specializing in design, websites, photography, and video &mdash; all with zero bidding wars and clear Peach Coin pricing.
           </p>
 
-          <div className="ph-actions">
-            <Link href="/auth?mode=signup" className="ph-primary">
-              Start a Project &rarr;
+          <div className="ph-hero-btns">
+            <Link href="/auth?mode=signup" className="ph-btn-primary">
+              Hire Creative Talent &rarr;
             </Link>
-            <Link href="/apply" className="ph-secondary">
-              Join as a Creative &rarr;
+            <Link href="/apply" className="ph-btn-secondary">
+              Join the Creative Network
             </Link>
-            <a href="#how-it-works" className="ph-link" style={{ fontSize: "14px", marginLeft: "4px" }}>
-              How Peach Coins Work
-            </a>
+          </div>
+
+          <div className="ph-trust-pills">
+            <span className="ph-trust-pill">
+              <span className="ph-trust-dot"></span> Vetted Creatives
+            </span>
+            <span className="ph-trust-pill">
+              <span className="ph-trust-dot"></span> Simple Peach Coin Pricing
+            </span>
+            <span className="ph-trust-pill">
+              <span className="ph-trust-dot"></span> Powered by Sweet As A Peach
+            </span>
           </div>
         </div>
 
@@ -1257,190 +1230,28 @@ export default function HomePage() {
           <div className="ph-badge-float">
             <div>
               <div className="ph-badge-title">Good ideas grow here. &hearts;</div>
-              <div className="ph-badge-sub">Woodlawn &bull; Avondale &bull; Loft District &bull; Downtown</div>
+              <div className="ph-badge-sub">Birmingham &amp; Across the South</div>
             </div>
-            <span className="ph-coin-pill">2 Coins &bull; $100</span>
+            <span className="ph-badge-tag">2 Coins &bull; $100</span>
           </div>
         </div>
-      </section>
-
-      {/* Three Pillars Value Proposition */}
-      <section className="ph-ribbon">
-        <div className="ph-ribbon-grid">
-          <div className="ph-prop">
-            <div className="ph-prop-icon">🎯</div>
-            <div>
-              <h3>Curated 3-Match</h3>
-              <p>No 40+ cut-and-paste pitches. Our algorithm returns exactly 3 vetted local creatives with clear creative differences.</p>
-            </div>
-          </div>
-          <div className="ph-prop">
-            <div className="ph-prop-icon">🪙</div>
-            <div>
-              <h3>Fixed Peach Coins</h3>
-              <p>1 Coin = $50 project value. Know your exact total cost upfront without hourly billing surprises or scope creep.</p>
-            </div>
-          </div>
-          <div className="ph-prop">
-            <div className="ph-prop-icon">🛡️</div>
-            <div>
-              <h3>Protected Payment &amp; Vault</h3>
-              <p>Upfront client funding held safely; payout released upon final approval. Vector assets saved forever in your Brand Vault.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Dual Audience Section: Businesses vs Creatives */}
-      <section className="ph-audience-sec" id="how-it-works">
-        <div className="ph-section-header">
-          <span className="ph-kicker">Built for Both Sides of the South</span>
-          <h2>A Marketplace Where Everyone Thrives</h2>
-          <p>
-            Generic freelance apps create an offshore race-to-the-bottom. Peach Network brings accountability, living wages, and reliable deliverables back home.
-          </p>
-          <div style={{ marginTop: "24px" }}>
-            <div className="ph-tabs">
-              <button
-                className={`ph-tab-btn ${audienceTab === "business" ? "active" : ""}`}
-                onClick={() => setAudienceTab("business")}
-              >
-                For Local Businesses
-              </button>
-              <button
-                className={`ph-tab-btn ${audienceTab === "creative" ? "active" : ""}`}
-                onClick={() => setAudienceTab("creative")}
-              >
-                For Southern Creatives
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {audienceTab === "business" ? (
-          <div className="ph-audience-card">
-            <div>
-              <h3 style={{ fontSize: "22px", fontWeight: "900", color: "var(--ph-green)", margin: "0 0 16px" }}>
-                Eliminate Hiring Risk for Your Business
-              </h3>
-              <ul className="ph-features-list">
-                <li className="ph-feature-item">
-                  <div className="ph-check">&check;</div>
-                  <div>
-                    <strong>1-Click Plain English Requests</strong>
-                    <span>Describe what you need in plain English. We scope the deliverables into fixed Peach Coins.</span>
-                  </div>
-                </li>
-                <li className="ph-feature-item">
-                  <div className="ph-check">&check;</div>
-                  <div>
-                    <strong>Fast 3&ndash;5 Business Day Turnarounds</strong>
-                    <span>No waiting weeks for ghosted replies. Get matched and review Round 1 proofs in days.</span>
-                  </div>
-                </li>
-                <li className="ph-feature-item">
-                  <div className="ph-check">&check;</div>
-                  <div>
-                    <strong>300 DPI CMYK Pre-Flight Verification</strong>
-                    <span>Files are pre-checked before handoff so local print shops never kick back your collateral.</span>
-                  </div>
-                </li>
-                <li className="ph-feature-item">
-                  <div className="ph-check">&check;</div>
-                  <div>
-                    <strong>Persistent Brand Vault</strong>
-                    <span>Never lose your high-res logo or source files again. Stored safely in your account forever.</span>
-                  </div>
-                </li>
-              </ul>
-              <div style={{ marginTop: "28px" }}>
-                <Link href="/auth?mode=signup" className="ph-primary">
-                  Start a Project as a Business &rarr;
-                </Link>
-              </div>
-            </div>
-
-            <div className="ph-quote-box">
-              <blockquote>
-                &ldquo;We needed a grand opening campaign for our bakery. Instead of scrolling through 50 random proposals, Peach gave us three talented local designers who understood Birmingham. Done in 4 days!&rdquo;
-              </blockquote>
-              <div>
-                <div className="ph-quote-author">Marcus Chen</div>
-                <div style={{ fontSize: "12px", color: "#785f54" }}>Woodlawn Bakehouse &bull; Birmingham, AL</div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="ph-audience-card">
-            <div>
-              <h3 style={{ fontSize: "22px", fontWeight: "900", color: "var(--ph-green)", margin: "0 0 16px" }}>
-                Anti-Exploitation Creative Protection
-              </h3>
-              <ul className="ph-features-list">
-                <li className="ph-feature-item">
-                  <div className="ph-check">&check;</div>
-                  <div>
-                    <strong>Zero Unpaid Proposal Drafting</strong>
-                    <span>Never design free specs or compete in bidding wars. 100% of client inquiries are funded briefs.</span>
-                  </div>
-                </li>
-                <li className="ph-feature-item">
-                  <div className="ph-check">&check;</div>
-                  <div>
-                    <strong>Guaranteed 75% Net Take-Home</strong>
-                    <span>Clear, locked payouts ($75 net on 2 coins, $150 on 4 coins) deposited directly to your wallet.</span>
-                  </div>
-                </li>
-                <li className="ph-feature-item">
-                  <div className="ph-check">&check;</div>
-                  <div>
-                    <strong>Calm 24-Hour Decision Window</strong>
-                    <span>Receive curated client requests with all brand vectors already collected. No panic timers.</span>
-                  </div>
-                </li>
-                <li className="ph-feature-item">
-                  <div className="ph-check">&check;</div>
-                  <div>
-                    <strong>Guild Mentorship &amp; Level Accreditation</strong>
-                    <span>Level 1 to Level 5 Guild ranks that unlock higher tier corporate, civic, and packaging briefs.</span>
-                  </div>
-                </li>
-              </ul>
-              <div style={{ marginTop: "28px" }}>
-                <Link href="/apply" className="ph-primary">
-                  Apply to Join the Guild &rarr;
-                </Link>
-              </div>
-            </div>
-
-            <div className="ph-quote-box">
-              <blockquote>
-                &ldquo;I spent years chasing down invoices and writing unpaid proposals. On Peach Network, every brief is pre-scoped with client money already held in escrow. I just design and get paid.&rdquo;
-              </blockquote>
-              <div>
-                <div className="ph-quote-author">Stephanie Williams</div>
-                <div style={{ fontSize: "12px", color: "#785f54" }}>Brand &amp; Packaging Designer &bull; Avondale Guild Hub</div>
-              </div>
-            </div>
-          </div>
-        )}
       </section>
 
       {/* 5 Disciplines Showcase */}
       <section className="ph-disciplines-sec">
         <div className="ph-section-header">
-          <span className="ph-kicker">Vetted Guild Disciplines</span>
-          <h2>Whatever Your Brand Needs, Handled by Experts</h2>
-          <p>Local specialists across Alabama and the South ready to bring your vision to life.</p>
+          <h2>Creative Support for Your Business</h2>
+          <p>Skilled professionals ready to bring your vision to life.</p>
         </div>
 
         <div className="ph-disciplines-grid">
           {DISCIPLINES.map((d, i) => (
             <div key={i} className="ph-discipline-card">
-              <img src={d.image} alt={d.role} className="ph-discipline-img" />
+              <div className="ph-discipline-img-wrap">
+                <img src={d.image} alt={d.role} className="ph-discipline-img" />
+              </div>
               <div className="ph-discipline-body">
                 <div>
-                  <div className="ph-discipline-tag">{d.tag}</div>
                   <h4>{d.role}</h4>
                   <p>{d.headline}</p>
                 </div>
@@ -1450,63 +1261,168 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* The Peach Coin Token Economics */}
-      <section className="ph-coins-sec">
-        <div className="ph-coins-inner">
-          <div className="ph-coins-header">
-            <span className="ph-kicker" style={{ background: "rgba(255,255,255,0.15)", color: "#fed7aa", borderColor: "rgba(255,255,255,0.2)" }}>
-              The Creative Vending Machine of the South
-            </span>
-            <h2>Transparent Peach Coin Pricing</h2>
-            <p>
-              Peach Coins turn creative services into predictable project units. Drop in the coins your project needs, get matched with vetted talent, and move the work forward without hourly guessing.
-            </p>
+      {/* Why Businesses Love Peach Coins (Clear, Trustworthy Value) */}
+      <section className="ph-reasons-sec">
+        <div className="ph-section-header">
+          <h2>Why Businesses Love Peach Coins</h2>
+          <p>Simple, predictable project units that eliminate hiring headaches.</p>
+        </div>
+
+        <div className="ph-reasons-grid">
+          <div className="ph-reason-card">
+            <h4>Cost Control</h4>
+            <p>Know exactly how much you are spending on every project before work begins. No runaway hourly invoices.</p>
+          </div>
+          <div className="ph-reason-card">
+            <h4>True Flexibility</h4>
+            <p>Use coins when you need them, for what you need. From single flyers to full website refreshes.</p>
+          </div>
+          <div className="ph-reason-card">
+            <h4>Vetted Creatives</h4>
+            <p>Work with talented, hand-reviewed creatives who know local print standards and brand design.</p>
+          </div>
+          <div className="ph-reason-card">
+            <h4>Focus on Growth</h4>
+            <p>We handle scoping and quality reviews so you can stay 100% focused on running your business.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Peach Coin Menu & Pricing (Streamlined & Non-Overwhelming) */}
+      <section className="ph-pricing-sec">
+        <div className="ph-pricing-inner">
+          <div className="ph-pricing-header">
+            <h2>Peach Coin Pricing</h2>
+            <p>1 Peach Coin = $50 Standard Creative Value. Choose how you want to work.</p>
           </div>
 
-          <div className="ph-pkg-grid">
-            {PACKAGES.map((pkg, idx) => (
-              <div key={idx} className={`ph-pkg-card ${pkg.highlight ? "highlight" : ""}`}>
-                {pkg.highlight && <span className="ph-pkg-badge">Most Popular</span>}
+          <div className="ph-switch-wrap">
+            <div className="ph-switch">
+              <button
+                className={`ph-switch-btn ${pricingMode === "project" ? "active" : ""}`}
+                onClick={() => setPricingMode("project")}
+              >
+                By the Project (Pay-As-You-Go)
+              </button>
+              <button
+                className={`ph-switch-btn ${pricingMode === "membership" ? "active" : ""}`}
+                onClick={() => setPricingMode("membership")}
+              >
+                Monthly Memberships
+              </button>
+            </div>
+          </div>
+
+          {pricingMode === "project" ? (
+            <div className="ph-price-grid">
+              <div className="ph-compact-card">
                 <div>
-                  <div className="ph-pkg-coins">{pkg.coins}</div>
-                  <div className="ph-pkg-price">{pkg.price}</div>
-                  <h3>{pkg.name}</h3>
-                  <p className="ph-pkg-desc">{pkg.description}</p>
+                  <div className="ph-compact-tag">Quick Tasks</div>
+                  <div className="ph-compact-price">$50</div>
+                  <div className="ph-compact-title">1 Peach Coin</div>
+                  <p className="ph-compact-desc">Social media graphics, menu price updates, event flyers, or web banner edits.</p>
                 </div>
-                <div className="ph-pkg-meta">
-                  <span>{pkg.turnaround}</span>
-                  <span style={{ color: "#fdba74", fontWeight: "bold" }}>{pkg.payout}</span>
+                <div className="ph-compact-meta">24–48h Turnaround</div>
+              </div>
+
+              <div className="ph-compact-card featured">
+                <div>
+                  <div className="ph-compact-tag" style={{ color: "#fdba74" }}>Most Popular</div>
+                  <div className="ph-compact-price">$100</div>
+                  <div className="ph-compact-title">2 Peach Coins</div>
+                  <p className="ph-compact-desc">Event Flyer Kit: Print-ready 8.5x11 flyer (300 DPI) + matching Instagram square &amp; story.</p>
+                </div>
+                <div className="ph-compact-meta">48h Turnaround</div>
+              </div>
+
+              <div className="ph-compact-card">
+                <div>
+                  <div className="ph-compact-tag">Brand Starters</div>
+                  <div className="ph-compact-price">$300</div>
+                  <div className="ph-compact-title">6 Peach Coins</div>
+                  <p className="ph-compact-desc">Mini Brand Kit: Primary logo, secondary badge, typography kit, color palette &amp; SVGs.</p>
+                </div>
+                <div className="ph-compact-meta">4–5 Days Turnaround</div>
+              </div>
+
+              <div className="ph-compact-card">
+                <div>
+                  <div className="ph-compact-tag">Web &amp; Prototypes</div>
+                  <div className="ph-compact-price">$500</div>
+                  <div className="ph-compact-title">10 Peach Coins</div>
+                  <p className="ph-compact-desc">Full responsive desktop &amp; mobile Figma design prototype with developer handoff.</p>
+                </div>
+                <div className="ph-compact-meta">5–7 Days Turnaround</div>
+              </div>
+            </div>
+          ) : (
+            <div className="ph-membership-grid">
+              <div className="ph-membership-card">
+                <div>
+                  <div className="ph-plan-name">Essentials</div>
+                  <div className="ph-plan-price">$499 <span>/month</span></div>
+                  <div className="ph-plan-coins">10 Peach Coins Monthly</div>
+                  <p className="ph-plan-desc">For everyday creative needs, menu updates, and weekly social promo graphics.</p>
+                </div>
+                <div style={{ marginTop: "16px" }}>
+                  <Link href="/auth?mode=signup" className="ph-pill" style={{ display: "inline-block", textAlign: "center", width: "100%" }}>
+                    Choose Essentials &rarr;
+                  </Link>
                 </div>
               </div>
-            ))}
-          </div>
 
-          <div className="ph-split-banner">
-            <div className="ph-split-text">
-              <strong>Why the 75 / 25 Split Works:</strong> Creatives willingly accept the platform fee because they incur zero business development costs, spend zero hours bidding, receive guaranteed payment protection, and have all vector brand assets pre-collected in the client&rsquo;s Brand Vault.
+              <div className="ph-membership-card featured">
+                <span className="ph-pop-tag">Most Popular</span>
+                <div>
+                  <div className="ph-plan-name">Growth</div>
+                  <div className="ph-plan-price">$1,099 <span>/month</span></div>
+                  <div className="ph-plan-coins">24 Coins (+4 Bonus Coins)</div>
+                  <p className="ph-plan-desc">For growing businesses needing parallel design requests and faster turnaround priority.</p>
+                </div>
+                <div style={{ marginTop: "16px" }}>
+                  <Link href="/auth?mode=signup" className="ph-pill" style={{ display: "inline-block", textAlign: "center", width: "100%" }}>
+                    Choose Growth &rarr;
+                  </Link>
+                </div>
+              </div>
+
+              <div className="ph-membership-card">
+                <div>
+                  <div className="ph-plan-name">Partner</div>
+                  <div className="ph-plan-price">$2,199 <span>/month</span></div>
+                  <div className="ph-plan-coins">50 Coins (+10 Bonus Coins)</div>
+                  <p className="ph-plan-desc">Full creative team replacement for high-volume content, video, and campaigns.</p>
+                </div>
+                <div style={{ marginTop: "16px" }}>
+                  <Link href="/auth?mode=signup" className="ph-pill" style={{ display: "inline-block", textAlign: "center", width: "100%" }}>
+                    Choose Partner &rarr;
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="ph-pricing-footer">
+            <div className="ph-pricing-footer-text">
+              <strong>Protected Payments:</strong> 100% of coin funds are held securely until you review and sign off on your deliverable.
             </div>
             <Link
               href="/auth?mode=signup"
               className="ph-pill"
-              style={{ backgroundColor: "var(--ph-cyan)", color: "var(--ph-burnt-orange)", padding: "10px 22px" }}
+              style={{ backgroundColor: "var(--ph-blue-light)", color: "var(--ph-coral)", padding: "9px 20px" }}
             >
-              Start a Project with Peach Coins &rarr;
+              Get Started with Peach Coins &rarr;
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Work from the Network (Interactive Gallery) */}
+      {/* Real Work Gallery */}
       <section className="ph-work-sec">
         <div className="ph-workhead">
           <div>
-            <span className="ph-kicker">Real Birmingham Case Studies</span>
-            <h2 style={{ fontSize: "clamp(26px, 3.5vw, 40px)", fontWeight: "900", color: "var(--ph-green)", margin: "8px 0 6px" }}>
-              Work From the Network
-            </h2>
-            <p style={{ color: "var(--ph-muted)", margin: 0, fontSize: "15px" }}>
-              Swipe through real client deliverables. Tap any project for technical specs and coin cost.
-            </p>
+            <h2>Work From the Network</h2>
+            <p>Swipe through real client deliverables. Tap any project to view details.</p>
           </div>
           <span style={{ fontSize: "13px", color: "var(--ph-muted)", fontWeight: "600" }}>Swipe &rarr;</span>
         </div>
@@ -1520,7 +1436,7 @@ export default function HomePage() {
                 <h3>{p.title}</h3>
                 <div className="ph-card-client">{p.client}</div>
                 <div className="ph-meta">
-                  <span className="ph-meta-time">&bull; {p.turnaround}</span>
+                  <span className="ph-meta-time">{p.turnaround}</span>
                   <span className="ph-price">{p.coins} Peach Coins</span>
                 </div>
               </div>
@@ -1529,35 +1445,35 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Birmingham Pride Skyline Banner */}
+      {/* Birmingham Skyline Banner */}
       <section className="ph-skyline-banner">
         <div className="ph-skyline-card">
+          <span className="ph-agency-tag">Powered by Sweet As A Peach Creative Agency</span>
           <h2 className="ph-skyline-title">
             Making brands <span>sweeter.</span> &hearts;
           </h2>
           <p className="ph-skyline-sub">
-            From the historic brick lofts of Downtown Birmingham to Avondale bakeries, Woodlawn markets, and Bessemer shops &mdash; keeping creative capital circulating right here in Jefferson County.
+            Keeping creative talent and marketing capital thriving right here in Birmingham and across the South.
           </p>
 
           <div className="ph-skyline-actions">
-            <Link href="/auth?mode=signup" className="ph-primary">
-              Post Your First Project &rarr;
+            <Link href="/auth?mode=signup" className="ph-btn-primary">
+              Post Your Project &rarr;
             </Link>
-            <Link href="/apply" className="ph-secondary">
-              Apply to the Guild
+            <Link href="/apply" className="ph-btn-secondary">
+              Apply to Be a Creative
             </Link>
           </div>
 
-          {/* Birmingham Skyline SVG Silhouette with Vulcan statue and bridge */}
-          <svg className="ph-skyline-svg" viewBox="0 0 1200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* Birmingham Skyline Silhouette */}
+          <svg className="ph-skyline-svg" viewBox="0 0 1200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
-              d="M0 240h1200v-30h-40l-8-12h-22l-14 18h-46v-38l-40-20v58h-26v-70h-18v70h-16v-40h-24v40h-18v-86h-24v86h-14v-110h-32v110h-16v-60h-28v60h-20v-130h-44v130h-16v-80h-30v80h-18v-145h-50v145h-20v-90h-34v90h-16v-120h-42v120h-18v-65h-32v65h-24v-45h-28v45h-22v-95h-46v95h-18v-70h-36v70h-18v-40h-28v40h-20v-55h-34v55H0v30z"
+              d="M0 220h1200v-25h-40l-8-12h-22l-14 18h-46v-34l-40-18v52h-26v-65h-18v65h-16v-38h-24v38h-18v-80h-24v80h-14v-102h-32v102h-16v-55h-28v55h-20v-120h-44v120h-16v-75h-30v75h-18v-135h-50v135h-20v-85h-34v85h-16v-110h-42v110h-18v-60h-32v60h-24v-42h-28v42h-22v-88h-46v88h-18v-65h-36v65h-18v-38h-28v38h-20v-50h-34v50H0v25z"
               fill="#f08a62"
-              fillOpacity="0.85"
+              fillOpacity="0.8"
             />
-            {/* Vulcan Statue Silhouette on the left */}
             <path
-              d="M75 140c0-6 5-11 11-11s11 5 11 11-5 11-11 11-11-5-11-11zm11 15c-12 0-22 10-22 22v43h44v-43c0-12-10-22-22-22zm-3-55l16-24 10 7-16 24-10-7zm-14 120h34v30H69v-30z"
+              d="M75 125c0-6 5-11 11-11s11 5 11 11-5 11-11 11-11-5-11-11zm11 14c-11 0-20 9-20 20v38h40v-38c0-11-9-20-20-20zm-3-50l15-22 9 6-15 22-9-6zm-13 110h30v26H70v-26z"
               fill="#e54307"
               fillOpacity="0.9"
             />
@@ -1565,7 +1481,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Modal Dialog for Project Inspection */}
+      {/* Modal Dialog */}
       {selected && (
         <div className="ph-modal" onClick={() => setSelected(null)}>
           <div className="ph-dialog" onClick={(e) => e.stopPropagation()}>
@@ -1579,7 +1495,7 @@ export default function HomePage() {
                 </button>
                 <span className="ph-cat">{selected.category}</span>
                 <h2>{selected.title}</h2>
-                <div style={{ color: "#64748b", fontSize: "13px", fontWeight: "600", marginBottom: "12px" }}>
+                <div style={{ color: "#64748b", fontSize: "12.5px", fontWeight: "600", marginBottom: "10px" }}>
                   {selected.client}
                 </div>
                 <p>{selected.description}</p>
@@ -1594,7 +1510,7 @@ export default function HomePage() {
               </div>
               <Link
                 href="/auth?mode=signup"
-                className="ph-primary"
+                className="ph-btn-primary"
                 onClick={() => setSelected(null)}
                 style={{ textAlign: "center" }}
               >
@@ -1608,12 +1524,9 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="ph-footer">
         <div className="ph-footer-inner">
-          <div className="ph-footer-left">
-            <span style={{ fontSize: "22px" }}>🍑</span>
-            <div>
-              <strong style={{ color: "var(--ph-green)", fontSize: "15px" }}>Peach Network</strong>
-              <div className="ph-footer-copy">Birmingham Creative Guild &bull; Powered by Sweet As A Peach</div>
-            </div>
+          <div>
+            <strong style={{ color: "var(--ph-green)", fontSize: "15px" }}>Peach Network</strong>
+            <div className="ph-footer-copy">Powered by Sweet As A Peach Creative Agency &bull; Birmingham, Alabama</div>
           </div>
           <div className="ph-footer-links">
             <Link href="/business">Business Hub</Link>
