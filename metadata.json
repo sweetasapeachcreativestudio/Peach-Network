@@ -1,0 +1,6 @@
+{
+  "name": "AI Studio Build Navigator & Capabilities Guide",
+  "description": "Peach Network MVP - Vetted creative talent matched to projects with Supabase, Next.js, and Stripe.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

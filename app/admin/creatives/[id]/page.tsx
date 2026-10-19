@@ -1,0 +1,99 @@
+import { createAdminClient } from "@/lib/supabase/admin";
+import { notFound } from "next/navigation";
+import CreativeReviewActions from "./review-actions";
+
+export default async function CreativeReviewDetail({
+  params
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params;
+  // Authentication/authorization is handled once by app/admin/layout.tsx.
+  // Use the server-only admin client for review data so RLS cannot bounce an
+  // already-authorized admin back to the public homepage.
+  const supabase = createAdminClient();
+
+  const { data: creative } = await supabase
+    .from("creatives")
+    .select(`
+      id,
+      primary_specialty,
+      city,
+      state,
+      peach_level,
+      application_status,
+      reliability_score,
+      profiles:user_id(full_name,email),
+      creative_applications(
+        id,
+        experience,
+        tools,
+        portfolio_url,
+        work_sample_urls,
+        contact_phone,
+        social_url,
+        admin_notes,
+        submitted_at,
+        reviewed_at
+      )
+    `)
+    .eq("id", id)
+    .single();
+
+  if (!creative) notFound();
+
+  const application: any = (creative as any).creative_applications?.[0];
+
+  return (
+    <main className="shell" style={{maxWidth:900}}>
+      <div className="brand">PE<span className="brand-accent">≡</span>CH</div>
+      <p className="muted">HQ · APPLICATION REVIEW</p>
+
+      <section className="card">
+        <div style={{display:"flex",justifyContent:"space-between",gap:16,alignItems:"start",flexWrap:"wrap"}}>
+          <div>
+            <h1 style={{marginTop:0}}>{(creative as any).profiles?.full_name ?? "Creative Applicant"}</h1>
+            <p className="muted">{(creative as any).profiles?.email}</p>
+            <p><strong>{creative.primary_specialty ?? "No specialty set"}</strong></p>
+            <p className="muted">
+              {[creative.city, creative.state].filter(Boolean).join(", ") || "Location not set"}
+            </p>
+          </div>
+          <span className="pill">{creative.application_status}</span>
+        </div>
+
+        <hr style={{border:0,borderTop:"1px solid var(--peach-border)",margin:"20px 0"}} />
+
+        <div className="grid grid-2">
+          <div>
+            <h3>Experience</h3>
+            <p className="muted">{application?.experience || "No experience summary provided."}</p>
+          </div>
+          <div>
+            <h3>Tools / Equipment</h3>
+            <p className="muted">{application?.tools || "No tools listed."}</p>
+          </div>
+        </div>
+
+        <div style={{marginTop:18}}>
+          <h3>Portfolio</h3>
+          {application?.portfolio_url ? (
+            <a href={/^https?:\/\//i.test(application.portfolio_url) ? application.portfolio_url : `https://${application.portfolio_url}`} target="_blank" rel="noreferrer" className="btn btn-outline" style={{display:"inline-block"}}>
+              Open Portfolio
+            </a>
+          ) : <p className="muted">No formal portfolio website provided.</p>}
+          {application?.work_sample_urls?.length > 0 && <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:12}}>{application.work_sample_urls.map((url:string,index:number)=><a key={url+index} href={/^https?:\/\//i.test(url)?url:`https://${url}`} target="_blank" rel="noreferrer" className="btn btn-outline">Work Sample {index+1}</a>)}</div>}
+          {(application?.contact_phone||application?.social_url)&&<div style={{marginTop:18}}><h3>Contact & professional links</h3>{application.contact_phone&&<p><strong>Phone:</strong> {application.contact_phone}</p>}{application.social_url&&<p><a href={/^https?:\/\//i.test(application.social_url)?application.social_url:`https://${application.social_url}`} target="_blank" rel="noreferrer">Open professional social profile →</a></p>}</div>}
+        </div>
+      </section>
+
+      <CreativeReviewActions
+        creativeId={creative.id}
+        applicationId={application?.id}
+        currentLevel={creative.peach_level}
+        currentStatus={creative.application_status}
+        existingNotes={application?.admin_notes ?? ""}
+      />
+    </main>
+  );
+}

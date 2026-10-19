@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/system/expire-offers",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/system/operations-watch",
+      "schedule": "15 6 * * *"
+    }
+  ]
+}
