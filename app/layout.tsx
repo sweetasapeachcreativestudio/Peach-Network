@@ -9,10 +9,13 @@ export const metadata: Metadata = {
   applicationName: "Peach Network",
 };
 
+import BrandSplash from "./components/brand-splash";
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <BrandSplash />
         <PWARegister />
         {children}
       </body>

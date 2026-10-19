@@ -1,8 +1,10 @@
-const CACHE = "peach-network-shell-v1";
+const CACHE = "peach-network-shell-v2";
 const SHELL = ["/", "/auth"];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
+  event.waitUntil(
+    caches.open(CACHE).then((cache) => cache.addAll(SHELL).catch(() => {}))
+  );
   self.skipWaiting();
 });
 
@@ -19,15 +21,32 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
 
-  // Never cache API calls or authenticated data.
   const url = new URL(req.url);
-  if (url.pathname.startsWith("/api/")) return;
+  // Never intercept API calls, dev chunks, or webpack HMR
+  if (
+    url.pathname.startsWith("/api/") ||
+    url.pathname.startsWith("/_next/webpack-hmr")
+  ) {
+    return;
+  }
 
-  // Network first for app pages. Fall back only to the tiny public shell cache.
+  // Only fall back to HTML shell for navigation requests (HTML pages)
+  if (req.mode === "navigate") {
+    event.respondWith(
+      fetch(req).catch(async () => {
+        const cached = await caches.match(req);
+        return cached || (await caches.match("/"));
+      })
+    );
+    return;
+  }
+
+  // For static assets, network first, never return HTML on error
   event.respondWith(
     fetch(req).catch(async () => {
       const cached = await caches.match(req);
-      return cached || caches.match("/");
+      if (cached) return cached;
+      return new Response("Network error", { status: 503, statusText: "Offline" });
     })
   );
 });

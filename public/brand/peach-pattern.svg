@@ -1,0 +1,71 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Soft Peach Linear Gradient for filled peaches -->
+    <linearGradient id="peachShine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF9E80" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#E07050" stop-opacity="0.15" />
+    </linearGradient>
+
+    <!-- Peach Symbol -->
+    <g id="peachOutline">
+      <!-- Left Leaf -->
+      <path d="M 49,19 C 43,13 36,13 34,16 C 34,21 42,23 49,20 Z" fill="#9CA38F" opacity="0.45" />
+      <!-- Right Leaf -->
+      <path d="M 51,19 C 57,13 64,13 66,16 C 66,21 58,23 51,20 Z" fill="#9CA38F" opacity="0.45" />
+      <!-- Peach Body Outline -->
+      <path d="M 50,22 C 41,22 33,28 28,37 C 22,48 23,62 31,73 C 39,83 50,88 50,88 C 50,88 61,83 69,73 C 77,62 78,48 72,37 C 67,28 59,22 50,22 Z" 
+            fill="none" 
+            stroke="#D07055" 
+            stroke-width="1.8" 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            opacity="0.35" />
+      <!-- Peach Cleft -->
+      <path d="M 50,23 C 50,33 50,42 50,50" 
+            fill="none" 
+            stroke="#D07055" 
+            stroke-width="1.4" 
+            stroke-linecap="round" 
+            opacity="0.25" />
+    </g>
+
+    <!-- Filled Shaded Peach Symbol -->
+    <g id="peachFilled">
+      <!-- Left Leaf -->
+      <path d="M 49,19 C 43,13 36,13 34,16 C 34,21 42,23 49,20 Z" fill="#889679" opacity="0.4" />
+      <!-- Right Leaf -->
+      <path d="M 51,19 C 57,13 64,13 66,16 C 66,21 58,23 51,20 Z" fill="#889679" opacity="0.4" />
+      <!-- Peach Body Fill -->
+      <path d="M 50,22 C 41,22 33,28 28,37 C 22,48 23,62 31,73 C 39,83 50,88 50,88 C 50,88 61,83 69,73 C 77,62 78,48 72,37 C 67,28 59,22 50,22 Z" 
+            fill="url(#peachShine)" 
+            stroke="#D07055" 
+            stroke-width="1.2" 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            opacity="0.5" />
+      <!-- Peach Cleft -->
+      <path d="M 50,23 C 50,33 50,42 50,50" 
+            fill="none" 
+            stroke="#C06045" 
+            stroke-width="1.2" 
+            stroke-linecap="round" 
+            opacity="0.3" />
+    </g>
+  </defs>
+
+  <!-- Staggered Diamond Grid Pattern of Peaches -->
+  <!-- Row 1 -->
+  <use href="#peachOutline" x="10" y="0" transform="scale(0.85)" />
+  <use href="#peachFilled" x="130" y="0" transform="scale(0.85)" />
+  <use href="#peachOutline" x="250" y="0" transform="scale(0.85)" />
+
+  <!-- Row 2 (Staggered) -->
+  <use href="#peachFilled" x="-50" y="120" transform="scale(0.85)" />
+  <use href="#peachOutline" x="70" y="120" transform="scale(0.85)" />
+  <use href="#peachFilled" x="190" y="120" transform="scale(0.85)" />
+
+  <!-- Row 3 -->
+  <use href="#peachOutline" x="10" y="240" transform="scale(0.85)" />
+  <use href="#peachFilled" x="130" y="240" transform="scale(0.85)" />
+  <use href="#peachOutline" x="250" y="240" transform="scale(0.85)" />
+</svg>

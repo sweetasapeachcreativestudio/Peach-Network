@@ -1,7 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
+import PhoneHeroMockup from "@/components/PhoneHeroMockup";
+import {
+  ShieldCheck,
+  Zap,
+  Users,
+  Lock,
+  ArrowRight,
+  Palette,
+  Printer,
+  Share2,
+  Layers,
+  Layout,
+  Check,
+  ChevronRight,
+  X,
+  Sparkles,
+} from "lucide-react";
 
 interface ProjectItem {
   id: number;
@@ -13,41 +30,49 @@ interface ProjectItem {
   image: string;
   description: string;
   specs: string[];
+  designer?: string;
+  designerRole?: string;
 }
 
 const PROJECTS: ProjectItem[] = [
   {
     id: 1,
-    title: "Empower Her Heart Mobile UI & Web Portal",
-    client: "Lillian Hewitt, Black Women's Heart Health, LLC",
-    category: "Mobile UI & Web Experience",
-    coins: 10,
-    turnaround: "5–7 Days",
-    image: "/lillian-project.jpg",
-    description: "A responsive digital experience and mobile health prototype created for a Birmingham founder.",
-    specs: ["Responsive Web Portal", "Mobile App UI Prototype", "Custom Interface Assets", "Launch-ready design handoff"]
+    title: "Runa Logo & Vector Kit",
+    client: "Runa",
+    category: "Logo & Vector Kit",
+    coins: 4,
+    turnaround: "4 Days",
+    image: "/project 7.jpg",
+    designer: "Jose Garcia",
+    designerRole: "Illustrator & Video Editor • ADDY Award Winner (Troy University)",
+    description: "High-precision vector logo and identity kit created by Jose Garcia, ADDY Award-winning illustrator and video editor at Troy University.",
+    specs: ["Primary Logo & Moon Icon", "Apparel Vector Artwork", "100% Scalable Vector SVGs", "Print & Screen Pre-Flight Passed"],
   },
   {
     id: 2,
-    title: "Runa Cultural Brand & Moon Iconography",
-    client: "Runa Streetwear Apparel",
-    category: "Brand Identity & Apparel",
-    coins: 6,
-    turnaround: "4–5 Days",
-    image: "/project 7.jpg",
-    description: "A distinctive crescent-moon identity system and apparel artwork built around the brand's visual story.",
-    specs: ["Primary & Submark Logos", "Apparel Vector Artwork", "Typography System", "Print-ready files"]
+    title: "Empower Her Heart",
+    client: "Lillian Hewitt, Black Women's Heart Health, LLC",
+    category: "UI/UX & Art Direction",
+    coins: 8,
+    turnaround: "5–7 Days",
+    image: "/lillian-project.jpg",
+    designer: "Stephanie Stewart",
+    designerRole: "UI/UX Designer & Art Director (Troy University)",
+    description: "Designed by Stephanie Stewart, UI/UX Designer & Art Director at Troy University for Lillian Hewitt's Empower Her Heart initiative.",
+    specs: ["Responsive Web Experience", "Mobile Health UI Prototype", "Figma Design System Tokens", "Art Direction & Brand Collateral"],
   },
   {
     id: 3,
-    title: "Bessemer Chamber Brand & Web Kit",
+    title: "Bessemer Chamber Logo & Brand Kit",
     client: "Bessemer Area Chamber of Commerce",
-    category: "Brand Identity & Web UI",
-    coins: 8,
-    turnaround: "5–7 Days",
+    category: "Logo & Brand Kit",
+    coins: 6,
+    turnaround: "48 Hours",
     image: "/Project 3.png",
-    description: "A civic identity system and web presence designed to make local business resources easier to navigate.",
-    specs: ["Primary civic identity", "Supporting collateral", "Brand palette & guides", "Production vector files"]
+    designer: "Donovan",
+    designerRole: "Graphic Designer (Studying at SCAD)",
+    description: "Official civic chamber logo and brand kit designed by Donovan, graphic designer studying at SCAD (Savannah College of Art and Design).",
+    specs: ["Primary Civic Identity Seal", "Signage & Apparel Vector Art", "300 DPI CMYK Pre-Flight", "Brand Guidelines & Color Specs"],
   },
   {
     id: 4,
@@ -58,7 +83,7 @@ const PROJECTS: ProjectItem[] = [
     turnaround: "48 Hours",
     image: "/Project 1.png",
     description: "A cohesive social campaign highlighting student achievement and program opportunities across Birmingham.",
-    specs: ["4 social media designs", "Feed & story formats", "Brand guidelines styling", "Editable source files"]
+    specs: ["4 social media designs", "Feed & story formats", "Brand guidelines styling", "Editable source files"],
   },
   {
     id: 5,
@@ -69,7 +94,7 @@ const PROJECTS: ProjectItem[] = [
     turnaround: "48–72 Hours",
     image: "/Project 4.png",
     description: "A coordinated print and digital event suite for a historic Birmingham community congregation.",
-    specs: ["Print-ready program (300 DPI)", "Digital mobile version", "Social announcement graphics", "Archive vector files"]
+    specs: ["Print-ready program (300 DPI)", "Digital mobile version", "Social announcement graphics", "Archive vector files"],
   },
   {
     id: 6,
@@ -80,1794 +105,422 @@ const PROJECTS: ProjectItem[] = [
     turnaround: "48 Hours",
     image: "/Project 2.png",
     description: "Pre-scoped event kit: 1 high-res print flyer with 300 DPI press bleeds + matching Instagram square and story.",
-    specs: ["1 Commercial Print Flyer (CMYK)", "1 Instagram Square (1080x1080)", "1 Instagram Story (1080x1920)", "Stored in Brand Vault"]
-  }
+    specs: ["1 Commercial Print Flyer (CMYK)", "1 Instagram Square (1080x1080)", "1 Instagram Story (1080x1920)", "Stored in Brand Vault"],
+  },
 ];
 
-const DISCIPLINES = [
+const CAPABILITIES = [
   {
-    role: "Photographers",
-    headline: "Showcase your work. Get hired.",
-    image: "/Creative5.jpg"
+    role: "Brand Identity",
+    headline: "Logos, brand books, typography systems, and vector icon suites.",
+    icon: Palette,
+    deliverables: "Vector SVG, AI, EPS, Brand Guide",
   },
   {
-    role: "Designers",
-    headline: "Create. Collaborate. Grow.",
-    image: "/hero-bg.png"
+    role: "Commercial Print",
+    headline: "300 DPI CMYK event flyers, menus, banners, and brochures.",
+    icon: Printer,
+    deliverables: "Press Bleed Crop Marks, CMYK",
   },
   {
-    role: "Video Editors",
-    headline: "Turn your talent into opportunity.",
-    image: "/Creative 3.jpg"
+    role: "Digital & Social",
+    headline: "Feed campaigns, promotional graphics, and 9:16 story assets.",
+    icon: Share2,
+    deliverables: "1080x1080 Feed, 1080x1920 Story",
   },
   {
-    role: "Writers",
-    headline: "Your words matter here.",
-    image: "/Creative 4.jpg"
+    role: "Product & Packaging",
+    headline: "Die-lines, apparel graphics, labels, and product mockup decks.",
+    icon: Layers,
+    deliverables: "Die-Cut Specs, High-Res Handoff",
   },
   {
-    role: "Businesses",
-    headline: "Find the right creative. Get it done.",
-    image: "/brand/business-owner.jpg"
-  }
-];
-
-interface HeroDemo {
-  id: number;
-  discipline: string;
-  icon: string;
-  client: string;
-  project: string;
-  coins: number;
-  dollarValue: string;
-  turnaround: string;
-  deliverables: string[];
-  matches: { name: string; specialty: string; fit: string; status: string }[];
-}
-
-const HERO_DEMOS: HeroDemo[] = [
-  {
-    id: 1,
-    discipline: "Product Photo",
-    icon: "📸",
-    client: "Local Culinary & Artisan Market",
-    project: "Event Flyer Kit & Commercial Photo Suite",
-    coins: 2,
-    dollarValue: "$100",
-    turnaround: "48 Hours",
-    deliverables: ["1 Commercial Print Flyer (CMYK)", "Instagram Square & Story", "Hi-Res Studio Handoff"],
-    matches: [
-      { name: "Marcus T.", specialty: "Commercial & Product Photo", fit: "99% Fit", status: "Selected" },
-      { name: "Elena R.", specialty: "Lifestyle & Food Photography", fit: "97% Fit", status: "Available" },
-      { name: "Devon S.", specialty: "Studio Lighting & Color Grading", fit: "95% Fit", status: "Available" },
-    ],
-  },
-  {
-    id: 2,
-    discipline: "Brand Identity",
-    icon: "🎨",
-    client: "Runa Streetwear Apparel",
-    project: "Moon Iconography & Streetwear Apparel Suite",
-    coins: 6,
-    dollarValue: "$300",
-    turnaround: "4–5 Days",
-    deliverables: ["Primary & Submark Vector Logos", "Apparel Vector Artwork", "Brand Vault Source Archive"],
-    matches: [
-      { name: "Simone K.", specialty: "Senior Brand & Apparel Designer", fit: "98% Fit", status: "Selected" },
-      { name: "Andre L.", specialty: "Typography & Vector Artist", fit: "96% Fit", status: "Available" },
-      { name: "Jordan M.", specialty: "Packaging & Print Specialist", fit: "95% Fit", status: "Available" },
-    ],
-  },
-  {
-    id: 3,
-    discipline: "Mobile & Web UI",
-    icon: "💻",
-    client: "Lillian Hewitt, Black Women's Heart Health",
-    project: "Responsive Health Portal & Mobile UI Prototype",
-    coins: 10,
-    dollarValue: "$500",
-    turnaround: "5–7 Days",
-    deliverables: ["Responsive Web Dashboard", "Mobile App Figma Prototype", "Developer Handoff Kit"],
-    matches: [
-      { name: "Maya B.", specialty: "Product & UI/UX Designer", fit: "99% Fit", status: "Selected" },
-      { name: "Chris W.", specialty: "Design Systems & Tailwind UI", fit: "97% Fit", status: "Available" },
-      { name: "Taylor N.", specialty: "Interactive Prototyping Lead", fit: "94% Fit", status: "Available" },
-    ],
+    role: "UI & Prototypes",
+    headline: "Responsive web designs, SaaS landing layouts, and Figma handoffs.",
+    icon: Layout,
+    deliverables: "Figma Components, Design Tokens",
   },
 ];
 
 export default function HomePage() {
   const [selected, setSelected] = useState<ProjectItem | null>(null);
   const [pricingTab, setPricingTab] = useState<"project" | "membership">("project");
-  const [activeHeroTab, setActiveHeroTab] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveHeroTab((prev) => (prev + 1) % HERO_DEMOS.length);
-    }, 4800);
-    return () => clearInterval(timer);
-  }, []);
-
-  const currentHero = HERO_DEMOS[activeHeroTab];
 
   return (
-    <main className="ph">
-
-      <style>{`
-        :root {
-          --ph-green: #0d2f24;
-          --ph-green-mid: #164335;
-          --ph-green-soft: #edf5f1;
-          --ph-blue-cyan: #70eaff;
-          --ph-blue-deep: #0284c7;
-          --ph-blue-sky: #38bdf8;
-          --ph-blue-navy: #034870;
-          --ph-blue-ice: #e0f2fe;
-          --ph-blue-soft: #f0f9ff;
-          --ph-peach-soft: #fff5ed;
-          --ph-peach-border: #fed7aa;
-          --ph-peach-warm: #ffe8df;
-          --ph-coral: #e54307;
-          --ph-coral-light: #ff7547;
-          --ph-coral-soft: #ffe8df;
-          --ph-ink: #0f241a;
-          --ph-muted: #4e6157;
-          --ph-border: #dbe7e2;
-          --ph-shadow-sm: 0 4px 16px rgba(2, 132, 199, 0.06);
-          --ph-shadow-lg: 0 24px 60px rgba(2, 132, 199, 0.16);
-        }
-
-        * {
-          box-sizing: border-box;
-        }
-
-        .ph {
-          min-height: 100vh;
-          /* Rich Southern sky-blue mist seamlessly blending with warm fresh peach */
-          background: linear-gradient(135deg, #e3f4fd 0%, #f1f9fe 22%, #fff5ed 52%, #eaf6fc 82%, #fff0e4 100%);
-          color: var(--ph-ink);
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-          overflow-x: hidden;
-          line-height: 1.5;
-        }
-
-        /* Top Announcement Strip with Southern Blue & Green Accent */
-        .ph-topbar {
-          background: linear-gradient(90deg, #092c4c 0%, #0369a1 40%, #0d2f24 100%);
-          color: #f0f9ff;
-          padding: 8px 16px;
-          font-size: 13px;
-          font-weight: 600;
-          text-align: center;
-          letter-spacing: 0.02em;
-        }
-
-        .ph-topbar strong {
-          color: var(--ph-blue-cyan);
-        }
-
-        /* Header Navigation */
-        .ph-nav {
-          min-height: 116px;
-          max-width: 1240px;
-          margin: auto;
-          padding: 12px 24px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-        }
-
-        .ph-logo-link {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-decoration: none;
-        }
-
-        .ph-logo {
-          width: 200px;
-          height: 100px;
-          display: block;
-          margin: 0 auto;
-          object-fit: contain;
-          transition: transform 0.2s ease;
-        }
-
-        .ph-logo:hover {
-          transform: scale(1.02);
-        }
-
-        .ph-navlinks {
-          position: absolute;
-          right: 24px;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .ph-login-link {
-          color: #0369a1;
-          text-decoration: none;
-          font-weight: 850;
-          font-size: 14px;
-          padding: 9px 20px;
-          border-radius: 999px;
-          background: #ffffff;
-          border: 1.5px solid #bae6fd;
-          box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
-          transition: all 0.2s ease;
-          display: inline-flex;
-          align-items: center;
-        }
-
-        .ph-login-link:hover {
-          background: #f0f9ff;
-          border-color: #38bdf8;
-          color: #0284c7;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
-        }
-
-        .ph-pill {
-          padding: 10px 22px;
-          border: 1px solid var(--ph-border);
-          border-radius: 999px;
-          background-color: var(--ph-blue-cyan);
-          color: var(--ph-coral);
-          font-weight: 850;
-          font-size: 14px;
-          text-decoration: none;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          box-shadow: 0 4px 14px rgba(112, 234, 255, 0.45);
-          transition: all 0.2s ease;
-        }
-
-        .ph-pill:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 20px rgba(112, 234, 255, 0.65);
-        }
-
-        /* Hero Section (One-Screen AppThink & Zoom Style) */
-        .ph-hero-sec {
-          max-width: 1240px;
-          margin: 0 auto;
-          min-height: calc(88vh - 116px);
-          padding: 16px 24px 34px;
-          display: grid;
-          grid-template-columns: 1.05fr 0.95fr;
-          gap: 36px;
-          align-items: center;
-          position: relative;
-        }
-
-        .ph-kicker {
-          font-size: 12px;
-          font-weight: 850;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: #0284c7;
-          background: #e0f2fe;
-          padding: 6px 14px;
-          border-radius: 999px;
-          border: 1.5px solid #70eaff;
-          margin-bottom: 18px;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          box-shadow: 0 2px 10px rgba(112, 234, 255, 0.3);
-        }
-
-        .ph-kicker-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #0284c7;
-          box-shadow: 0 0 8px #70eaff;
-          display: inline-block;
-          animation: dotPulse 2s infinite ease-in-out;
-        }
-
-        .ph-hero-title {
-          font-size: clamp(40px, 4.8vw, 62px);
-          line-height: 1.06;
-          letter-spacing: -0.04em;
-          color: var(--ph-green);
-          font-weight: 900;
-          margin: 0 0 16px;
-        }
-
-        .ph-hero-title span {
-          display: block;
-          color: var(--ph-coral);
-        }
-
-        .ph-hero-sub {
-          font-size: 17px;
-          line-height: 1.55;
-          color: var(--ph-muted);
-          max-width: 500px;
-          margin: 0 0 26px;
-        }
-
-        .ph-hero-sub strong {
-          color: var(--ph-green);
-        }
-
-        .ph-hero-actions {
-          display: flex;
-          gap: 14px;
-          flex-wrap: wrap;
-          align-items: center;
-          margin-bottom: 24px;
-        }
-
-        .ph-btn-primary {
-          min-height: 52px;
-          padding: 0 32px;
-          border-radius: 999px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 850;
-          font-size: 15px;
-          background: var(--ph-green);
-          color: #ffffff;
-          text-decoration: none;
-          box-shadow: 0 10px 24px rgba(13, 47, 36, 0.22);
-          transition: all 0.2s ease;
-        }
-
-        .ph-btn-primary:hover {
-          background: var(--ph-green-mid);
-          transform: translateY(-2px);
-          box-shadow: 0 14px 30px rgba(13, 47, 36, 0.3);
-        }
-
-        .ph-btn-secondary {
-          min-height: 52px;
-          padding: 0 26px;
-          border-radius: 999px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 800;
-          font-size: 15px;
-          background: #ffffff;
-          color: #0369a1;
-          border: 1.5px solid #bae6fd;
-          text-decoration: none;
-          box-shadow: 0 4px 14px rgba(2, 132, 199, 0.08);
-          transition: all 0.2s ease;
-        }
-
-        .ph-btn-secondary:hover {
-          background: #f0f9ff;
-          border-color: #38bdf8;
-          color: #0284c7;
-          transform: translateY(-1px);
-        }
-
-        .ph-hero-trust {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          font-size: 12.5px;
-          color: #526b60;
-          font-weight: 700;
-          flex-wrap: wrap;
-        }
-
-        .ph-hero-trust-item {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        /* Hero Interactive Stage (Seamlessly Blended in Hero Viewport) */
-        .ph-stage-container {
-          position: relative;
-          width: 100%;
-          max-width: 530px;
-          margin: 0 auto;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .ph-ambient-glow {
-          position: absolute;
-          width: 480px;
-          height: 480px;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(112, 234, 255, 0.45) 0%, rgba(56, 189, 248, 0.28) 35%, rgba(254, 215, 170, 0.32) 65%, transparent 75%);
-          filter: blur(52px);
-          animation: ambientBlueGlow 6s ease-in-out infinite alternate;
-          pointer-events: none;
-        }
-
-        .ph-live-stage {
-          position: relative;
-          width: 100%;
-          background: rgba(255, 255, 255, 0.94);
-          backdrop-filter: blur(20px);
-          border: 1.5px solid rgba(112, 234, 255, 0.7);
-          border-radius: 28px;
-          padding: 20px 22px;
-          box-shadow: 0 24px 60px rgba(2, 132, 199, 0.14), 0 4px 16px rgba(13, 47, 36, 0.05);
-          animation: stageFloat 5.5s ease-in-out infinite;
-          z-index: 2;
-        }
-
-        /* Top Bar inside the stage */
-        .ph-stage-topbar {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding-bottom: 12px;
-          border-bottom: 1px solid #e0f2fe;
-          margin-bottom: 12px;
-        }
-
-        .ph-stage-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 11.5px;
-          font-weight: 850;
-          color: #0369a1;
-          background: #e0f2fe;
-          padding: 4px 12px;
-          border-radius: 999px;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-        }
-
-        .ph-stage-status-dot {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: #10b981;
-          box-shadow: 0 0 6px #10b981;
-          display: inline-block;
-          animation: dotPulse 1.8s infinite ease-in-out;
-        }
-
-        .ph-stage-counter {
-          font-size: 11.5px;
-          font-weight: 700;
-          color: #64748b;
-        }
-
-        /* Interactive Discipline Switcher Tabs */
-        .ph-stage-tabs {
-          display: flex;
-          gap: 8px;
-          margin-bottom: 14px;
-        }
-
-        .ph-stage-tab {
-          flex: 1;
-          padding: 7px 8px;
-          border-radius: 12px;
-          font-size: 12px;
-          font-weight: 800;
-          border: 1px solid #dbeafe;
-          background: #f8fafc;
-          color: #475569;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 5px;
-          transition: all 0.2s ease;
-          white-space: nowrap;
-        }
-
-        .ph-stage-tab.active {
-          background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-          color: #ffffff;
-          border-color: #0284c7;
-          box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
-        }
-
-        /* Active Project Overview Card */
-        .ph-stage-card {
-          background: linear-gradient(135deg, #f0f9ff 0%, #fff7ed 100%);
-          border: 1.5px solid #bae6fd;
-          border-radius: 16px;
-          padding: 14px 16px;
-          margin-bottom: 12px;
-        }
-
-        .ph-stage-card-head {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 6px;
-        }
-
-        .ph-stage-client {
-          font-size: 11px;
-          font-weight: 850;
-          text-transform: uppercase;
-          color: #0284c7;
-          letter-spacing: 0.05em;
-        }
-
-        .ph-stage-project-name {
-          font-size: 14.5px;
-          font-weight: 850;
-          color: var(--ph-green);
-          margin: 2px 0 6px;
-        }
-
-        .ph-stage-coin-badge {
-          background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 100%);
-          border: 1.5px solid #70eaff;
-          border-radius: 12px;
-          padding: 5px 10px;
-          text-align: right;
-          box-shadow: 0 3px 10px rgba(112, 234, 255, 0.35);
-        }
-
-        .ph-stage-coin-val {
-          font-size: 15px;
-          font-weight: 900;
-          color: var(--ph-coral);
-          line-height: 1.1;
-        }
-
-        .ph-stage-coin-usd {
-          font-size: 10.5px;
-          font-weight: 700;
-          color: #0369a1;
-        }
-
-        .ph-stage-deliverables {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 6px;
-          margin-top: 6px;
-        }
-
-        .ph-stage-deliv-tag {
-          font-size: 10.5px;
-          font-weight: 700;
-          background: rgba(255, 255, 255, 0.85);
-          border: 1px solid #cbd5e1;
-          color: #334155;
-          padding: 2px 7px;
-          border-radius: 6px;
-        }
-
-        /* 3-Match Creative Candidates List */
-        .ph-stage-matches {
-          display: flex;
-          flex-direction: column;
-          gap: 7px;
-          margin-bottom: 12px;
-        }
-
-        .ph-stage-match-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 7px 11px;
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 11px;
-          transition: all 0.2s ease;
-        }
-
-        .ph-stage-match-row.active {
-          border-color: #38bdf8;
-          background: #f0f9ff;
-          box-shadow: 0 3px 10px rgba(56, 189, 248, 0.15);
-        }
-
-        .ph-stage-match-info {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-        }
-
-        .ph-stage-avatar {
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #70eaff 0%, #0284c7 100%);
-          color: #ffffff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 10.5px;
-          font-weight: 900;
-        }
-
-        .ph-stage-creative-name {
-          font-size: 12px;
-          font-weight: 850;
-          color: var(--ph-green);
-          line-height: 1.2;
-        }
-
-        .ph-stage-creative-spec {
-          font-size: 10.5px;
-          color: #64748b;
-        }
-
-        .ph-stage-match-pill {
-          font-size: 10.5px;
-          font-weight: 850;
-          padding: 2px 7px;
-          border-radius: 999px;
-          background: #dcfce7;
-          color: #166534;
-        }
-
-        .ph-stage-match-pill.blue {
-          background: #e0f2fe;
-          color: #0369a1;
-        }
-
-        /* Stage Footer */
-        .ph-stage-footer {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding-top: 10px;
-          border-top: 1px solid #e0f2fe;
-          font-size: 11.5px;
-          color: #475569;
-          font-weight: 700;
-        }
-
-        .ph-stage-footer strong {
-          color: #0284c7;
-        }
-
-        /* Floating AppThink-Style Badges hovering around the stage */
-        .ph-float-tag-top {
-          position: absolute;
-          top: -14px;
-          right: -14px;
-          background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
-          color: #ffffff;
-          padding: 7px 16px;
-          border-radius: 999px;
-          font-size: 11.5px;
-          font-weight: 850;
-          box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35);
-          animation: pillHover1 3.8s ease-in-out infinite alternate;
-          z-index: 10;
-          pointer-events: none;
-        }
-
-        .ph-float-tag-bottom {
-          position: absolute;
-          bottom: -14px;
-          left: -14px;
-          background: #ffffff;
-          color: var(--ph-coral);
-          border: 1.5px solid #fed7aa;
-          padding: 7px 16px;
-          border-radius: 999px;
-          font-size: 11.5px;
-          font-weight: 850;
-          box-shadow: 0 8px 20px rgba(229, 67, 7, 0.15);
-          animation: pillHover2 4.2s ease-in-out infinite alternate;
-          z-index: 10;
-          pointer-events: none;
-        }
-
-        /* Animations */
-        @keyframes stageFloat {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-8px);
-          }
-        }
-
-        @keyframes ambientBlueGlow {
-          0%, 100% {
-            transform: scale(1);
-            opacity: 0.72;
-          }
-          50% {
-            transform: scale(1.15);
-            opacity: 0.95;
-          }
-        }
-
-        @keyframes pillHover1 {
-          0% {
-            transform: translateY(0px) translateX(0px);
-          }
-          100% {
-            transform: translateY(-8px) translateX(4px);
-          }
-        }
-
-        @keyframes pillHover2 {
-          0% {
-            transform: translateY(0px) translateX(0px);
-          }
-          100% {
-            transform: translateY(6px) translateX(-4px);
-          }
-        }
-
-        @keyframes dotPulse {
-          0%, 100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.4;
-            transform: scale(0.85);
-          }
-        }
-
-        /* Section Headings */
-        .ph-section-header {
-          text-align: center;
-          max-width: 680px;
-          margin: 0 auto 30px;
-          padding: 0 16px;
-        }
-
-        .ph-section-header h2 {
-          font-size: clamp(28px, 3.4vw, 40px);
-          font-weight: 900;
-          color: var(--ph-green);
-          letter-spacing: -0.03em;
-          margin: 0 0 10px;
-        }
-
-        .ph-section-header p {
-          color: var(--ph-muted);
-          font-size: 16px;
-          margin: 0;
-        }
-
-        /* 3 Core Pillars (AppThink Structured Feature Grid) */
-        .ph-pillars-sec {
-          max-width: 1240px;
-          margin: 0 auto 60px;
-          padding: 0 24px;
-        }
-
-        .ph-pillars-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 18px;
-        }
-
-        .ph-pillar-card {
-          background: #ffffff;
-          border: 1.5px solid var(--ph-border);
-          border-radius: 22px;
-          padding: 26px 22px;
-          box-shadow: var(--ph-shadow-sm);
-          transition: transform 0.2s ease;
-        }
-
-        .ph-pillar-card:hover {
-          transform: translateY(-3px);
-        }
-
-        .ph-pillar-num {
-          font-size: 12px;
-          font-weight: 900;
-          color: var(--ph-blue-deep);
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          margin-bottom: 8px;
-          display: block;
-        }
-
-        .ph-pillar-card h3 {
-          font-size: 18px;
-          font-weight: 850;
-          color: var(--ph-green);
-          margin: 0 0 8px;
-        }
-
-        .ph-pillar-card p {
-          margin: 0;
-          font-size: 14px;
-          color: var(--ph-muted);
-          line-height: 1.5;
-        }
-
-        /* 5 Creative Disciplines */
-        .ph-disciplines-sec {
-          max-width: 1240px;
-          margin: 0 auto 60px;
-          padding: 0 24px;
-        }
-
-        .ph-disciplines-grid {
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          gap: 14px;
-        }
-
-        .ph-discipline-card {
-          background: #ffffff;
-          border: 1px solid var(--ph-border);
-          border-radius: 20px;
-          overflow: hidden;
-          box-shadow: var(--ph-shadow-sm);
-          display: flex;
-          flex-direction: column;
-          transition: transform 0.2s ease;
-        }
-
-        .ph-discipline-card:hover {
-          transform: translateY(-4px);
-        }
-
-        .ph-discipline-img-wrap {
-          width: 100%;
-          height: 160px;
-          background: #f1ede8;
-          overflow: hidden;
-        }
-
-        .ph-discipline-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          object-position: center 20%;
-          display: block;
-        }
-
-        .ph-discipline-body {
-          padding: 14px;
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-          justify-content: space-between;
-        }
-
-        .ph-discipline-body h4 {
-          margin: 0 0 4px;
-          font-size: 14.5px;
-          font-weight: 850;
-          color: var(--ph-green);
-        }
-
-        .ph-discipline-body p {
-          margin: 0;
-          font-size: 12px;
-          color: var(--ph-muted);
-          line-height: 1.4;
-        }
-
-        /* Why Businesses Love Peach Coins */
-        .ph-reasons-sec {
-          max-width: 1240px;
-          margin: 0 auto 60px;
-          padding: 0 24px;
-        }
-
-        .ph-reasons-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 14px;
-        }
-
-        .ph-reason-card {
-          background: #ffffff;
-          border: 1px solid var(--ph-border);
-          border-radius: 20px;
-          padding: 24px 20px;
-          box-shadow: var(--ph-shadow-sm);
-          border-top: 4px solid var(--ph-blue-deep);
-        }
-
-        .ph-reason-card:nth-child(2) {
-          border-top-color: var(--ph-blue-cyan);
-        }
-
-        .ph-reason-card:nth-child(3) {
-          border-top-color: var(--ph-green);
-        }
-
-        .ph-reason-card:nth-child(4) {
-          border-top-color: var(--ph-coral);
-        }
-
-        .ph-reason-card h4 {
-          margin: 0 0 8px;
-          font-size: 16px;
-          font-weight: 850;
-          color: var(--ph-green);
-        }
-
-        .ph-reason-card p {
-          margin: 0;
-          font-size: 13.5px;
-          color: var(--ph-muted);
-          line-height: 1.5;
-        }
-
-        /* Peach Coin Pricing (Compact & Clean) */
-        .ph-pricing-sec {
-          background: var(--ph-green);
-          color: #ffffff;
-          padding: 60px 24px;
-          margin-bottom: 60px;
-        }
-
-        .ph-pricing-inner {
-          max-width: 1100px;
-          margin: auto;
-        }
-
-        .ph-pricing-header {
-          text-align: center;
-          max-width: 660px;
-          margin: 0 auto 28px;
-        }
-
-        .ph-pricing-header h2 {
-          font-size: clamp(28px, 3.4vw, 40px);
-          font-weight: 900;
-          letter-spacing: -0.025em;
-          margin: 0 0 10px;
-        }
-
-        .ph-pricing-header p {
-          color: #d1ded8;
-          font-size: 16px;
-          margin: 0;
-        }
-
-        .ph-switch-wrap {
-          display: flex;
-          justify-content: center;
-          margin-bottom: 28px;
-        }
-
-        .ph-switch {
-          display: inline-flex;
-          background: rgba(255, 255, 255, 0.12);
-          padding: 4px;
-          border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .ph-switch-btn {
-          padding: 8px 24px;
-          border-radius: 999px;
-          border: none;
-          background: transparent;
-          color: #e2ede8;
-          font-weight: 800;
-          font-size: 13.5px;
-          cursor: pointer;
-          transition: all 0.15s ease;
-        }
-
-        .ph-switch-btn.active {
-          background: #ffffff;
-          color: var(--ph-green);
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Project Cards */
-        .ph-price-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 14px;
-          margin-bottom: 24px;
-        }
-
-        .ph-compact-card {
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.16);
-          border-radius: 20px;
-          padding: 20px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-        }
-
-        .ph-compact-card.featured {
-          background: rgba(255, 255, 255, 0.14);
-          border-color: var(--ph-blue-cyan);
-        }
-
-        .ph-compact-tag {
-          font-size: 11px;
-          font-weight: 900;
-          letter-spacing: 0.06em;
-          color: var(--ph-blue-cyan);
-          text-transform: uppercase;
-        }
-
-        .ph-compact-price {
-          font-size: 28px;
-          font-weight: 900;
-          color: #ffffff;
-          margin: 4px 0 2px;
-        }
-
-        .ph-compact-title {
-          font-size: 15px;
-          font-weight: 850;
-          margin: 4px 0 6px;
-        }
-
-        .ph-compact-desc {
-          font-size: 12.5px;
-          color: #c7d6cf;
-          line-height: 1.45;
-          margin: 0 0 12px;
-        }
-
-        .ph-compact-meta {
-          padding-top: 10px;
-          border-top: 1px solid rgba(255, 255, 255, 0.12);
-          font-size: 11.5px;
-          color: #9cb3a8;
-          font-weight: 600;
-        }
-
-        /* Membership Grid */
-        .ph-membership-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-          margin-bottom: 24px;
-        }
-
-        .ph-membership-card {
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.16);
-          border-radius: 22px;
-          padding: 24px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          position: relative;
-        }
-
-        .ph-membership-card.featured {
-          background: rgba(255, 255, 255, 0.14);
-          border-color: var(--ph-blue-cyan);
-        }
-
-        .ph-pop-tag {
-          position: absolute;
-          top: -10px;
-          right: 18px;
-          background: var(--ph-blue-cyan);
-          color: #0c4a6e;
-          font-size: 10px;
-          font-weight: 900;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          padding: 3px 10px;
-          border-radius: 999px;
-        }
-
-        .ph-plan-name {
-          font-size: 16px;
-          font-weight: 850;
-          color: #ffffff;
-        }
-
-        .ph-plan-price {
-          font-size: 32px;
-          font-weight: 900;
-          margin: 6px 0;
-        }
-
-        .ph-plan-price span {
-          font-size: 13px;
-          font-weight: 600;
-          color: #a4beaf;
-        }
-
-        .ph-plan-coins {
-          font-size: 13.5px;
-          font-weight: 800;
-          color: var(--ph-blue-cyan);
-          margin-bottom: 10px;
-        }
-
-        .ph-plan-desc {
-          font-size: 12.5px;
-          color: #c7d6cf;
-          line-height: 1.45;
-          margin: 0;
-        }
-
-        .ph-pricing-footer {
-          background: rgba(255, 255, 255, 0.07);
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          border-radius: 18px;
-          padding: 16px 24px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 14px;
-        }
-
-        .ph-pricing-footer-text {
-          font-size: 13.5px;
-          color: #e2ede8;
-        }
-
-        /* Work Showcase */
-        .ph-work-sec {
-          max-width: 1240px;
-          margin: 0 auto 60px;
-          padding: 0 24px;
-        }
-
-        .ph-workhead {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-end;
-          margin-bottom: 22px;
-        }
-
-        .ph-workhead h2 {
-          font-size: clamp(26px, 3.2vw, 36px);
-          font-weight: 900;
-          color: var(--ph-green);
-          margin: 0 0 4px;
-        }
-
-        .ph-workhead p {
-          color: var(--ph-muted);
-          font-size: 15px;
-          margin: 0;
-        }
-
-        .ph-track {
-          display: flex;
-          gap: 18px;
-          overflow-x: auto;
-          scroll-snap-type: x mandatory;
-          padding: 4px 2px 20px;
-          -webkit-overflow-scrolling: touch;
-        }
-
-        .ph-card {
-          flex: 0 0 330px;
-          scroll-snap-align: start;
-          border: 1px solid var(--ph-border);
-          border-radius: 22px;
-          overflow: hidden;
-          background: #ffffff;
-          cursor: pointer;
-          text-align: left;
-          padding: 0;
-          box-shadow: var(--ph-shadow-sm);
-          transition: transform 0.2s ease;
-        }
-
-        .ph-card:hover {
-          transform: translateY(-3px);
-        }
-
-        .ph-card img {
-          width: 100%;
-          height: 200px;
-          object-fit: cover;
-          display: block;
-        }
-
-        .ph-cardbody {
-          padding: 18px;
-        }
-
-        .ph-cat {
-          font-size: 11px;
-          font-weight: 900;
-          color: #0284c7;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-        }
-
-        .ph-card h3 {
-          font-size: 16px;
-          font-weight: 850;
-          color: var(--ph-green);
-          margin: 4px 0;
-          line-height: 1.3;
-        }
-
-        .ph-card-client {
-          font-size: 12px;
-          color: #64748b;
-          margin-bottom: 12px;
-        }
-
-        .ph-meta {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 12px;
-          padding-top: 12px;
-          border-top: 1px solid #f4ebe4;
-        }
-
-        .ph-meta-time {
-          color: var(--ph-muted);
-          font-weight: 600;
-        }
-
-        .ph-price {
-          color: var(--ph-coral);
-          font-weight: 900;
-        }
-
-        /* Skyline Banner */
-        .ph-skyline-banner {
-          max-width: 1240px;
-          margin: 0 auto 60px;
-          padding: 0 24px;
-        }
-
-        .ph-skyline-card {
-          background: linear-gradient(180deg, #fff2e8 0%, #ffd8c4 100%);
-          border: 1.5px solid #fed7aa;
-          border-radius: 32px;
-          padding: 42px 32px 0;
-          overflow: hidden;
-          text-align: center;
-          position: relative;
-        }
-
-        .ph-agency-tag {
-          font-size: 12px;
-          font-weight: 900;
-          text-transform: uppercase;
-          letter-spacing: 0.12em;
-          color: var(--ph-blue-deep);
-          margin-bottom: 10px;
-          display: block;
-        }
-
-        .ph-skyline-title {
-          font-size: clamp(28px, 3.4vw, 42px);
-          font-weight: 900;
-          color: var(--ph-green);
-          margin: 0 0 12px;
-          letter-spacing: -0.025em;
-        }
-
-        .ph-skyline-title span {
-          color: var(--ph-coral);
-          font-family: Georgia, serif;
-          font-style: italic;
-          font-weight: 400;
-        }
-
-        .ph-skyline-sub {
-          font-size: 16px;
-          color: #624b40;
-          max-width: 620px;
-          margin: 0 auto 28px;
-          line-height: 1.55;
-        }
-
-        .ph-skyline-actions {
-          display: flex;
-          justify-content: center;
-          gap: 14px;
-          flex-wrap: wrap;
-          margin-bottom: 30px;
-        }
-
-        .ph-skyline-svg {
-          width: 100%;
-          max-height: 120px;
-          object-fit: cover;
-          display: block;
-        }
-
-        /* Modal Dialog */
-        .ph-modal {
-          position: fixed;
-          inset: 0;
-          z-index: 120;
-          background: rgba(13, 47, 36, 0.75);
-          backdrop-filter: blur(6px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 16px;
-        }
-
-        .ph-dialog {
-          width: min(840px, 100%);
-          max-height: 90vh;
-          overflow: auto;
-          background: #ffffff;
-          border-radius: 24px;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          position: relative;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-        }
-
-        .ph-dialog-media {
-          background: #11281e;
-          padding: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .ph-dialog-media img {
-          width: 100%;
-          max-height: 480px;
-          object-fit: contain;
-          border-radius: 14px;
-        }
-
-        .ph-dialog-info {
-          padding: 30px 26px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-        }
-
-        .ph-close {
-          float: right;
-          border: 0;
-          background: #f1f5f9;
-          border-radius: 50%;
-          width: 34px;
-          height: 34px;
-          cursor: pointer;
-          font-size: 18px;
-          font-weight: bold;
-          color: #475569;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .ph-dialog-info h2 {
-          font-size: 21px;
-          font-weight: 850;
-          color: var(--ph-green);
-          margin: 14px 0 4px;
-          line-height: 1.3;
-        }
-
-        .ph-dialog-info p {
-          color: var(--ph-muted);
-          line-height: 1.55;
-          font-size: 13.5px;
-        }
-
-        .ph-specs {
-          padding-left: 18px;
-          color: #334155;
-          line-height: 1.7;
-          font-size: 12.5px;
-          margin: 14px 0;
-        }
-
-        .ph-dialog-price {
-          padding: 12px 16px;
-          background: #fff7ed;
-          border-radius: 12px;
-          color: #9a3412;
-          font-weight: 900;
-          margin: 14px 0 18px;
-          font-size: 13.5px;
-          border: 1px solid #fed7aa;
-        }
-
-        /* Footer */
-        .ph-footer {
-          border-top: 1px solid var(--ph-border);
-          background: #ffffff;
-          padding: 38px 24px;
-        }
-
-        .ph-footer-inner {
-          max-width: 1240px;
-          margin: auto;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 18px;
-        }
-
-        .ph-footer-copy {
-          font-size: 13px;
-          color: #64748b;
-        }
-
-        .ph-footer-links {
-          display: flex;
-          gap: 18px;
-          font-size: 13px;
-          font-weight: 700;
-          color: var(--ph-green);
-        }
-
-        .ph-footer-links a {
-          text-decoration: none;
-          color: inherit;
-        }
-
-        .ph-footer-links a:hover {
-          color: var(--ph-coral);
-        }
-
-        /* Mobile Optimization */
-        @media (max-width: 900px) {
-          .ph-nav {
-            min-height: 90px;
-            padding: 8px 16px;
-          }
-
-          .ph-logo {
-            width: 150px;
-            height: 75px;
-          }
-
-          .ph-navlinks {
-            right: 12px;
-            gap: 8px;
-          }
-
-          .ph-login-link {
-            font-size: 13px;
-            padding: 6px 10px;
-          }
-
-          .ph-pill {
-            padding: 8px 16px;
-            font-size: 13px;
-          }
-
-          .ph-hero-sec {
-            grid-template-columns: 1fr;
-            min-height: auto;
-            padding: 16px 16px 36px;
-            gap: 28px;
-          }
-
-          .ph-stage-container {
-            max-width: 100%;
-          }
-
-          .ph-float-tag-top {
-            right: 0px;
-            top: -10px;
-          }
-
-          .ph-float-tag-bottom {
-            left: 0px;
-            bottom: -10px;
-          }
-
-          .ph-pillars-grid {
-            grid-template-columns: 1fr;
-            gap: 14px;
-          }
-
-          .ph-disciplines-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-          }
-
-          .ph-reasons-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-          }
-
-          .ph-price-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-          }
-
-          .ph-membership-grid {
-            grid-template-columns: 1fr;
-            gap: 12px;
-          }
-
-          .ph-dialog {
-            grid-template-columns: 1fr;
-          }
-
-          .ph-dialog-media {
-            max-height: 35vh;
-          }
-
-          .ph-dialog-info {
-            padding: 20px;
-          }
-
-          .ph-card {
-            flex-basis: 82vw;
-          }
-        }
-      `}</style>
-
-      {/* Top Announcement Strip */}
-      <div className="ph-topbar">
-        Birmingham&rsquo;s Creative Marketplace &bull; <strong>1 Peach Coin = $50</strong> &bull; Clear Project Value
+    <main className="min-h-screen bg-[#FAF8F5] relative text-[#0F172A] selection:bg-[#FF5733]/20 selection:text-[#FF5733]">
+      
+      {/* Subtle Peach Wallpaper Pattern (Turned down so you can hardly see it) */}
+      <div 
+        className="fixed inset-0 pointer-events-none opacity-[0.07] z-0"
+        style={{
+          backgroundImage: "url('/brand/peach-pattern.svg')",
+          backgroundRepeat: "repeat",
+          backgroundSize: "180px 180px",
+        }}
+      />
+      
+      {/* Top Announcement Strip with Deep Royal Blue & Aqua Accent */}
+      <div className="relative z-10 bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-sky-100 py-2.5 px-4 text-center text-xs font-medium tracking-wide border-b border-blue-900/50">
+        <span className="inline-flex items-center gap-1.5 text-cyan-300 font-bold mr-1.5">
+          📍 Birmingham&rsquo;s Creative Marketplace
+        </span>
+        <span className="text-slate-400">&bull;</span>{" "}
+        <strong className="text-white font-semibold">Vetted Creatives at the touch of a button.</strong>{" "}
+        <span className="text-slate-400">&bull;</span>{" "}
+        <span className="text-blue-200">Quality design work &amp; Creative Support</span>
       </div>
 
-      {/* Nav Header */}
-      <header className="ph-nav">
-        <Link href="/" className="ph-logo-link">
-          <img
-            src="/peach-app-logo.png"
-            className="ph-logo"
-            alt="Peach Network"
-            style={{ width: "200px", height: "100px" }}
-          />
-        </Link>
-        <div className="ph-navlinks">
-          <Link href="/auth?mode=signin" className="ph-login-link">
-            Log In
+      {/* 1. HEADER */}
+      <header className="sticky top-0 z-40 bg-[#FFF5EE]/95 backdrop-blur-md border-b border-[#F0D5C7]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+          
+          {/* Logo: Authentic Peach Network Emblem / Wordmark */}
+          <Link href="/" className="flex items-center gap-3 group shrink-0">
+            <img
+              src="/brand/peach-network-logo.png"
+              alt="Peach Network"
+              className="h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-102"
+            />
           </Link>
-          <Link
-            href="/auth?mode=signup"
-            className="ph-pill"
-            style={{ backgroundColor: "#70eaff", color: "#e54307" }}
-          >
-            Start a Project &rarr;
-          </Link>
+
+          {/* Menu Links: ALL IN A SINGLE ROW */}
+          <nav className="flex items-center gap-3 sm:gap-6 lg:gap-8 text-xs sm:text-sm font-semibold text-[#142B20]/90 whitespace-nowrap overflow-x-auto no-scrollbar py-1">
+            <a href="#about" className="hover:text-[#FF5733] transition-colors">
+              About Us
+            </a>
+            <a href="#how-it-works" className="hover:text-[#FF5733] transition-colors">
+              How It Works
+            </a>
+            <a href="#pricing" className="hover:text-[#FF5733] transition-colors">
+              Pricing
+            </a>
+            <a href="#why-choose-us" className="hover:text-[#FF5733] transition-colors">
+              Why Choose Us
+            </a>
+          </nav>
+
+          {/* Header Right: Sign In + Coral Start a Project CTA */}
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            {/* Sign In link */}
+            <Link
+              href="/auth?mode=signin"
+              className="text-xs sm:text-sm font-semibold text-[#142B20] hover:text-[#FF5733] transition-colors px-2 py-1"
+            >
+              Sign In
+            </Link>
+
+            {/* Electric Coral Start a Project button */}
+            <Link
+              href="/auth?mode=signup"
+              className="inline-flex items-center gap-1.5 bg-[#FF5733] hover:bg-[#E04826] text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-md shadow-sm transition-all duration-150 hover:shadow"
+            >
+              Start a Project <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+            </Link>
+          </div>
+
         </div>
       </header>
 
-      {/* Hero Section (One-Screen AppThink-Style Animated Hero with Southern Blue & Peach Tones) */}
-      <section className="ph-hero-sec">
-        <div>
-          <span className="ph-kicker">
-            <span className="ph-kicker-dot"></span>
-            BIRMINGHAM&rsquo;S CREATIVE MARKETPLACE
-          </span>
+      {/* 2 & 3. HERO SECTION (Peach Theme with Vetted Creatives) */}
+      <section className="relative overflow-hidden pt-8 pb-14 lg:pt-16 lg:pb-20 border-b border-[#F0D5C7] bg-gradient-to-b from-[#FDF2EC]/90 via-[#FCEAE0]/70 to-[#FAF8F5]/90">
+        {/* Ambient Glows: Warm Peach + Refreshing Aqua/Blue Orbs */}
+        <div className="absolute top-0 right-1/4 w-[480px] h-[480px] bg-gradient-to-br from-[#FFD8C2]/40 via-[#38BDF8]/15 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="absolute top-1/3 left-10 w-[380px] h-[380px] bg-gradient-to-tr from-sky-400/20 via-[#FFE2D1]/30 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-          <h1 className="ph-hero-title">
-            Helping Brands <br />
-            <span>Grow Sweeter.</span>
-          </h1>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+            
+            {/* HERO LEFT COLUMN */}
+            <div className="lg:col-span-6 flex flex-col items-start text-left z-10">
+              
+              {/* Creative Lockup Eyebrow: Birmingham's Creative Marketplace (Prominent & Stylish) */}
+              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 border border-sky-400/40 text-xs font-bold tracking-wider text-white shadow-md mb-5 group">
+                <span className="flex h-2.5 w-2.5 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400"></span>
+                </span>
+                <span className="text-cyan-300 font-extrabold uppercase tracking-widest text-[11px] sm:text-xs">
+                  BIRMINGHAM&rsquo;S CREATIVE MARKETPLACE
+                </span>
+                <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-sky-300/60" />
+                <span className="hidden sm:inline-flex items-center text-[10px] text-sky-200 bg-white/10 px-2 py-0.5 rounded-full border border-sky-300/30">
+                  Magic City Creatives
+                </span>
+              </div>
 
-          <p className="ph-hero-sub">
-            Built by <strong>Sweet As A Peach Creative Agency</strong>.<br />
-            Connecting businesses with vetted Southern creatives through transparent Peach Coins and zero bidding wars.
-          </p>
+              {/* Headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-black tracking-tight text-[#142B20] leading-[1.12]">
+                Vetted Creatives at the{" "}
+                <span className="text-[#FF5733] italic font-serif">
+                  touch of a button.
+                </span>
+              </h1>
 
-          <div className="ph-hero-actions">
-            <Link href="/auth?mode=signup" className="ph-btn-primary">
-              Start a Project &rarr;
-            </Link>
-            <Link href="/apply" className="ph-btn-secondary">
-              Join the Creative Network
-            </Link>
-          </div>
+              {/* Subhead: Quality design work & creative support */}
+              <p className="mt-6 text-base sm:text-lg text-[#142B20]/80 leading-relaxed font-normal max-w-xl">
+                Quality design work &amp; creative support for the South&rsquo;s business &amp; creative community. Fixed scopes, commercial pre-flight checks, and verified local talent ready to bring your vision to life.
+              </p>
 
-          <div className="ph-hero-trust">
-            <span className="ph-hero-trust-item">
-              <span>🪙</span> 1 Coin = $50 Fixed
-            </span>
-            <span className="ph-hero-trust-item">
-              <span>⚡</span> 3-Match in 24h
-            </span>
-            <span className="ph-hero-trust-item">
-              <span>🔒</span> Protected Escrow
-            </span>
+              {/* Agency Credential Credit */}
+              <div className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-[#142B20] bg-white/80 border border-blue-200/60 px-3.5 py-1.5 rounded-md shadow-2xs">
+                <span className="text-base leading-none">🍑</span>
+                <span>Built by <strong className="text-[#FF5733]">Sweet As A Peach Creative Agency</strong></span>
+                <span className="text-blue-600 font-semibold ml-1 border-l border-slate-300 pl-2 text-[11px]">Birmingham, AL</span>
+              </div>
+
+              {/* Exactly Two Buttons Below: Coral Primary & Clean White Secondary with Blue hover */}
+              <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                {/* Primary Call to Action Button: I am A Business (Electric Coral) */}
+                <Link
+                  href="/auth?mode=signup&role=business"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#FF5733] hover:bg-[#E04826] text-white text-base font-bold px-8 py-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-150"
+                >
+                  I am A Business <ArrowRight className="w-4 h-4 text-white" />
+                </Link>
+
+                {/* Secondary Button: I am A Creative (Clean Crisp White with Stone Border & Blue hover) */}
+                <Link
+                  href="/apply"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-blue-50/50 text-[#142B20] hover:text-blue-700 border-2 border-[#E2E8F0] hover:border-blue-400 text-base font-bold px-8 py-4 rounded-lg shadow-2xs transition-all duration-150"
+                >
+                  I am A Creative
+                </Link>
+              </div>
+
+              {/* Subtle Trust Indicators */}
+              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-[#142B20]/80">
+                <span className="flex items-center gap-1.5 text-[#142B20]">
+                  <Check className="w-3.5 h-3.5 text-blue-600" /> Hand-vetted talent
+                </span>
+                <span className="text-slate-400 hidden sm:inline">&bull;</span>
+                <span className="flex items-center gap-1.5 text-[#142B20]">
+                  <Check className="w-3.5 h-3.5 text-blue-600" /> Direct creative match
+                </span>
+                <span className="text-slate-400 hidden sm:inline">&bull;</span>
+                <span className="flex items-center gap-1.5 text-[#142B20]">
+                  <Zap className="w-3.5 h-3.5 text-blue-600" /> Fast process
+                </span>
+              </div>
+            </div>
+
+            {/* HERO RIGHT COLUMN (Interactive 3D Floating Phone Mockup with iPad Studio & Books) */}
+            <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
+              <PhoneHeroMockup />
+            </div>
+
           </div>
         </div>
+      </section>
 
-        {/* Seamlessly Integrated Peach Network 3-Match Stage in the Hero Screen */}
-        <div className="ph-stage-container">
-          <div className="ph-ambient-glow"></div>
+      {/* 4. WOW FACTOR STRIP (Below Hero) */}
+      <section className="py-12 bg-white border-b border-[#E2E8F0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            {/* Card 1: Zero Bidding Wars */}
+            <div className="bg-white border border-[#E2E8F0] p-6 rounded-lg shadow-xs hover:shadow-md transition-shadow">
+              <div className="w-10 h-10 rounded-md bg-[#FAF8F5] border border-[#E2E8F0] flex items-center justify-center text-[#FF5733] mb-4">
+                <Zap className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-[#0F172A] mb-2">
+                Zero Bidding Wars
+              </h3>
+              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
+                No bidding wars or spam proposals. Fixed project units pair your brief directly with verified creative specialists ready to execute immediately.
+              </p>
+            </div>
 
-          {/* Floating contextual badges hovering smoothly around the stage */}
-          <div className="ph-float-tag-top">
-            🪙 1 Coin = $50 Standard Rate
+            {/* Card 2: 100% Vetted Talent */}
+            <div className="bg-white border border-[#E2E8F0] p-6 rounded-lg shadow-xs hover:shadow-md transition-shadow">
+              <div className="w-10 h-10 rounded-md bg-[#FAF8F5] border border-[#E2E8F0] flex items-center justify-center text-[#142B20] mb-4">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-[#0F172A] mb-2">
+                100% Vetted Talent
+              </h3>
+              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
+                Every designer and art director is hand-screened for commercial craft, vector precision, and strict print pre-flight reliability.
+              </p>
+            </div>
+
+            {/* Card 3: Supporting Local Creatives */}
+            <div className="bg-white border border-[#E2E8F0] p-6 rounded-lg shadow-xs hover:shadow-md transition-shadow">
+              <div className="w-10 h-10 rounded-md bg-[#FAF8F5] border border-[#E2E8F0] flex items-center justify-center text-[#FF5733] mb-4">
+                <Users className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-[#0F172A] mb-2">
+                Supporting Local Creatives
+              </h3>
+              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
+                Keeping marketing budgets and creative capital thriving locally across Birmingham and the South with equitable, transparent compensation.
+              </p>
+            </div>
+
+            {/* Card 4: Protected Payments */}
+            <div className="bg-white border border-[#E2E8F0] p-6 rounded-lg shadow-xs hover:shadow-md transition-shadow">
+              <div className="w-10 h-10 rounded-md bg-[#FAF8F5] border border-[#E2E8F0] flex items-center justify-center text-[#142B20] mb-4">
+                <Lock className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-[#0F172A] mb-2">
+                Protected Payments
+              </h3>
+              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
+                Your coin funds remain completely protected and are only disbursed after you inspect and sign off on your commercial deliverables.
+              </p>
+            </div>
+
           </div>
-          <div className="ph-float-tag-bottom">
-            🔒 Escrow Protected &bull; Vault Storage
+        </div>
+      </section>
+
+      {/* HOW IT WORKS SECTION (Clean 3-Step Process) */}
+      <section id="how-it-works" className="py-20 bg-[#FAF8F5] border-b border-[#E2E8F0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-xs font-mono font-bold tracking-widest text-[#FF5733] uppercase">
+              STREAMLINED DISPATCH
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#142B20] mt-2">
+              From Raw Idea to Commercial Asset in 3 Steps
+            </h2>
+            <p className="text-[#0F172A]/70 text-base mt-3">
+              Simple fixed-scope ordering with automated pre-flight certification.
+            </p>
           </div>
 
-          {/* Interactive Live Match & Vending Card */}
-          <div className="ph-live-stage">
-            {/* Stage Top Bar */}
-            <div className="ph-stage-topbar">
-              <div className="ph-stage-badge">
-                <span className="ph-stage-status-dot"></span>
-                Peach Match Engine
-              </div>
-              <div className="ph-stage-counter">
-                Active in 205 Area &bull; 100% Vetted
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white border border-[#E2E8F0] rounded-lg p-6 relative shadow-xs">
+              <div className="text-xs font-mono font-bold text-[#FF5733] mb-2">STEP 01</div>
+              <h3 className="text-xl font-bold text-[#142B20] mb-2">Scope Your Deliverable</h3>
+              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
+                Select your pre-packaged creative item—from a 2-Coin Event Flyer Kit to a 10-Coin Web UI Prototype. No scope creep, no hourly surprises.
+              </p>
             </div>
 
-            {/* Clickable / Auto-cycling Project Tabs */}
-            <div className="ph-stage-tabs">
-              {HERO_DEMOS.map((demo, idx) => (
-                <button
-                  key={demo.id}
-                  type="button"
-                  onClick={() => setActiveHeroTab(idx)}
-                  className={`ph-stage-tab ${activeHeroTab === idx ? "active" : ""}`}
-                >
-                  <span>{demo.icon}</span>
-                  <span>{demo.discipline}</span>
-                </button>
-              ))}
+            <div className="bg-white border border-[#E2E8F0] rounded-lg p-6 relative shadow-xs">
+              <div className="text-xs font-mono font-bold text-[#FF5733] mb-2">STEP 02</div>
+              <h3 className="text-xl font-bold text-[#142B20] mb-2">Vetted Talent Dispatch</h3>
+              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
+                Our dispatch engine matches your brief with a pre-screened creative skilled in your specific discipline. Rapid kick-off with zero bidding delays.
+              </p>
             </div>
 
-            {/* Active Project Card */}
-            <div className="ph-stage-card">
-              <div className="ph-stage-card-head">
-                <div>
-                  <div className="ph-stage-client">{currentHero.client}</div>
-                  <div className="ph-stage-project-name">{currentHero.project}</div>
-                </div>
-                <div className="ph-stage-coin-badge">
-                  <div className="ph-stage-coin-val">{currentHero.coins} Coins</div>
-                  <div className="ph-stage-coin-usd">{currentHero.dollarValue} Total</div>
-                </div>
-              </div>
+            <div className="bg-white border border-[#E2E8F0] rounded-lg p-6 relative shadow-xs">
+              <div className="text-xs font-mono font-bold text-[#FF5733] mb-2">STEP 03</div>
+              <h3 className="text-xl font-bold text-[#142B20] mb-2">Pre-Flight Delivery</h3>
+              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
+                Receive commercial-grade assets: 300 DPI CMYK press bleed files, formatted feed &amp; story squares, plus permanent Brand Vault archival.
+              </p>
+            </div>
+          </div>
 
-              <div className="ph-stage-deliverables">
-                {currentHero.deliverables.map((item, i) => (
-                  <span key={i} className="ph-stage-deliv-tag">{item}</span>
-                ))}
-              </div>
+        </div>
+      </section>
+
+      {/* CREATIVE CAPABILITIES (NO human photos or headshots, clean corporate cards) */}
+      <section id="why-choose-us" className="py-20 bg-white border-b border-[#E2E8F0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+            <div>
+              <span className="text-xs font-mono font-bold tracking-widest text-[#FF5733] uppercase">
+                COMMERCIAL DISCIPLINES
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#142B20] mt-2">
+                Enterprise Creative Support
+              </h2>
+              <p className="text-[#0F172A]/70 text-base mt-2">
+                Hand-vetted creative disciplines ready to produce your marketing collateral.
+              </p>
             </div>
 
-            {/* Curated 3-Match Creative Candidates */}
-            <div className="ph-stage-matches">
-              {currentHero.matches.map((cand, idx) => (
+            <Link
+              href="/auth?mode=signup"
+              className="mt-4 md:mt-0 inline-flex items-center gap-1.5 text-sm font-semibold text-[#FF5733] hover:underline"
+            >
+              Explore all packages <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {CAPABILITIES.map((c, i) => {
+              const IconComp = c.icon;
+              return (
                 <div
-                  key={idx}
-                  className={`ph-stage-match-row ${idx === 0 ? "active" : ""}`}
+                  key={i}
+                  className="bg-[#FAF8F5] border border-[#E2E8F0] rounded-lg p-6 hover:border-slate-300 transition-colors"
                 >
-                  <div className="ph-stage-match-info">
-                    <div className="ph-stage-avatar">
-                      {cand.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="ph-stage-creative-name">
-                        {cand.name}
-                        {idx === 0 && (
-                          <span style={{ marginLeft: "6px", fontSize: "10.5px", color: "var(--ph-coral)", fontWeight: "800" }}>
-                            &bull; Top Pick
-                          </span>
-                        )}
-                      </div>
-                      <div className="ph-stage-creative-spec">{cand.specialty}</div>
-                    </div>
+                  <div className="w-12 h-12 rounded-md bg-white border border-[#E2E8F0] flex items-center justify-center text-[#142B20] mb-4">
+                    <IconComp className="w-6 h-6 text-[#FF5733]" />
                   </div>
-                  <span className={`ph-stage-match-pill ${idx === 0 ? "" : "blue"}`}>
-                    {cand.fit}
-                  </span>
+                  <h3 className="text-lg font-bold text-[#142B20] mb-1.5">{c.role}</h3>
+                  <p className="text-sm text-[#0F172A]/70 mb-4 leading-relaxed">{c.headline}</p>
+                  <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-mono text-[#0F172A]/60">
+                    <span>SPECS:</span>
+                    <span className="font-semibold text-[#142B20]">{c.deliverables}</span>
+                  </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
 
-            {/* Stage Footer Status */}
-            <div className="ph-stage-footer">
+            {/* Final CTA Card */}
+            <div className="bg-[#142B20] text-white rounded-lg p-6 flex flex-col justify-between">
               <div>
-                Turnaround: <strong>{currentHero.turnaround}</strong>
+                <span className="text-xs font-mono font-bold text-[#FF5733] uppercase">CUSTOM INQUIRY</span>
+                <h3 className="text-lg font-bold mt-1 text-white">Need a Multi-Asset Campaign?</h3>
+                <p className="text-sm text-white/80 mt-2 leading-relaxed">
+                  Our team packages custom multi-coin deliverables for large-scale launches, events, and rebrands.
+                </p>
               </div>
-              <div>
-                Status: <strong style={{ color: "var(--ph-coral)" }}>Ready to Match</strong>
-              </div>
+              <Link
+                href="/auth?mode=signup"
+                className="mt-6 inline-flex items-center justify-center gap-2 bg-[#FF5733] hover:bg-[#E04826] text-white text-sm font-semibold px-4 py-2.5 rounded-md transition"
+              >
+                Request Custom Scope <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
+
         </div>
       </section>
 
-      {/* 3 Core Pillars (AppThink Structured Feature Grid) */}
-      <section className="ph-pillars-sec">
-        <div className="ph-pillars-grid">
-          <div className="ph-pillar-card">
-            <span className="ph-pillar-num">Pillar 01</span>
-            <h3>Fixed Currency</h3>
-            <p>1 Peach Coin = $50 standard creative value. Zero bidding wars, no hourly creep, and guaranteed rate integrity.</p>
-          </div>
-          <div className="ph-pillar-card">
-            <span className="ph-pillar-num">Pillar 02</span>
-            <h3>Curated 3-Match</h3>
-            <p>Intelligent matching presents exactly 3 vetted local creatives with clear differences. Work starts in 24 hours.</p>
-          </div>
-          <div className="ph-pillar-card">
-            <span className="ph-pillar-num">Pillar 03</span>
-            <h3>Protected Payout &amp; Vault</h3>
-            <p>Funds are held securely in escrow until you approve. Vector source files are stored permanently in your Brand Vault.</p>
-          </div>
-        </div>
-      </section>
+      {/* PRICING SECTION (Clean Corporate Pricing Cards) */}
+      <section id="pricing" className="py-20 bg-[#FAF8F5] border-b border-[#E2E8F0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-xs font-mono font-bold tracking-widest text-[#FF5733] uppercase">
+              TRANSPARENT PRICING
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#142B20] mt-2">
+              Peach Coin Packages
+            </h2>
+            <p className="text-[#0F172A]/70 text-base mt-2">
+              1 Peach Coin = $50 Standard Creative Value. Choose how you want to work.
+            </p>
 
-      {/* 5 Creative Disciplines */}
-      <section className="ph-disciplines-sec">
-        <div className="ph-section-header">
-          <h2>Creative Support for Your Business</h2>
-          <p>Skilled professionals ready to bring your vision to life.</p>
-        </div>
-
-        <div className="ph-disciplines-grid">
-          {DISCIPLINES.map((d, i) => (
-            <div key={i} className="ph-discipline-card">
-              <div className="ph-discipline-img-wrap">
-                <img src={d.image} alt={d.role} className="ph-discipline-img" />
-              </div>
-              <div className="ph-discipline-body">
-                <div>
-                  <h4>{d.role}</h4>
-                  <p>{d.headline}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Why Businesses Love Peach Coins */}
-      <section className="ph-reasons-sec">
-        <div className="ph-section-header">
-          <h2>Why Businesses Love Peach Coins</h2>
-          <p>Simple, predictable project units that eliminate hiring headaches.</p>
-        </div>
-
-        <div className="ph-reasons-grid">
-          <div className="ph-reason-card">
-            <h4>Cost Control</h4>
-            <p>Know exactly how much you are spending on every project before work begins. No runaway hourly invoices.</p>
-          </div>
-          <div className="ph-reason-card">
-            <h4>True Flexibility</h4>
-            <p>Use coins when you need them, for what you need. From single flyers to full website refreshes.</p>
-          </div>
-          <div className="ph-reason-card">
-            <h4>Vetted Creatives</h4>
-            <p>Work with talented, hand-reviewed creatives who know local print standards and brand design.</p>
-          </div>
-          <div className="ph-reason-card">
-            <h4>Focus on Growth</h4>
-            <p>We handle scoping and quality reviews so you can stay 100% focused on running your business.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Peach Coin Menu & Pricing (Streamlined & Non-Overwhelming) */}
-      <section className="ph-pricing-sec">
-        <div className="ph-pricing-inner">
-          <div className="ph-pricing-header">
-            <h2>Peach Coin Pricing</h2>
-            <p>1 Peach Coin = $50 Standard Creative Value. Choose how you want to work.</p>
-          </div>
-
-          <div className="ph-switch-wrap">
-            <div className="ph-switch">
+            {/* Toggle (Clean corporate rounded-md buttons, NO pills) */}
+            <div className="mt-6 inline-flex p-1 bg-white border border-[#E2E8F0] rounded-md shadow-xs">
               <button
-                className={`ph-switch-btn ${pricingTab === "project" ? "active" : ""}`}
+                type="button"
                 onClick={() => setPricingTab("project")}
+                className={`px-4 py-2 text-sm font-semibold rounded transition ${
+                  pricingTab === "project"
+                    ? "bg-[#142B20] text-white shadow-xs"
+                    : "text-[#0F172A]/70 hover:text-[#0F172A]"
+                }`}
               >
                 By the Project (Pay-As-You-Go)
               </button>
               <button
-                className={`ph-switch-btn ${pricingTab === "membership" ? "active" : ""}`}
+                type="button"
                 onClick={() => setPricingTab("membership")}
+                className={`px-4 py-2 text-sm font-semibold rounded transition ${
+                  pricingTab === "membership"
+                    ? "bg-[#142B20] text-white shadow-xs"
+                    : "text-[#0F172A]/70 hover:text-[#0F172A]"
+                }`}
               >
                 Monthly Memberships
               </button>
@@ -1875,229 +528,368 @@ export default function HomePage() {
           </div>
 
           {pricingTab === "project" ? (
-            <div className="ph-price-grid">
-              <div className="ph-compact-card">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              
+              {/* Package 1 */}
+              <div className="bg-white border border-[#E2E8F0] rounded-lg p-6 flex flex-col justify-between shadow-xs">
                 <div>
-                  <div className="ph-compact-tag">Quick Tasks</div>
-                  <div className="ph-compact-price">$50</div>
-                  <div className="ph-compact-title">1 Peach Coin</div>
-                  <p className="ph-compact-desc">Social media graphics, menu price updates, event flyers, or web banner edits.</p>
+                  <div className="text-xs font-mono font-bold text-[#FF5733] uppercase">Quick Tasks</div>
+                  <div className="mt-2 flex items-baseline gap-1">
+                    <span className="text-3xl font-extrabold text-[#0F172A]">$50</span>
+                    <span className="text-xs font-mono text-slate-500">/ Flat Rate</span>
+                  </div>
+                  <p className="text-xs text-[#0F172A]/70 mt-3 leading-relaxed">
+                    Social promo graphic, menu price updates, event banner adjustments, or high-res vector conversion.
+                  </p>
                 </div>
-                <div className="ph-compact-meta">24–48h Turnaround</div>
+                <div className="mt-6 pt-4 border-t border-[#E2E8F0] text-xs font-mono text-slate-500 flex items-center justify-between">
+                  <span>TURNAROUND</span>
+                  <span className="font-bold text-[#142B20]">Fast Delivery</span>
+                </div>
               </div>
 
-              <div className="ph-compact-card featured">
-                <div>
-                  <div className="ph-compact-tag" style={{ color: "var(--ph-blue-cyan)" }}>Most Popular</div>
-                  <div className="ph-compact-price">$100</div>
-                  <div className="ph-compact-title">2 Peach Coins</div>
-                  <p className="ph-compact-desc">Event Flyer Kit: Print-ready 8.5x11 flyer (300 DPI) + matching Instagram square &amp; story.</p>
+              {/* Package 2 (Featured) */}
+              <div className="bg-white border-2 border-[#FF5733] rounded-lg p-6 flex flex-col justify-between shadow-md relative">
+                <div className="absolute -top-3 right-4 bg-[#FF5733] text-white text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded">
+                  MOST POPULAR
                 </div>
-                <div className="ph-compact-meta">48h Turnaround</div>
+                <div>
+                  <div className="text-xs font-mono font-bold text-[#FF5733] uppercase">Launch Kits</div>
+                  <div className="mt-2 flex items-baseline gap-1">
+                    <span className="text-3xl font-extrabold text-[#0F172A]">$100</span>
+                    <span className="text-xs font-mono text-slate-500">/ Flat Rate</span>
+                  </div>
+                  <p className="text-xs text-[#0F172A]/70 mt-3 leading-relaxed">
+                    Event Flyer Kit: Print-ready 8.5x11 flyer (300 DPI CMYK) + matching Instagram square &amp; story assets.
+                  </p>
+                </div>
+                <div className="mt-6 pt-4 border-t border-[#E2E8F0] text-xs font-mono text-slate-500 flex items-center justify-between">
+                  <span>TURNAROUND</span>
+                  <span className="font-bold text-[#FF5733]">48 Hours</span>
+                </div>
               </div>
 
-              <div className="ph-compact-card">
+              {/* Package 3 */}
+              <div className="bg-white border border-[#E2E8F0] rounded-lg p-6 flex flex-col justify-between shadow-xs">
                 <div>
-                  <div className="ph-compact-tag">Brand Starters</div>
-                  <div className="ph-compact-price">$300</div>
-                  <div className="ph-compact-title">6 Peach Coins</div>
-                  <p className="ph-compact-desc">Mini Brand Kit: Primary logo, secondary badge, typography kit, color palette &amp; SVGs.</p>
+                  <div className="text-xs font-mono font-bold text-[#FF5733] uppercase">Brand Starters</div>
+                  <div className="mt-2 flex items-baseline gap-1">
+                    <span className="text-3xl font-extrabold text-[#0F172A]">$300</span>
+                    <span className="text-xs font-mono text-slate-500">/ Flat Rate</span>
+                  </div>
+                  <p className="text-xs text-[#0F172A]/70 mt-3 leading-relaxed">
+                    Mini Brand Kit: Primary corporate logo, secondary mark, typography guidelines, color system, and master SVGs.
+                  </p>
                 </div>
-                <div className="ph-compact-meta">4–5 Days Turnaround</div>
+                <div className="mt-6 pt-4 border-t border-[#E2E8F0] text-xs font-mono text-slate-500 flex items-center justify-between">
+                  <span>TURNAROUND</span>
+                  <span className="font-bold text-[#142B20]">4–5 Days</span>
+                </div>
               </div>
 
-              <div className="ph-compact-card">
+              {/* Package 4 */}
+              <div className="bg-white border border-[#E2E8F0] rounded-lg p-6 flex flex-col justify-between shadow-xs">
                 <div>
-                  <div className="ph-compact-tag">Web &amp; Prototypes</div>
-                  <div className="ph-compact-price">$500</div>
-                  <div className="ph-compact-title">10 Peach Coins</div>
-                  <p className="ph-compact-desc">Full responsive desktop &amp; mobile Figma design prototype with developer handoff.</p>
+                  <div className="text-xs font-mono font-bold text-[#FF5733] uppercase">Web &amp; Prototypes</div>
+                  <div className="mt-2 flex items-baseline gap-1">
+                    <span className="text-3xl font-extrabold text-[#0F172A]">$500</span>
+                    <span className="text-xs font-mono text-slate-500">/ Flat Rate</span>
+                  </div>
+                  <p className="text-xs text-[#0F172A]/70 mt-3 leading-relaxed">
+                    Full responsive desktop &amp; mobile Figma design prototype with interactive transitions and developer handoff.
+                  </p>
                 </div>
-                <div className="ph-compact-meta">5–7 Days Turnaround</div>
+                <div className="mt-6 pt-4 border-t border-[#E2E8F0] text-xs font-mono text-slate-500 flex items-center justify-between">
+                  <span>TURNAROUND</span>
+                  <span className="font-bold text-[#142B20]">5–7 Days</span>
+                </div>
               </div>
+
             </div>
           ) : (
-            <div className="ph-membership-grid">
-              <div className="ph-membership-card">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {/* Membership 1 */}
+              <div className="bg-white border border-[#E2E8F0] rounded-lg p-7 flex flex-col justify-between shadow-xs">
                 <div>
-                  <div className="ph-plan-name">Essentials</div>
-                  <div className="ph-plan-price">$499 <span>/month</span></div>
-                  <div className="ph-plan-coins">10 Peach Coins Monthly</div>
-                  <p className="ph-plan-desc">For everyday creative needs, menu updates, and weekly social promo graphics.</p>
+                  <div className="text-xs font-mono font-bold text-[#0F172A]/60 uppercase">ESSENTIALS</div>
+                  <div className="text-2xl font-black text-[#142B20] mt-1">$499 <span className="text-xs font-normal text-slate-500">/mo</span></div>
+                  <div className="text-xs font-bold text-[#FF5733] mt-1">10 Peach Coins Monthly</div>
+                  <p className="text-xs text-[#0F172A]/70 mt-4 leading-relaxed">
+                    Ideal for ongoing graphic updates, weekly social promos, and monthly promotional collateral.
+                  </p>
                 </div>
-                <div style={{ marginTop: "16px" }}>
-                  <Link href="/auth?mode=signup" className="ph-pill" style={{ display: "inline-block", textAlign: "center", width: "100%" }}>
-                    Choose Essentials &rarr;
-                  </Link>
-                </div>
+                <Link
+                  href="/auth?mode=signup"
+                  className="mt-8 block text-center bg-[#FAF8F5] hover:bg-[#E2E8F0] text-[#0F172A] font-semibold text-sm py-2.5 rounded-md border border-[#E2E8F0] transition"
+                >
+                  Choose Essentials &rarr;
+                </Link>
               </div>
 
-              <div className="ph-membership-card featured">
-                <span className="ph-pop-tag">Most Popular</span>
+              {/* Membership 2 (Growth) */}
+              <div className="bg-white border-2 border-[#FF5733] rounded-lg p-7 flex flex-col justify-between shadow-md relative">
+                <div className="absolute -top-3 right-4 bg-[#FF5733] text-white text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded">
+                  POPULAR
+                </div>
                 <div>
-                  <div className="ph-plan-name">Growth</div>
-                  <div className="ph-plan-price">$1,099 <span>/month</span></div>
-                  <div className="ph-plan-coins">24 Coins (+4 Bonus Coins)</div>
-                  <p className="ph-plan-desc">For growing businesses needing parallel design requests and faster turnaround priority.</p>
+                  <div className="text-xs font-mono font-bold text-[#FF5733] uppercase">GROWTH</div>
+                  <div className="text-2xl font-black text-[#142B20] mt-1">$1,099 <span className="text-xs font-normal text-slate-500">/mo</span></div>
+                  <div className="text-xs font-bold text-[#FF5733] mt-1">24 Coins (+4 Bonus Coins)</div>
+                  <p className="text-xs text-[#0F172A]/70 mt-4 leading-relaxed">
+                    For scaling companies needing parallel design tasks, priority dispatch, and faster turnaround times.
+                  </p>
                 </div>
-                <div style={{ marginTop: "16px" }}>
-                  <Link href="/auth?mode=signup" className="ph-pill" style={{ display: "inline-block", textAlign: "center", width: "100%" }}>
-                    Choose Growth &rarr;
-                  </Link>
-                </div>
+                <Link
+                  href="/auth?mode=signup"
+                  className="mt-8 block text-center bg-[#FF5733] hover:bg-[#E04826] text-white font-semibold text-sm py-2.5 rounded-md shadow-xs transition"
+                >
+                  Choose Growth &rarr;
+                </Link>
               </div>
 
-              <div className="ph-membership-card">
+              {/* Membership 3 */}
+              <div className="bg-white border border-[#E2E8F0] rounded-lg p-7 flex flex-col justify-between shadow-xs">
                 <div>
-                  <div className="ph-plan-name">Partner</div>
-                  <div className="ph-plan-price">$2,199 <span>/month</span></div>
-                  <div className="ph-plan-coins">50 Coins (+10 Bonus Coins)</div>
-                  <p className="ph-plan-desc">Full creative team replacement for high-volume content, video, and campaigns.</p>
+                  <div className="text-xs font-mono font-bold text-[#0F172A]/60 uppercase">PARTNER</div>
+                  <div className="text-2xl font-black text-[#142B20] mt-1">$2,199 <span className="text-xs font-normal text-slate-500">/mo</span></div>
+                  <div className="text-xs font-bold text-[#FF5733] mt-1">50 Coins (+10 Bonus Coins)</div>
+                  <p className="text-xs text-[#0F172A]/70 mt-4 leading-relaxed">
+                    Full creative team replacement for high-volume content, video graphics, packaging, and campaigns.
+                  </p>
                 </div>
-                <div style={{ marginTop: "16px" }}>
-                  <Link href="/auth?mode=signup" className="ph-pill" style={{ display: "inline-block", textAlign: "center", width: "100%" }}>
-                    Choose Partner &rarr;
-                  </Link>
-                </div>
+                <Link
+                  href="/auth?mode=signup"
+                  className="mt-8 block text-center bg-[#FAF8F5] hover:bg-[#E2E8F0] text-[#0F172A] font-semibold text-sm py-2.5 rounded-md border border-[#E2E8F0] transition"
+                >
+                  Choose Partner &rarr;
+                </Link>
               </div>
             </div>
           )}
 
-          <div className="ph-pricing-footer">
-            <div className="ph-pricing-footer-text">
-              <strong>Protected Payments:</strong> 100% of coin funds are held securely until you review and sign off on your deliverable.
+        </div>
+      </section>
+
+      {/* REAL DELIVERABLES GALLERY */}
+      <section id="about" className="py-20 bg-white border-b border-[#E2E8F0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+            <div>
+              <span className="text-xs font-mono font-bold tracking-widest text-[#FF5733] uppercase">
+                PORTFOLIO ARCHIVE
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#142B20] mt-2">
+                Real Commercial Deliverables
+              </h2>
+              <p className="text-[#0F172A]/70 text-base mt-2">
+                Click any project deliverable to inspect scope, specs, and coin investment.
+              </p>
             </div>
-            <Link
-              href="/auth?mode=signup"
-              className="ph-pill"
-              style={{ backgroundColor: "var(--ph-blue-cyan)", color: "var(--ph-coral)", padding: "9px 20px" }}
-            >
-              Get Started with Peach Coins &rarr;
-            </Link>
           </div>
-        </div>
-      </section>
 
-      {/* Real Work Gallery */}
-      <section className="ph-work-sec">
-        <div className="ph-workhead">
-          <div>
-            <h2>Work From the Network</h2>
-            <p>Swipe through real client deliverables. Tap any project to view details.</p>
-          </div>
-          <span style={{ fontSize: "13px", color: "var(--ph-muted)", fontWeight: "600" }}>Swipe &rarr;</span>
-        </div>
-
-        <div className="ph-track">
-          {PROJECTS.map((p) => (
-            <button key={p.id} className="ph-card" onClick={() => setSelected(p)}>
-              <img src={p.image} alt={p.title} />
-              <div className="ph-cardbody">
-                <div className="ph-cat">{p.category}</div>
-                <h3>{p.title}</h3>
-                <div className="ph-card-client">{p.client}</div>
-                <div className="ph-meta">
-                  <span className="ph-meta-time">{p.turnaround}</span>
-                  <span className="ph-price">{p.coins} Peach Coins</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {PROJECTS.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => setSelected(p)}
+                className="group text-left bg-[#FAF8F5] border border-[#E2E8F0] rounded-lg overflow-hidden hover:border-slate-300 transition-all hover:shadow-md flex flex-col"
+              >
+                <div className="h-52 w-full overflow-hidden bg-slate-100 relative">
+                  <img
+                    src={p.image}
+                    alt={p.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-xs px-2 py-0.5 rounded text-[10px] font-mono font-bold text-[#142B20] border border-[#E2E8F0]">
+                    {p.coins} Peach Coins
+                  </div>
                 </div>
-              </div>
-            </button>
-          ))}
+
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="text-[11px] font-mono font-bold text-[#FF5733] uppercase mb-1">
+                      {p.category}
+                    </div>
+                    <h3 className="text-base font-bold text-[#142B20] line-clamp-1 group-hover:text-[#FF5733] transition-colors">
+                      {p.title}
+                    </h3>
+                    <p className="text-xs text-[#0F172A]/70 mt-1 line-clamp-2">
+                      {p.description}
+                    </p>
+
+                    {p.designer && (
+                      <div className="mt-2.5 pt-2 border-t border-slate-200/80 flex items-center gap-1.5 text-xs text-[#142B20]">
+                        <span className="w-5 h-5 rounded-full bg-[#142B20] text-[#38BDF8] text-[9px] font-bold flex items-center justify-center shrink-0">
+                          {p.designer[0]}
+                        </span>
+                        <div className="truncate">
+                          <span className="font-bold">{p.designer}</span>
+                          <span className="text-slate-400 mx-1">&bull;</span>
+                          <span className="text-[11px] text-[#0284C7] font-medium">{p.designerRole}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-mono text-slate-500">
+                    <span>{p.turnaround}</span>
+                    <span className="font-semibold text-[#142B20] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                      Inspect &rarr;
+                    </span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+
         </div>
       </section>
 
-      {/* Birmingham Skyline Banner */}
-      <section className="ph-skyline-banner">
-        <div className="ph-skyline-card">
-          <span className="ph-agency-tag">Powered by Sweet As A Peach Creative Agency</span>
-          <h2 className="ph-skyline-title">
-            Making brands <span>sweeter.</span> &hearts;
+      {/* BIRMINGHAM SKYLINE / CALL TO ACTION */}
+      <section className="py-20 bg-[#142B20] text-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <span className="text-xs font-mono font-bold tracking-widest text-[#FF5733] uppercase">
+            POWERED BY SWEET AS A PEACH CREATIVE AGENCY
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-black mt-3 tracking-tight">
+            Ready to Elevate Your Brand Assets?
           </h2>
-          <p className="ph-skyline-sub">
-            Keeping creative talent and marketing capital thriving right here in Birmingham and across the South.
+          <p className="text-white/80 max-w-2xl mx-auto mt-4 text-base sm:text-lg leading-relaxed">
+            Get commercial-grade graphic design, branding, and marketing collateral with predictable coin pricing and pre-flight quality guarantees.
           </p>
 
-          <div className="ph-skyline-actions">
-            <Link href="/auth?mode=signup" className="ph-btn-primary">
-              Post Your Project &rarr;
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/auth?mode=signup"
+              className="inline-flex items-center gap-2 bg-[#FF5733] hover:bg-[#E04826] text-white font-semibold text-base px-8 py-3.5 rounded-md shadow-sm transition"
+            >
+              Start a Project <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/apply" className="ph-btn-secondary">
-              Apply to Be a Creative
+            <Link
+              href="/apply"
+              className="inline-flex items-center gap-2 bg-transparent hover:bg-white/10 text-white font-semibold text-base px-8 py-3.5 rounded-md border border-white/20 transition"
+            >
+              Become a Creative
             </Link>
           </div>
-
-          {/* Birmingham Skyline Silhouette */}
-          <svg className="ph-skyline-svg" viewBox="0 0 1200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M0 220h1200v-25h-40l-8-12h-22l-14 18h-46v-34l-40-18v52h-26v-65h-18v65h-16v-38h-24v38h-18v-80h-24v80h-14v-102h-32v102h-16v-55h-28v55h-20v-120h-44v120h-16v-75h-30v75h-18v-135h-50v135h-20v-85h-34v85h-16v-110h-42v110h-18v-60h-32v60h-24v-42h-28v42h-22v-88h-46v88h-18v-65h-36v65h-18v-38h-28v38h-20v-50h-34v50H0v25z"
-              fill="#f08a62"
-              fillOpacity="0.8"
-            />
-            <path
-              d="M75 125c0-6 5-11 11-11s11 5 11 11-5 11-11 11-11-5-11-11zm11 14c-11 0-20 9-20 20v38h40v-38c0-11-9-20-20-20zm-3-50l15-22 9 6-15 22-9-6zm-13 110h30v26H70v-26z"
-              fill="#e54307"
-              fillOpacity="0.9"
-            />
-          </svg>
         </div>
       </section>
 
-      {/* Modal Dialog */}
+      {/* PROJECT DETAILS MODAL */}
       {selected && (
-        <div className="ph-modal" onClick={() => setSelected(null)}>
-          <div className="ph-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="ph-dialog-media">
-              <img src={selected.image} alt={selected.title} />
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+          onClick={() => setSelected(null)}
+        >
+          <div
+            className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-[#E2E8F0] shadow-2xl relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setSelected(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-[#0F172A] p-1.5 rounded-md hover:bg-slate-100 transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="h-64 sm:h-72 w-full bg-slate-100 overflow-hidden">
+              <img
+                src={selected.image}
+                alt={selected.title}
+                className="w-full h-full object-cover"
+              />
             </div>
-            <div className="ph-dialog-info">
-              <div>
-                <button className="ph-close" onClick={() => setSelected(null)} aria-label="Close">
-                  &times;
-                </button>
-                <span className="ph-cat">{selected.category}</span>
-                <h2>{selected.title}</h2>
-                <div style={{ color: "#64748b", fontSize: "12.5px", fontWeight: "600", marginBottom: "10px" }}>
-                  {selected.client}
+
+            <div className="p-6">
+              <span className="text-xs font-mono font-bold text-[#FF5733] uppercase">
+                {selected.category}
+              </span>
+              <h3 className="text-2xl font-extrabold text-[#142B20] mt-1">
+                {selected.title}
+              </h3>
+              <p className="text-xs text-slate-500 font-mono mt-1">
+                Client: {selected.client}
+              </p>
+
+              {selected.designer && (
+                <div className="mt-3 p-3 rounded-lg bg-[#FAF8F5] border border-[#E2E8F0] flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-[#142B20] text-[#38BDF8] text-xs font-bold flex items-center justify-center shadow-xs shrink-0">
+                      {selected.designer[0]}
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-[#142B20]">
+                        Designed by {selected.designer}
+                      </div>
+                      <div className="text-[11px] text-[#0284C7] font-semibold">
+                        {selected.designerRole}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
+                    Verified Creative
+                  </span>
                 </div>
-                <p>{selected.description}</p>
-                <ul className="ph-specs">
-                  {selected.specs.map((s, i) => (
-                    <li key={i}>{s}</li>
+              )}
+
+              <p className="text-sm text-[#0F172A]/80 mt-4 leading-relaxed">
+                {selected.description}
+              </p>
+
+              <div className="mt-5 pt-4 border-t border-[#E2E8F0]">
+                <div className="text-xs font-mono font-bold text-[#142B20] mb-2">DELIVERABLE SPECIFICATIONS:</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-600">
+                  {selected.specs.map((s, idx) => (
+                    <div key={idx} className="flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>{s}</span>
+                    </div>
                   ))}
-                </ul>
-                <div className="ph-dialog-price">
-                  {selected.coins} Peach Coins &bull; Turnaround: {selected.turnaround}
                 </div>
               </div>
-              <Link
-                href="/auth?mode=signup"
-                className="ph-btn-primary"
-                onClick={() => setSelected(null)}
-                style={{ textAlign: "center" }}
-              >
-                Start a Similar Project &rarr;
-              </Link>
+
+              <div className="mt-6 pt-5 border-t border-[#E2E8F0] flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-sm font-mono">
+                  <span className="text-slate-500">Fixed Scope: </span>
+                  <strong className="text-[#FF5733] font-bold">{selected.coins} Peach Coins (${selected.coins * 50})</strong>
+                </div>
+
+                <Link
+                  href="/auth?mode=signup"
+                  onClick={() => setSelected(null)}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#FF5733] hover:bg-[#E04826] text-white text-sm font-semibold px-6 py-2.5 rounded-md transition shadow-sm"
+                >
+                  Start Similar Project <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="ph-footer">
-        <div className="ph-footer-inner">
-          <div>
-            <strong style={{ color: "var(--ph-green)", fontSize: "15px" }}>Peach Network</strong>
-            <div className="ph-footer-copy">Powered by Sweet As A Peach Creative Agency &bull; Birmingham, Alabama</div>
+      {/* FOOTER */}
+      <footer className="bg-white border-t border-[#E2E8F0] py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-center md:text-left">
+            <div className="text-base font-extrabold text-[#142B20]">Peach Network</div>
+            <div className="text-xs text-slate-500 mt-1">
+              Powered by Sweet As A Peach Creative Agency &bull; Birmingham, Alabama
+            </div>
           </div>
-          <div className="ph-footer-links">
-            <Link href="/business">Business Hub</Link>
-            <Link href="/creative">Creative Portal</Link>
-            <Link href="/legal/terms">Terms</Link>
-            <Link href="/legal/privacy">Privacy</Link>
-            <Link href="/legal/peach-coins">Coin Rules</Link>
+
+          <div className="flex flex-wrap items-center justify-center gap-6 text-xs font-medium text-slate-600">
+            <Link href="/business" className="hover:text-[#FF5733] transition">Business Hub</Link>
+            <Link href="/creative" className="hover:text-[#FF5733] transition">Creative Portal</Link>
+            <Link href="/legal/terms" className="hover:text-[#FF5733] transition">Terms</Link>
+            <Link href="/legal/privacy" className="hover:text-[#FF5733] transition">Privacy</Link>
+            <Link href="/legal/peach-coins" className="hover:text-[#FF5733] transition">Coin Rules</Link>
           </div>
         </div>
       </footer>
+
     </main>
   );
 }
