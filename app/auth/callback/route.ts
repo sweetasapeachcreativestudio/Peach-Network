@@ -101,8 +101,10 @@ export async function GET(request: Request) {
         destination = userRole === 'creative' ? '/hub' : '/dashboard/business';
       }
 
-      const response = NextResponse.redirect(`${origin}${destination}`);
+      const destination = userRole === 'creative' ? '/hub' : '/dashboard/business';
+const response = NextResponse.redirect(`${origin}${destination}`);
 
+response.cookies.set('peach_role', userRole, {
       response.cookies.set('peach_role', userRole, {
         path: '/',
         maxAge: 604800,
