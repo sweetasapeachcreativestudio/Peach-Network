@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Sparkles,
@@ -13,21 +13,12 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-function SignInFormContent() {
+export default function SignInPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  // Read URL params: ?role=partner|creative & mode=login|signup
-  const initialRole = searchParams.get("role") === "creative" ? "creative" : "partner";
-  const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
+  const [persona, setPersona] = useState<"partner" | "creative" | "business">("partner");
+  const [authMode, setAuthMode] = useState<"login" | "signup" | "recovery">("login");
 
-  // Role: "partner" (Business) | "creative" (Talent)
-  const [persona, setPersona] = useState<"partner" | "creative" | "business">(initialRole);
-
-  // Screen mode: "login" | "signup" | "recovery"
-  const [authMode, setAuthMode] = useState<"login" | "signup" | "recovery">(initialMode);
-
-  // Form input fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -37,17 +28,32 @@ function SignInFormContent() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState<string | null>(null);
 
-  // Recovery state
   const [recoveryStep, setRecoveryStep] = useState<"request" | "verify">("request");
   const [recoveryCode, setRecoveryCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [recoverySuccess, setRecoverySuccess] = useState<string | null>(null);
 
-  // 🎯 CATCH GOOGLE ACCESS TOKEN & FORWARD TO PROPER DASHBOARD
+  // Read URL query parameters safely without useSearchParams bailout:
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const hash = window.location.hash;
+      const params = new URLSearchParams(window.location.search);
+      const roleParam = params.get("role");
+      const modeParam = params.get("mode");
 
+      if (roleParam === "creative" || roleParam === "partner" || roleParam === "business") {
+        setPersona(roleParam === "creative" ? "creative" : "partner");
+      }
+      if (modeParam === "signup" || modeParam === "login" || modeParam === "signin" || modeParam === "recovery") {
+        setAuthMode(modeParam === "signin" ? "login" : (modeParam as "login" | "signup" | "recovery"));
+      }
+
+      const errorParam = params.get("error_description") || params.get("error");
+      if (errorParam) {
+        setAuthError(`Authentication notice: ${decodeURIComponent(errorParam)}`);
+      }
+
+      // 🎯 CATCH GOOGLE ACCESS TOKEN & FORWARD TO PROPER DASHBOARD
+      const hash = window.location.hash;
       if (hash && hash.includes("access_token")) {
         let targetRole = localStorage.getItem("peach_auth_role") || "business";
 
@@ -58,33 +64,11 @@ function SignInFormContent() {
         }
 
         localStorage.removeItem("peach_auth_role");
-
-        if (targetRole === "creative") {
-          window.location.href = "/hub";
-        } else {
-          window.location.href = "/dashboard/business";
-        }
+        window.location.href = targetRole === "creative" ? "/hub" : "/dashboard/business";
       }
     }
   }, []);
 
-  useEffect(() => {
-    const roleParam = searchParams.get("role");
-    const modeParam = searchParams.get("mode");
-    if (roleParam === "creative" || roleParam === "partner" || roleParam === "business") {
-      setPersona(roleParam === "creative" ? "creative" : "partner");
-    }
-    if (modeParam === "signup" || modeParam === "login" || modeParam === "signin" || modeParam === "recovery") {
-      setAuthMode(modeParam === "signin" ? "login" : (modeParam as "login" | "signup" | "recovery"));
-    }
-
-    const errorParam = searchParams.get("error_description") || searchParams.get("error");
-    if (errorParam) {
-      setAuthError(`Authentication notice: ${decodeURIComponent(errorParam)}`);
-    }
-  }, [searchParams]);
-
-  // Google Sign-In with Real Dashboard Routing
   const handleGoogleSignIn = async () => {
     try {
       setIsGoogleLoading(true);
@@ -92,22 +76,19 @@ function SignInFormContent() {
 
       const isPartner = persona === "partner" || persona === "business";
       const assignedRole = isPartner ? "business" : "creative";
-      
-      // 🎯 FIXED DESTINATIONS (Pointing to real existing pages, not 404 /business)
       const targetRoute = isPartner ? "/dashboard/business" : "/hub";
 
-      // Save role so it persists through Google's redirect
       localStorage.setItem("peach_auth_role", assignedRole);
 
       const redirectUrl = `${window.location.origin}/auth/callback?role=${assignedRole}&next=${encodeURIComponent(targetRoute)}`;
 
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
           redirectTo: redirectUrl,
           queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
+            access_type: "offline",
+            prompt: "consent",
           },
         },
       });
@@ -124,7 +105,6 @@ function SignInFormContent() {
     }
   };
 
-  // Email + Password Login
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
@@ -162,7 +142,6 @@ function SignInFormContent() {
     }
   };
 
-  // Password recovery
   const handleSendRecovery = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
@@ -180,7 +159,6 @@ function SignInFormContent() {
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-slate-900 font-sans antialiased flex flex-col justify-between selection:bg-[#FF5733]/20 selection:text-[#FF5733] relative">
-      {/* Top Bar with Back Button */}
       <header className="relative z-10 w-full px-4 sm:px-8 py-5 flex items-center justify-between max-w-5xl mx-auto">
         <Link
           href="/"
@@ -198,10 +176,8 @@ function SignInFormContent() {
         </Link>
       </header>
 
-      {/* Centered Auth Card */}
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-6 sm:py-10">
         <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200/90 shadow-xl p-6 sm:p-8 md:p-9 transition-all">
-          {/* Role Switcher Tabs */}
           <div className="grid grid-cols-2 p-1 bg-[#FAF8F5] border border-slate-200 rounded-xl mb-6 shadow-2xs">
             <button
               type="button"
@@ -237,7 +213,6 @@ function SignInFormContent() {
             </button>
           </div>
 
-          {/* Heading */}
           <div className="text-center mb-6">
             <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#FF5733] mb-1.5">
               <Sparkles className="w-3.5 h-3.5" />
@@ -261,7 +236,6 @@ function SignInFormContent() {
             </p>
           </div>
 
-          {/* Error Message */}
           {authError && (
             <div className="mb-4 p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-xl leading-relaxed flex items-start gap-2.5">
               <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
@@ -269,7 +243,6 @@ function SignInFormContent() {
             </div>
           )}
 
-          {/* Success Banner */}
           {authSuccess && (
             <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-xl text-center flex items-center justify-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -277,7 +250,6 @@ function SignInFormContent() {
             </div>
           )}
 
-          {/* RECOVERY MODE */}
           {authMode === "recovery" ? (
             <div className="space-y-4">
               {recoverySuccess && (
@@ -287,3 +259,240 @@ function SignInFormContent() {
               )}
 
               {recoveryStep === "request" ? (
+                <form onSubmit={handleSendRecovery} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1.5">
+                      Account Email
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@company.com"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full bg-[#FF5733] hover:bg-[#E04826] text-white font-bold text-sm py-3 rounded-xl shadow-xs transition-colors cursor-pointer"
+                  >
+                    Send Reset Code &rarr;
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyRecovery} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1.5">
+                      6-Digit Code
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={6}
+                      value={recoveryCode}
+                      onChange={(e) => setRecoveryCode(e.target.value)}
+                      placeholder="123456"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-center text-lg font-bold tracking-widest text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1.5">
+                      New Password
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full bg-[#FF5733] hover:bg-[#E04826] text-white font-bold text-sm py-3 rounded-xl shadow-xs transition-colors cursor-pointer"
+                  >
+                    Update Password &amp; Sign In &rarr;
+                  </button>
+                </form>
+              )}
+
+              <div className="pt-2 text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode("login");
+                    setRecoveryStep("request");
+                    setRecoverySuccess(null);
+                  }}
+                  className="text-xs font-semibold text-slate-600 hover:text-[#FF5733] transition-colors cursor-pointer"
+                >
+                  &larr; Back to Sign In
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={isGoogleLoading}
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-[#CBD5E1] bg-white text-[#0F172A] font-bold text-sm hover:bg-[#F8FAFC] hover:border-[#94A3B8] transition-all shadow-sm active:scale-[0.99] mb-4 cursor-pointer disabled:opacity-60"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z"/>
+                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z"/>
+                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.16 0 9.98 0 12s.45 3.84 1.24 5.42l4.04-3.15z"/>
+                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                </svg>
+                <span>{isGoogleLoading ? "Connecting..." : (authMode === "signup" ? "Sign Up with Google" : "Continue with Google")}</span>
+              </button>
+
+              <div className="flex items-center gap-3 py-1">
+                <div className="flex-1 h-px bg-slate-200" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  or with email
+                </span>
+                <div className="flex-1 h-px bg-slate-200" />
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-3.5">
+                {authMode === "signup" && (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Jane Doe"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
+                    />
+                  </div>
+                )}
+
+                {authMode === "signup" && (persona === "partner" || persona === "business") && (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1">
+                      Business Name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={businessName}
+                      onChange={(e) => setBusinessName(e.target.value)}
+                      placeholder="My Business"
+                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@company.com"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide">
+                      Password
+                    </label>
+                    {authMode === "login" && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAuthMode("recovery");
+                          setRecoveryStep("request");
+                        }}
+                        className="text-xs font-semibold text-[#FF5733] hover:underline cursor-pointer"
+                      >
+                        Forgot password?
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || isGoogleLoading}
+                  className="w-full h-12 bg-[#FF5733] hover:bg-[#E04826] text-white font-bold text-sm rounded-xl shadow-xs hover:shadow transition-all mt-2 cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <span>Signing in...</span>
+                  ) : (
+                    <span>
+                      {authMode === "login"
+                        ? persona === "partner" || persona === "business"
+                          ? "Sign In to Business Dashboard →"
+                          : "Sign In to Creative Hub →"
+                        : "Create Account →"}
+                    </span>
+                  )}
+                </button>
+              </form>
+
+              <div className="text-center pt-3 text-xs text-slate-600">
+                {authMode === "login" ? (
+                  <span>
+                    New to Peach Network?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setAuthMode("signup")}
+                      className="font-bold text-[#FF5733] hover:underline cursor-pointer"
+                    >
+                      Create account
+                    </button>
+                  </span>
+                ) : (
+                  <span>
+                    Already have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setAuthMode("login")}
+                      className="font-bold text-[#FF5733] hover:underline cursor-pointer"
+                    >
+                      Sign in here
+                    </button>
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      <footer className="relative z-10 py-5 text-center text-xs text-slate-500 border-t border-slate-200/80 bg-white/50">
+        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div>
+            &copy; {new Date().getFullYear()} Peach Network • Sweet As A Peach Creative Agency. All rights reserved.
+          </div>
+          <div className="flex items-center gap-5 font-medium text-slate-600">
+            <Link href="/" className="hover:text-[#FF5733] transition-colors">
+              Marketplace Home
+            </Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
