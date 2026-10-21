@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import PhoneHeroMockup from "@/components/PhoneHeroMockup";
 import { X, Check } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 interface ProjectItem {
   id: number;
@@ -140,6 +141,67 @@ export default function HomePage() {
   const [contactTopic, setContactTopic] = useState("Question About the App");
   const [contactMessage, setContactMessage] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
+
+  // 🎯 CATCH GOOGLE OAUTH ACCESS TOKEN & FORWARD DIRECTLY TO DASHBOARD
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash;
+      const search = window.location.search;
+
+      // 1. If Supabase returned an access_token in the URL hash fragment:
+      if (hash && hash.includes("access_token")) {
+        let targetRole = localStorage.getItem("peach_auth_role") || "business";
+
+        // Check if role metadata was embedded in the token hash:
+        if (hash.includes('"role"%3A"creative"') || hash.includes('"role":"creative"')) {
+          targetRole = "creative";
+        } else if (
+          hash.includes('"role"%3A"business"') ||
+          hash.includes('"role":"business"') ||
+          hash.includes('"role"%3A"partner"') ||
+          hash.includes('"role":"partner"')
+        ) {
+          targetRole = "business";
+        }
+
+        localStorage.removeItem("peach_auth_role");
+
+        // Forward immediately without stopping on homepage
+        if (targetRole === "creative") {
+          window.location.href = "/hub";
+        } else {
+          window.location.href = "/dashboard/business";
+        }
+        return;
+      }
+
+      // 2. If Supabase returned with a PKCE code in query params:
+      if (search && search.includes("code=")) {
+        const params = new URLSearchParams(search);
+        const code = params.get("code");
+        if (code) {
+          const targetRole = localStorage.getItem("peach_auth_role") || "business";
+          const next = targetRole === "creative" ? "/hub" : "/dashboard/business";
+          window.location.href = `/auth/callback?code=${code}&next=${encodeURIComponent(next)}&role=${targetRole}`;
+          return;
+        }
+      }
+
+      // 3. Safety listener: If user just initiated Google auth and Supabase session establishes:
+      const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+        const pendingAuthRole = localStorage.getItem("peach_auth_role");
+        if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session?.user && pendingAuthRole) {
+          localStorage.removeItem("peach_auth_role");
+          const destination = pendingAuthRole === "creative" ? "/hub" : "/dashboard/business";
+          window.location.href = destination;
+        }
+      });
+
+      return () => {
+        authListener?.subscription.unsubscribe();
+      };
+    }
+  }, []);
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -903,7 +965,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 8. BASIC CONTACT & PARTNER FORM (Not talking about projects, just questions & partnerships) */}
+      {/* 8. BASIC CONTACT & PARTNER FORM */}
       <section id="contact" className="py-24 bg-white border-b border-slate-200">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
@@ -1136,7 +1198,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* 10. COLORFUL & OPTIMIZED FOOTER WITH LOGO, CONTACT INFO & WARM PALETTE */}
+      {/* 10. COLORFUL & OPTIMIZED FOOTER */}
       <footer className="bg-[#0B2D22] text-white border-t-4 border-[#FF5733] pt-16 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-12 pb-14 border-b border-emerald-900/60">
@@ -1158,91 +1220,4 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Column 2: Studio Contact Info (Moved here per user request) */}
-            <div className="md:col-span-4 space-y-3">
-              <div className="text-xs font-extrabold uppercase tracking-wider text-[#FFD8C2]">
-                Studio Contact &amp; Headquarters
-              </div>
-              <ul className="space-y-2.5 text-xs text-emerald-100/90">
-                <li className="flex flex-col">
-                  <span className="text-emerald-400 font-semibold text-[11px] uppercase tracking-wide">Email</span>
-                  <a
-                    href="mailto:sweetasapeachcreativestudio@gmail.com"
-                    className="hover:text-[#FFD8C2] transition-colors break-all font-medium"
-                  >
-                    sweetasapeachcreativestudio@gmail.com
-                  </a>
-                </li>
-                <li className="flex flex-col">
-                  <span className="text-emerald-400 font-semibold text-[11px] uppercase tracking-wide">Website</span>
-                  <a
-                    href="https://www.sweetasapeachcreativeca.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-[#FFD8C2] transition-colors font-medium"
-                  >
-                    www.sweetasapeachcreativeca.com
-                  </a>
-                </li>
-                <li className="flex flex-col">
-                  <span className="text-emerald-400 font-semibold text-[11px] uppercase tracking-wide">Location</span>
-                  <span className="font-medium text-white">Birmingham, Alabama</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 3: Quick Navigation */}
-            <div className="md:col-span-3 space-y-3">
-              <div className="text-xs font-extrabold uppercase tracking-wider text-[#FFD8C2]">
-                Platform Navigation
-              </div>
-              <ul className="space-y-2 text-xs font-medium text-emerald-100/80">
-                <li>
-                  <a href="#about" className="hover:text-white transition-colors">About Us</a>
-                </li>
-                <li>
-                  <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
-                </li>
-                <li>
-                  <a href="#pricing" className="hover:text-white transition-colors">Pricing &amp; Memberships</a>
-                </li>
-                <li>
-                  <a href="#why-choose-us" className="hover:text-white transition-colors">Why Choose Us</a>
-                </li>
-                <li>
-                  <Link href="/login" className="hover:text-[#FFD8C2] transition-colors text-white font-semibold">
-                    Start a Project &rarr;
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/apply" className="hover:text-[#FFD8C2] transition-colors">
-                    Apply as a Creative
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom Sub-Footer Bar */}
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-emerald-300/70">
-            <div>
-              &copy; {new Date().getFullYear()} Peach Network &bull; Sweet As A Peach Creative Agency. All rights reserved.
-            </div>
-
-            <div className="flex items-center gap-6">
-              <Link href="/legal/terms" className="hover:text-white transition-colors">
-                Terms of Service
-              </Link>
-              <Link href="/legal/privacy" className="hover:text-white transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/legal/peach-coins" className="hover:text-white transition-colors">
-                Coin Rules
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </main>
-  );
-}
+            {/* Column
