@@ -33,8 +33,24 @@ export default async function BusinessDashboard() {
   const {data:profile} = await admin.from("profiles").select("full_name,role,avatar_url").eq("id", user.id).single();
   if (profile?.role === "creative") redirect("/creative");
   if (profile?.role === "admin") redirect("/admin");
-  const {data:business} = await admin.from("businesses").select("id,name,industry,logo_url").eq("owner_user_id",user.id).single();
-  if (!business) redirect("/auth?role=business&mode=signup");
+  let {data:business} = await admin.from("businesses").select("id,name,industry,logo_url").eq("owner_user_id",user.id).maybeSingle();
+  if (!business) {
+    const bizName = user.user_metadata?.business_name || (profile?.full_name ? `${profile.full_name}'s Business` : "My Business");
+    const { data: createdBiz } = await admin.from("businesses").insert({
+      owner_user_id: user.id,
+      name: bizName,
+      industry: "Commercial & Creative",
+    }).select("id,name,industry,logo_url").single();
+    business = createdBiz;
+    if (business) {
+      await admin.from("coin_wallets").insert({
+        business_id: business.id,
+        available_coins: 0,
+        held_coins: 0,
+      });
+    }
+  }
+  if (!business) redirect("/signin?role=partner");
   const [{data:wallet},{data:projects},{data:brandAssets}] = await Promise.all([
     admin.from("coin_wallets").select("available_coins,held_coins").eq("business_id",business.id).maybeSingle(),
     admin.from("projects").select("id,title,category,status,coin_amount,due_at,created_at,assigned_creative_id,revision_rounds").eq("business_id",business.id).order("created_at",{ascending:false}),

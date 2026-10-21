@@ -61,18 +61,46 @@ function SignInFormContent() {
     }
   }, [searchParams]);
 
-  // Real Supabase Google OAuth Handler
+  // Google Sign-In with role-based routing (Vercel Supabase OAuth + Preview iframe support)
   const handleGoogleSignIn = async () => {
     try {
       setIsGoogleLoading(true);
       setAuthError(null);
 
-      // Determines where to send the user after Google approves login
-      const targetRoute = (persona === "partner" || persona === "business") 
-        ? "/dashboard/business" 
-        : "/hub";
+      const isPartner = persona === "partner" || persona === "business";
+      const assignedRole = isPartner ? "business" : "creative";
+      const targetRoute = isPartner ? "/business" : "/creative";
 
-      const redirectUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(targetRoute)}`;
+      // Detect if in iframe (such as AI Studio preview) where Google blocks iframe login
+      const isIframe = typeof window !== "undefined" && window.self !== window.top;
+
+      if (isIframe) {
+        setAuthSuccess(`Preview mode: Connecting to ${isPartner ? "Business" : "Creative"} Home...`);
+        const user = {
+          id: isPartner ? "usr_business_demo" : "usr_creative_demo",
+          email: isPartner ? "partner@peachnetwork.com" : "creative@peachnetwork.com",
+          role: assignedRole,
+          user_metadata: {
+            full_name: isPartner ? "Peach Partner" : "Peach Creative",
+            role: assignedRole,
+            business_name: isPartner ? "Magic City Brands" : undefined,
+          },
+        };
+        try {
+          document.cookie = `peach_session=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=604800; SameSite=None; Secure`;
+          document.cookie = `peach_role=${assignedRole}; path=/; max-age=604800; SameSite=None; Secure`;
+          localStorage.setItem("peach_session", JSON.stringify(user));
+          localStorage.setItem("peach_role", assignedRole);
+        } catch {}
+
+        setTimeout(() => {
+          router.push(targetRoute);
+        }, 500);
+        return;
+      }
+
+      // Live environment (e.g. Vercel): call Supabase Google OAuth
+      const redirectUrl = `${window.location.origin}/auth/callback?role=${assignedRole}&next=${encodeURIComponent(targetRoute)}`;
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -108,7 +136,9 @@ function SignInFormContent() {
     setLoading(true);
     setAuthError(null);
     setAuthSuccess(null);
-    const assignedRole = persona === "partner" ? "business" : "creative";
+    const isPartner = persona === "partner" || persona === "business";
+    const assignedRole = isPartner ? "business" : "creative";
+    const targetRoute = isPartner ? "/business" : "/creative";
 
     try {
       const res = await fetch("/api/auth/session", {
@@ -138,11 +168,7 @@ function SignInFormContent() {
         localStorage.setItem("peach_role", assignedRole);
       } catch {}
 
-      if (persona === "partner") {
-        router.push("/dashboard/business");
-      } else {
-        router.push("/hub");
-      }
+      router.push(targetRoute);
     } catch (err: unknown) {
       setAuthError(err instanceof Error ? err.message : "An error occurred during authentication.");
       setLoading(false);

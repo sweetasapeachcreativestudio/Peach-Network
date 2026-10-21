@@ -4,7 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') || '/dashboard/business';
+  const next = searchParams.get('next');
+  const roleParam = searchParams.get('role');
 
   if (code) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder-project.supabase.co';
@@ -12,23 +13,104 @@ export async function GET(request: Request) {
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      const response = NextResponse.redirect(`${origin}${next}`);
-      if (data?.user) {
-        const role = next.includes('hub') || next.includes('creative') ? 'creative' : 'business';
-        response.cookies.set('peach_role', role, {
-          path: '/',
-          maxAge: 604800,
-          sameSite: 'none',
-          secure: true,
-        });
-        response.cookies.set('peach_session', encodeURIComponent(JSON.stringify(data.user)), {
-          path: '/',
-          maxAge: 604800,
-          sameSite: 'none',
-          secure: true,
-        });
+    if (!error && data?.user) {
+      const user = data.user;
+
+      // Determine target role:
+      // 1. Explicit role parameter
+      // 2. Path inspection (/hub or /creative)
+      // 3. User metadata
+      let userRole: 'business' | 'creative' = 'business';
+      if (roleParam === 'creative' || (next && (next.includes('hub') || next.includes('creative')))) {
+        userRole = 'creative';
       }
+
+      // Check existing profile in Supabase
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profile?.role === 'creative' || profile?.role === 'business') {
+          userRole = profile.role;
+        } else {
+          await supabase.from('profiles').upsert({
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
+            role: userRole,
+          });
+        }
+      } catch {}
+
+      // Guarantee business or creative record exists
+      try {
+        if (userRole === 'business') {
+          const { data: existingBiz } = await supabase
+            .from('businesses')
+            .select('id')
+            .eq('owner_user_id', user.id)
+            .maybeSingle();
+
+          if (!existingBiz) {
+            const bizName = user.user_metadata?.business_name || (user.user_metadata?.full_name ? `${user.user_metadata.full_name}'s Business` : 'My Business');
+            const { data: createdBiz } = await supabase
+              .from('businesses')
+              .insert({
+                owner_user_id: user.id,
+                name: bizName,
+                industry: 'Commercial & Creative',
+              })
+              .select('id')
+              .single();
+
+            if (createdBiz) {
+              await supabase.from('coin_wallets').insert({
+                business_id: createdBiz.id,
+                available_coins: 0,
+                held_coins: 0,
+              });
+            }
+          }
+        } else {
+          const { data: existingCr } = await supabase
+            .from('creatives')
+            .select('id')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          if (!existingCr) {
+            await supabase.from('creatives').insert({
+              user_id: user.id,
+              application_status: 'approved',
+              peach_level: 'fresh',
+              primary_specialty: 'Graphic Design & Branding',
+              city: 'Birmingham',
+              state: 'AL',
+            });
+          }
+        }
+      } catch {}
+
+      // Route directly to the corresponding home page!
+      const destination = userRole === 'creative' ? '/creative' : '/business';
+      const response = NextResponse.redirect(`${origin}${destination}`);
+
+      response.cookies.set('peach_role', userRole, {
+        path: '/',
+        maxAge: 604800,
+        sameSite: 'none',
+        secure: true,
+      });
+      response.cookies.set('peach_session', encodeURIComponent(JSON.stringify(user)), {
+        path: '/',
+        maxAge: 604800,
+        sameSite: 'none',
+        secure: true,
+      });
+
       return response;
     }
   }
