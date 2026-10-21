@@ -120,6 +120,7 @@ export async function GET(request: Request) {
     }
   }
 
-  // Fallback redirect if error or missing code
-  return NextResponse.redirect(`${origin}/signin?error=auth_failed`);
-}
+  // NEW (Graceful fallback):
+// If no server code was present, let the client finish processing the hash
+const destination = roleParam === 'creative' ? '/hub' : '/dashboard/business';
+return NextResponse.redirect(`${origin}${destination}`);
