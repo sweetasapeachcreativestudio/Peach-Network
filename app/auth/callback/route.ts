@@ -1,41 +1,38 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
-function safeNext(value: string | null) {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/account";
-  return value;
-}
-
-export async function GET(request: NextRequest) {
-  const url = new URL(request.url);
-  const code = url.searchParams.get("code");
-  const tokenHash = url.searchParams.get("token_hash");
-  const type = url.searchParams.get("type");
-  const next = safeNext(url.searchParams.get("next"));
-  const requestedRole = url.searchParams.get("role") === "creative" ? "creative" : "business";
-  const supabase = await createClient();
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url);
+  const code = searchParams.get('code');
+  const next = searchParams.get('next') || '/dashboard/business';
 
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder-project.supabase.co';
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key';
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      const { data: auth } = await supabase.auth.getUser();
-      if (auth.user) {
-        const { data: profile } = await supabase.from("profiles").select("role").eq("id", auth.user.id).maybeSingle();
-        if (!profile) {
-          await supabase.auth.updateUser({ data: { ...auth.user.user_metadata, role: requestedRole } });
-        }
+      const response = NextResponse.redirect(`${origin}${next}`);
+      if (data?.user) {
+        const role = next.includes('hub') || next.includes('creative') ? 'creative' : 'business';
+        response.cookies.set('peach_role', role, {
+          path: '/',
+          maxAge: 604800,
+          sameSite: 'none',
+          secure: true,
+        });
+        response.cookies.set('peach_session', encodeURIComponent(JSON.stringify(data.user)), {
+          path: '/',
+          maxAge: 604800,
+          sameSite: 'none',
+          secure: true,
+        });
       }
-      return NextResponse.redirect(new URL(next, url.origin));
+      return response;
     }
   }
 
-  if (tokenHash && type) {
-    const { error } = await supabase.auth.verifyOtp({
-      token_hash: tokenHash,
-      type: type as "signup" | "email" | "recovery" | "invite" | "email_change",
-    });
-    if (!error) return NextResponse.redirect(new URL(next, url.origin));
-  }
-
-  return NextResponse.redirect(new URL("/auth?mode=signin&error=confirmation", url.origin));
+  // Fallback redirect if error or missing code
+  return NextResponse.redirect(`${origin}/signin?error=auth_failed`);
 }

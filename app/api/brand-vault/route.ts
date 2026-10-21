@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     if (!new RegExp(`^${business.id}/[0-9a-f-]{36}/[a-zA-Z0-9._-]+$`).test(path)) return NextResponse.json({error:"Invalid asset upload."},{status:400});
     originalName = path.split("/").pop()!;
     const {data,error} = await admin.storage.from("brand-vault").list(path.slice(0,path.lastIndexOf("/")),{search:originalName});
-    const file = data?.find(f=>f.name===originalName);
+    const file = data?.find((f: any)=>f.name===originalName);
     if (error || !file) return NextResponse.json({error:"Upload not found. Please upload the file again."},{status:400});
     size = Number(file.metadata?.size??0);
     if (size>25*1024*1024) return NextResponse.json({error:"Files must be 25 MB or smaller."},{status:400});

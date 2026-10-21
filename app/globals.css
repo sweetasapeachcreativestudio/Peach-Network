@@ -365,3 +365,33 @@ body{background:var(--pn-bg);color:var(--pn-ink)}
 
 /* compact auth refinement */
 @media(min-width:900px){.pn-login-page{padding:18px 20px}.pn-login-shell{max-width:1000px;max-height:94vh}.pn-login-showcase{padding:22px 26px}.pn-login-badges{margin-bottom:12px}.pn-login-photo{aspect-ratio:4/3.75;max-height:520px}.pn-login-project-card{margin-top:12px;padding:12px 16px}.pn-login-project-card h2{font-size:15px}.pn-login-project-card p{margin-bottom:7px}.pn-login-form-panel{padding:26px 38px}.pn-login-logo{margin-bottom:12px;max-width:185px}.pn-login-role{margin-bottom:14px}.pn-login-role button{height:36px}.pn-login-form-panel h1{font-size:26px;margin:5px 0 6px}.pn-login-sub{margin-bottom:12px}.pn-login-form-panel .auth-tabs{margin:8px 0}.pn-google-btn{height:44px;margin:10px 0}.pn-login-divider{margin:0 0 10px}.pn-login-form-panel label{margin-bottom:9px}.pn-login-form-panel .field{min-height:44px}.pn-login-forgot{margin:-2px 0 8px}.pn-login-form-panel .btn-large{min-height:46px}.pn-login-home{margin-top:10px}}
+
+/* Performance-Optimized Hardware-Accelerated Animations */
+@keyframes marqueeScroll {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+.animate-marquee-scroll {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 36s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+.animate-marquee-scroll:hover {
+  animation-play-state: paused;
+}
+
+@keyframes smoothFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -8px, 0); }
+}
+
+.animate-smooth-float {
+  animation: smoothFloat 5s ease-in-out infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}

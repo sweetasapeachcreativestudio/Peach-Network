@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Peach Network",
-  description: "Vetted creative talent, matched to the work that needs them.",
+  description: "On-demand creative platform connecting businesses with vetted local commercial designers. Operated by Sweet As A Peach Creative Agency in Birmingham, Alabama.",
   applicationName: "Peach Network",
 };
 

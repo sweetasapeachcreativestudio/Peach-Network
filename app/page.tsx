@@ -3,22 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import PhoneHeroMockup from "@/components/PhoneHeroMockup";
-import {
-  ShieldCheck,
-  Zap,
-  Users,
-  Lock,
-  ArrowRight,
-  Palette,
-  Printer,
-  Share2,
-  Layers,
-  Layout,
-  Check,
-  ChevronRight,
-  X,
-  Sparkles,
-} from "lucide-react";
+import { X, Check } from "lucide-react";
 
 interface ProjectItem {
   id: number;
@@ -26,7 +11,7 @@ interface ProjectItem {
   client: string;
   category: string;
   coins: number;
-  turnaround: string;
+  timeline: string;
   image: string;
   description: string;
   specs: string[];
@@ -41,12 +26,18 @@ const PROJECTS: ProjectItem[] = [
     client: "Runa",
     category: "Logo & Vector Kit",
     coins: 4,
-    turnaround: "4 Days",
+    timeline: "Est. 3–4 Days",
     image: "/project 7.jpg",
     designer: "Jose Garcia",
     designerRole: "Illustrator & Video Editor • ADDY Award Winner (Troy University)",
-    description: "High-precision vector logo and identity kit created by Jose Garcia, ADDY Award-winning illustrator and video editor at Troy University.",
-    specs: ["Primary Logo & Moon Icon", "Apparel Vector Artwork", "100% Scalable Vector SVGs", "Print & Screen Pre-Flight Passed"],
+    description:
+      "High-precision vector logo and identity kit created by Jose Garcia, ADDY Award-winning illustrator and video editor at Troy University.",
+    specs: [
+      "Primary Logo & Moon Icon",
+      "Apparel Vector Artwork",
+      "100% Scalable Vector SVGs",
+      "Print & Screen Pre-Flight Passed",
+    ],
   },
   {
     id: 2,
@@ -54,12 +45,18 @@ const PROJECTS: ProjectItem[] = [
     client: "Lillian Hewitt, Black Women's Heart Health, LLC",
     category: "UI/UX & Art Direction",
     coins: 8,
-    turnaround: "5–7 Days",
+    timeline: "Est. 5–7 Days",
     image: "/lillian-project.jpg",
     designer: "Stephanie Stewart",
     designerRole: "UI/UX Designer & Art Director (Troy University)",
-    description: "Designed by Stephanie Stewart, UI/UX Designer & Art Director at Troy University for Lillian Hewitt's Empower Her Heart initiative.",
-    specs: ["Responsive Web Experience", "Mobile Health UI Prototype", "Figma Design System Tokens", "Art Direction & Brand Collateral"],
+    description:
+      "Designed by Stephanie Stewart, UI/UX Designer & Art Director at Troy University for Lillian Hewitt's Empower Her Heart initiative.",
+    specs: [
+      "Responsive Web Experience",
+      "Mobile Health UI Prototype",
+      "Figma Design System Tokens",
+      "Art Direction & Brand Collateral",
+    ],
   },
   {
     id: 3,
@@ -67,12 +64,18 @@ const PROJECTS: ProjectItem[] = [
     client: "Bessemer Area Chamber of Commerce",
     category: "Logo & Brand Kit",
     coins: 6,
-    turnaround: "48 Hours",
+    timeline: "Est. 4–5 Days",
     image: "/Project 3.png",
     designer: "Donovan",
     designerRole: "Graphic Designer (Studying at SCAD)",
-    description: "Official civic chamber logo and brand kit designed by Donovan, graphic designer studying at SCAD (Savannah College of Art and Design).",
-    specs: ["Primary Civic Identity Seal", "Signage & Apparel Vector Art", "300 DPI CMYK Pre-Flight", "Brand Guidelines & Color Specs"],
+    description:
+      "Official civic chamber logo and brand kit designed by Donovan, graphic designer studying at SCAD (Savannah College of Art and Design).",
+    specs: [
+      "Primary Civic Identity Seal",
+      "Signage & Apparel Vector Art",
+      "300 DPI CMYK Pre-Flight",
+      "Brand Guidelines & Color Specs",
+    ],
   },
   {
     id: 4,
@@ -80,10 +83,16 @@ const PROJECTS: ProjectItem[] = [
     client: "Lawson State Community College",
     category: "Social Media Campaign",
     coins: 3,
-    turnaround: "48 Hours",
+    timeline: "Est. 2–3 Days",
     image: "/Project 1.png",
-    description: "A cohesive social campaign highlighting student achievement and program opportunities across Birmingham.",
-    specs: ["4 social media designs", "Feed & story formats", "Brand guidelines styling", "Editable source files"],
+    description:
+      "A cohesive social campaign highlighting student achievement and program opportunities across Birmingham.",
+    specs: [
+      "4 social media designs",
+      "Feed & story formats",
+      "Brand guidelines styling",
+      "Editable source files",
+    ],
   },
   {
     id: 5,
@@ -91,10 +100,16 @@ const PROJECTS: ProjectItem[] = [
     client: "New Joy Fellowship Baptist Church",
     category: "Editorial & Print Design",
     coins: 4,
-    turnaround: "48–72 Hours",
+    timeline: "Est. 3–4 Days",
     image: "/Project 4.png",
-    description: "A coordinated print and digital event suite for a historic Birmingham community congregation.",
-    specs: ["Print-ready program (300 DPI)", "Digital mobile version", "Social announcement graphics", "Archive vector files"],
+    description:
+      "A coordinated print and digital event suite for a historic Birmingham community congregation.",
+    specs: [
+      "Print-ready program (300 DPI)",
+      "Digital mobile version",
+      "Social announcement graphics",
+      "Archive vector files",
+    ],
   },
   {
     id: 6,
@@ -102,43 +117,16 @@ const PROJECTS: ProjectItem[] = [
     client: "Local Culinary & Artisan Market",
     category: "Print & Social Launch Kit",
     coins: 2,
-    turnaround: "48 Hours",
+    timeline: "Est. 2–3 Days",
     image: "/Project 2.png",
-    description: "Pre-scoped event kit: 1 high-res print flyer with 300 DPI press bleeds + matching Instagram square and story.",
-    specs: ["1 Commercial Print Flyer (CMYK)", "1 Instagram Square (1080x1080)", "1 Instagram Story (1080x1920)", "Stored in Brand Vault"],
-  },
-];
-
-const CAPABILITIES = [
-  {
-    role: "Brand Identity",
-    headline: "Logos, brand books, typography systems, and vector icon suites.",
-    icon: Palette,
-    deliverables: "Vector SVG, AI, EPS, Brand Guide",
-  },
-  {
-    role: "Commercial Print",
-    headline: "300 DPI CMYK event flyers, menus, banners, and brochures.",
-    icon: Printer,
-    deliverables: "Press Bleed Crop Marks, CMYK",
-  },
-  {
-    role: "Digital & Social",
-    headline: "Feed campaigns, promotional graphics, and 9:16 story assets.",
-    icon: Share2,
-    deliverables: "1080x1080 Feed, 1080x1920 Story",
-  },
-  {
-    role: "Product & Packaging",
-    headline: "Die-lines, apparel graphics, labels, and product mockup decks.",
-    icon: Layers,
-    deliverables: "Die-Cut Specs, High-Res Handoff",
-  },
-  {
-    role: "UI & Prototypes",
-    headline: "Responsive web designs, SaaS landing layouts, and Figma handoffs.",
-    icon: Layout,
-    deliverables: "Figma Components, Design Tokens",
+    description:
+      "Pre-scoped event kit: 1 high-res print flyer with 300 DPI press bleeds + matching Instagram square and story.",
+    specs: [
+      "1 Commercial Print Flyer (CMYK)",
+      "1 Instagram Square (1080x1080)",
+      "1 Instagram Story (1080x1920)",
+      "Stored in Brand Vault",
+    ],
   },
 ];
 
@@ -146,45 +134,54 @@ export default function HomePage() {
   const [selected, setSelected] = useState<ProjectItem | null>(null);
   const [pricingTab, setPricingTab] = useState<"project" | "membership">("project");
 
+  // Basic Contact / Partner / Question Form
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactTopic, setContactTopic] = useState("Question About the App");
+  const [contactMessage, setContactMessage] = useState("");
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactName.trim() || !contactEmail.trim() || !contactMessage.trim()) return;
+    setFormSubmitted(true);
+  };
+
   return (
-    <main className="min-h-screen bg-[#FAF8F5] relative text-[#0F172A] selection:bg-[#FF5733]/20 selection:text-[#FF5733]">
-      
-      {/* Subtle Peach Wallpaper Pattern (Turned down so you can hardly see it) */}
-      <div 
-        className="fixed inset-0 pointer-events-none opacity-[0.07] z-0"
+    <main className="min-h-screen bg-[#FAF8F5] relative text-slate-900 selection:bg-[#FF5733]/20 selection:text-[#FF5733] font-sans antialiased">
+      {/* Subtle Peach Wallpaper Pattern */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.04] z-0"
         style={{
           backgroundImage: "url('/brand/peach-pattern.svg')",
           backgroundRepeat: "repeat",
           backgroundSize: "180px 180px",
         }}
       />
-      
-      {/* Top Announcement Strip with Deep Royal Blue & Aqua Accent */}
-      <div className="relative z-10 bg-gradient-to-r from-blue-950 via-slate-900 to-indigo-950 text-sky-100 py-2.5 px-4 text-center text-xs font-medium tracking-wide border-b border-blue-900/50">
-        <span className="inline-flex items-center gap-1.5 text-cyan-300 font-bold mr-1.5">
+
+      {/* 1. TOP ANNOUNCEMENT BAR */}
+      <div className="relative z-10 bg-slate-950 text-slate-200 py-2.5 px-4 text-center text-xs font-medium tracking-wide border-b border-slate-800">
+        <span className="text-cyan-300 font-semibold mr-1.5">
           📍 Birmingham&rsquo;s Creative Marketplace
         </span>
-        <span className="text-slate-400">&bull;</span>{" "}
-        <strong className="text-white font-semibold">Vetted Creatives at the touch of a button.</strong>{" "}
-        <span className="text-slate-400">&bull;</span>{" "}
-        <span className="text-blue-200">Quality design work &amp; Creative Support</span>
+        <span className="text-slate-500">&bull;</span>{" "}
+        <strong className="text-white font-semibold ml-1.5">Real Local Human Talent</strong>
       </div>
 
       {/* 1. HEADER */}
       <header className="sticky top-0 z-40 bg-[#FFF5EE]/95 backdrop-blur-md border-b border-[#F0D5C7]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-          
-          {/* Logo: Authentic Peach Network Emblem / Wordmark */}
-          <Link href="/" className="flex items-center gap-3 group shrink-0">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 shrink-0">
             <img
               src="/brand/peach-network-logo.png"
               alt="Peach Network"
-              className="h-10 sm:h-11 w-auto object-contain transition-transform group-hover:scale-102"
+              className="h-10 sm:h-11 w-auto object-contain"
             />
           </Link>
 
-          {/* Menu Links: ALL IN A SINGLE ROW */}
-          <nav className="flex items-center gap-3 sm:gap-6 lg:gap-8 text-xs sm:text-sm font-semibold text-[#142B20]/90 whitespace-nowrap overflow-x-auto no-scrollbar py-1">
+          {/* Menu Links */}
+          <nav className="flex items-center gap-5 sm:gap-8 lg:gap-10 text-xs sm:text-sm font-semibold text-slate-800 whitespace-nowrap overflow-x-auto py-1">
             <a href="#about" className="hover:text-[#FF5733] transition-colors">
               About Us
             </a>
@@ -197,581 +194,846 @@ export default function HomePage() {
             <a href="#why-choose-us" className="hover:text-[#FF5733] transition-colors">
               Why Choose Us
             </a>
+            <a href="#contact" className="hover:text-[#FF5733] transition-colors">
+              Contact
+            </a>
           </nav>
 
-          {/* Header Right: Sign In + Coral Start a Project CTA */}
-          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-            {/* Sign In link */}
+          {/* Header Right: Sign In + High-converting Coral Start a Project CTA (No coin badge clutter) */}
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
             <Link
-              href="/auth?mode=signin"
-              className="text-xs sm:text-sm font-semibold text-[#142B20] hover:text-[#FF5733] transition-colors px-2 py-1"
+              href="/login"
+              className="text-xs sm:text-sm font-semibold text-slate-800 hover:text-[#FF5733] transition-colors px-2 py-1"
             >
               Sign In
             </Link>
 
-            {/* Electric Coral Start a Project button */}
             <Link
-              href="/auth?mode=signup"
-              className="inline-flex items-center gap-1.5 bg-[#FF5733] hover:bg-[#E04826] text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-md shadow-sm transition-all duration-150 hover:shadow"
+              href="/login"
+              className="inline-flex items-center gap-1.5 bg-[#FF5733] hover:bg-[#E04826] text-white text-xs sm:text-sm font-semibold px-4 sm:px-5 py-2.5 rounded-lg shadow-xs hover:shadow transition-all"
             >
-              Start a Project <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+              Start a Project &rarr;
             </Link>
           </div>
-
         </div>
       </header>
 
-      {/* 2 & 3. HERO SECTION (Peach Theme with Vetted Creatives) */}
-      <section className="relative overflow-hidden pt-8 pb-14 lg:pt-16 lg:pb-20 border-b border-[#F0D5C7] bg-gradient-to-b from-[#FDF2EC]/90 via-[#FCEAE0]/70 to-[#FAF8F5]/90">
-        {/* Ambient Glows: Warm Peach + Refreshing Aqua/Blue Orbs */}
-        <div className="absolute top-0 right-1/4 w-[480px] h-[480px] bg-gradient-to-br from-[#FFD8C2]/40 via-[#38BDF8]/15 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
-        <div className="absolute top-1/3 left-10 w-[380px] h-[380px] bg-gradient-to-tr from-sky-400/20 via-[#FFE2D1]/30 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
-
+      {/* 2. HERO SECTION */}
+      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-24 border-b border-[#F0D5C7] bg-gradient-to-b from-[#FDF2EC] via-[#FCEAE0]/70 to-[#FAF8F5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
-            
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
             {/* HERO LEFT COLUMN */}
             <div className="lg:col-span-6 flex flex-col items-start text-left z-10">
-              
-              {/* Creative Lockup Eyebrow: Birmingham's Creative Marketplace (Prominent & Stylish) */}
-              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 border border-sky-400/40 text-xs font-bold tracking-wider text-white shadow-md mb-5 group">
-                <span className="flex h-2.5 w-2.5 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400"></span>
-                </span>
-                <span className="text-cyan-300 font-extrabold uppercase tracking-widest text-[11px] sm:text-xs">
-                  BIRMINGHAM&rsquo;S CREATIVE MARKETPLACE
-                </span>
-                <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-sky-300/60" />
-                <span className="hidden sm:inline-flex items-center text-[10px] text-sky-200 bg-white/10 px-2 py-0.5 rounded-full border border-sky-300/30">
-                  Magic City Creatives
-                </span>
-              </div>
+              <p className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#1E3A8A] mb-4">
+                ✦ THE ON-DEMAND CREATIVE PLATFORM
+              </p>
 
-              {/* Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-black tracking-tight text-[#142B20] leading-[1.12]">
+              {/* H1 Headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-extrabold tracking-tight text-slate-950 leading-[1.1] text-balance">
                 Vetted Creatives at the{" "}
-                <span className="text-[#FF5733] italic font-serif">
-                  touch of a button.
+                <span className="text-[#FF5733] italic font-extrabold">
+                  Touch of a Button.
                 </span>
               </h1>
 
-              {/* Subhead: Quality design work & creative support */}
-              <p className="mt-6 text-base sm:text-lg text-[#142B20]/80 leading-relaxed font-normal max-w-xl">
-                Quality design work &amp; creative support for the South&rsquo;s business &amp; creative community. Fixed scopes, commercial pre-flight checks, and verified local talent ready to bring your vision to life.
+              {/* Subhead with comfortable breathing room */}
+              <p className="mt-6 text-base sm:text-lg text-slate-700 leading-relaxed max-w-xl">
+                Describe what you need in plain English. Get matched with top commercial designers at transparent coin pricing&mdash;with zero bidding wars, no hourly bloat, and no low-quality AI shortcuts.
               </p>
 
-              {/* Agency Credential Credit */}
-              <div className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-[#142B20] bg-white/80 border border-blue-200/60 px-3.5 py-1.5 rounded-md shadow-2xs">
-                <span className="text-base leading-none">🍑</span>
-                <span>Built by <strong className="text-[#FF5733]">Sweet As A Peach Creative Agency</strong></span>
-                <span className="text-blue-600 font-semibold ml-1 border-l border-slate-300 pl-2 text-[11px]">Birmingham, AL</span>
-              </div>
-
-              {/* Exactly Two Buttons Below: Coral Primary & Clean White Secondary with Blue hover */}
-              <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                {/* Primary Call to Action Button: I am A Business (Electric Coral) */}
+              {/* ACTION Buttons */}
+              <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
                 <Link
-                  href="/auth?mode=signup&role=business"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#FF5733] hover:bg-[#E04826] text-white text-base font-bold px-8 py-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-150"
+                  href="/login"
+                  className="inline-flex items-center justify-center gap-2 bg-[#FF5733] hover:bg-[#E04826] text-white text-base font-semibold px-8 py-3.5 rounded-lg shadow-sm hover:shadow transition-colors text-center"
                 >
-                  I am A Business <ArrowRight className="w-4 h-4 text-white" />
+                  Start a Project &rarr;
                 </Link>
 
-                {/* Secondary Button: I am A Creative (Clean Crisp White with Stone Border & Blue hover) */}
                 <Link
                   href="/apply"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-blue-50/50 text-[#142B20] hover:text-blue-700 border-2 border-[#E2E8F0] hover:border-blue-400 text-base font-bold px-8 py-4 rounded-lg shadow-2xs transition-all duration-150"
+                  className="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-900 border border-slate-300 text-base font-semibold px-8 py-3.5 rounded-lg transition-colors text-center shadow-2xs"
                 >
-                  I am A Creative
+                  Apply as a Creative
                 </Link>
               </div>
 
-              {/* Subtle Trust Indicators */}
-              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-[#142B20]/80">
-                <span className="flex items-center gap-1.5 text-[#142B20]">
-                  <Check className="w-3.5 h-3.5 text-blue-600" /> Hand-vetted talent
-                </span>
-                <span className="text-slate-400 hidden sm:inline">&bull;</span>
-                <span className="flex items-center gap-1.5 text-[#142B20]">
-                  <Check className="w-3.5 h-3.5 text-blue-600" /> Direct creative match
-                </span>
-                <span className="text-slate-400 hidden sm:inline">&bull;</span>
-                <span className="flex items-center gap-1.5 text-[#142B20]">
-                  <Zap className="w-3.5 h-3.5 text-blue-600" /> Fast process
-                </span>
+              {/* 4 Clean Proof Anchors */}
+              <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-slate-700">
+                <span>Real Human Craft</span>
+                <span className="text-slate-400">&bull;</span>
+                <span>Zero Bidding Wars</span>
+                <span className="text-slate-400">&bull;</span>
+                <span>Stackable Coin Banking</span>
+                <span className="text-slate-400">&bull;</span>
+                <span>Protected Milestone Release</span>
               </div>
             </div>
 
-            {/* HERO RIGHT COLUMN (Interactive 3D Floating Phone Mockup with iPad Studio & Books) */}
+            {/* HERO RIGHT COLUMN (3D Smartphone Mockup — Intact & Untouched) */}
             <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
               <PhoneHeroMockup />
             </div>
+          </div>
+        </div>
 
+        {/* Live Marketplace Scrolling Marquee Ribbon */}
+        <div className="mt-16 lg:mt-20 border-t border-b border-[#F0D5C7] bg-slate-950 backdrop-blur-md overflow-hidden py-3.5 select-none text-xs">
+          <div className="animate-marquee-scroll flex items-center whitespace-nowrap">
+            {[1, 2].map((loopIdx) => (
+              <div key={loopIdx} className="flex items-center gap-7 shrink-0 pr-7">
+                <span className="flex items-center gap-2 text-cyan-300 font-bold uppercase tracking-wider text-[11px]">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                  Built in Birmingham, Alabama
+                </span>
+                <span className="text-slate-600">&bull;</span>
+                <span className="text-[#FFD8C2] font-semibold">Vetted Creatives</span>
+                <span className="text-slate-600">&bull;</span>
+                <span className="text-white font-medium">Logo Design &amp; Brand Systems</span>
+                <span className="text-slate-600">&bull;</span>
+                <span className="text-white font-medium">Website Design</span>
+                <span className="text-slate-600">&bull;</span>
+                <span className="text-white font-medium">Social Media Marketing</span>
+                <span className="text-slate-600">&bull;</span>
+                <span className="text-sky-300 font-medium">Creative Campaigns</span>
+                <span className="text-slate-600">&bull;</span>
+                <span className="text-white font-medium">Photography &amp; Video</span>
+                <span className="text-slate-600">&bull;</span>
+                <span className="text-[#FFD8C2] font-medium">Dedicated Creative Support</span>
+                <span className="text-slate-600">&bull;</span>
+                <span className="text-white font-medium">Supporting Business Owners &amp; Local Creatives</span>
+                <span className="text-slate-600">&bull;</span>
+                <span className="text-cyan-300 font-semibold">Sweet As A Peach Creative Agency</span>
+                <span className="text-slate-600">&bull;</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* 4. WOW FACTOR STRIP (Below Hero) */}
-      <section className="py-12 bg-white border-b border-[#E2E8F0]">
+      {/* 3. HOW IT WORKS SECTION */}
+      <section id="how-it-works" className="py-24 bg-[#FAF8F5] border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            {/* Card 1: Zero Bidding Wars */}
-            <div className="bg-white border border-[#E2E8F0] p-6 rounded-lg shadow-xs hover:shadow-md transition-shadow">
-              <div className="w-10 h-10 rounded-md bg-[#FAF8F5] border border-[#E2E8F0] flex items-center justify-center text-[#FF5733] mb-4">
-                <Zap className="w-5 h-5" />
-              </div>
-              <h3 className="text-lg font-bold text-[#0F172A] mb-2">
-                Zero Bidding Wars
-              </h3>
-              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
-                No bidding wars or spam proposals. Fixed project units pair your brief directly with verified creative specialists ready to execute immediately.
-              </p>
-            </div>
-
-            {/* Card 2: 100% Vetted Talent */}
-            <div className="bg-white border border-[#E2E8F0] p-6 rounded-lg shadow-xs hover:shadow-md transition-shadow">
-              <div className="w-10 h-10 rounded-md bg-[#FAF8F5] border border-[#E2E8F0] flex items-center justify-center text-[#142B20] mb-4">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <h3 className="text-lg font-bold text-[#0F172A] mb-2">
-                100% Vetted Talent
-              </h3>
-              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
-                Every designer and art director is hand-screened for commercial craft, vector precision, and strict print pre-flight reliability.
-              </p>
-            </div>
-
-            {/* Card 3: Supporting Local Creatives */}
-            <div className="bg-white border border-[#E2E8F0] p-6 rounded-lg shadow-xs hover:shadow-md transition-shadow">
-              <div className="w-10 h-10 rounded-md bg-[#FAF8F5] border border-[#E2E8F0] flex items-center justify-center text-[#FF5733] mb-4">
-                <Users className="w-5 h-5" />
-              </div>
-              <h3 className="text-lg font-bold text-[#0F172A] mb-2">
-                Supporting Local Creatives
-              </h3>
-              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
-                Keeping marketing budgets and creative capital thriving locally across Birmingham and the South with equitable, transparent compensation.
-              </p>
-            </div>
-
-            {/* Card 4: Protected Payments */}
-            <div className="bg-white border border-[#E2E8F0] p-6 rounded-lg shadow-xs hover:shadow-md transition-shadow">
-              <div className="w-10 h-10 rounded-md bg-[#FAF8F5] border border-[#E2E8F0] flex items-center justify-center text-[#142B20] mb-4">
-                <Lock className="w-5 h-5" />
-              </div>
-              <h3 className="text-lg font-bold text-[#0F172A] mb-2">
-                Protected Payments
-              </h3>
-              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
-                Your coin funds remain completely protected and are only disbursed after you inspect and sign off on your commercial deliverables.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* HOW IT WORKS SECTION (Clean 3-Step Process) */}
-      <section id="how-it-works" className="py-20 bg-[#FAF8F5] border-b border-[#E2E8F0]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <span className="text-xs font-mono font-bold tracking-widest text-[#FF5733] uppercase">
-              STREAMLINED DISPATCH
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#142B20] mt-2">
-              From Raw Idea to Commercial Asset in 3 Steps
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950">
+              From Raw Idea to Finished Asset in 3 Steps
             </h2>
-            <p className="text-[#0F172A]/70 text-base mt-3">
-              Simple fixed-scope ordering with automated pre-flight certification.
+            <p className="text-slate-600 text-base sm:text-lg mt-4 leading-relaxed">
+              No bidding wars, no confusing creative jargon, and no hourly guessing.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white border border-[#E2E8F0] rounded-lg p-6 relative shadow-xs">
-              <div className="text-xs font-mono font-bold text-[#FF5733] mb-2">STEP 01</div>
-              <h3 className="text-xl font-bold text-[#142B20] mb-2">Scope Your Deliverable</h3>
-              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
-                Select your pre-packaged creative item—from a 2-Coin Event Flyer Kit to a 10-Coin Web UI Prototype. No scope creep, no hourly surprises.
-              </p>
-            </div>
-
-            <div className="bg-white border border-[#E2E8F0] rounded-lg p-6 relative shadow-xs">
-              <div className="text-xs font-mono font-bold text-[#FF5733] mb-2">STEP 02</div>
-              <h3 className="text-xl font-bold text-[#142B20] mb-2">Vetted Talent Dispatch</h3>
-              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
-                Our dispatch engine matches your brief with a pre-screened creative skilled in your specific discipline. Rapid kick-off with zero bidding delays.
-              </p>
-            </div>
-
-            <div className="bg-white border border-[#E2E8F0] rounded-lg p-6 relative shadow-xs">
-              <div className="text-xs font-mono font-bold text-[#FF5733] mb-2">STEP 03</div>
-              <h3 className="text-xl font-bold text-[#142B20] mb-2">Pre-Flight Delivery</h3>
-              <p className="text-sm text-[#0F172A]/70 leading-relaxed">
-                Receive commercial-grade assets: 300 DPI CMYK press bleed files, formatted feed &amp; story squares, plus permanent Brand Vault archival.
-              </p>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* CREATIVE CAPABILITIES (NO human photos or headshots, clean corporate cards) */}
-      <section id="why-choose-us" className="py-20 bg-white border-b border-[#E2E8F0]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
-            <div>
-              <span className="text-xs font-mono font-bold tracking-widest text-[#FF5733] uppercase">
-                COMMERCIAL DISCIPLINES
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#142B20] mt-2">
-                Enterprise Creative Support
-              </h2>
-              <p className="text-[#0F172A]/70 text-base mt-2">
-                Hand-vetted creative disciplines ready to produce your marketing collateral.
-              </p>
-            </div>
-
-            <Link
-              href="/auth?mode=signup"
-              className="mt-4 md:mt-0 inline-flex items-center gap-1.5 text-sm font-semibold text-[#FF5733] hover:underline"
-            >
-              Explore all packages <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {CAPABILITIES.map((c, i) => {
-              const IconComp = c.icon;
-              return (
-                <div
-                  key={i}
-                  className="bg-[#FAF8F5] border border-[#E2E8F0] rounded-lg p-6 hover:border-slate-300 transition-colors"
-                >
-                  <div className="w-12 h-12 rounded-md bg-white border border-[#E2E8F0] flex items-center justify-center text-[#142B20] mb-4">
-                    <IconComp className="w-6 h-6 text-[#FF5733]" />
-                  </div>
-                  <h3 className="text-lg font-bold text-[#142B20] mb-1.5">{c.role}</h3>
-                  <p className="text-sm text-[#0F172A]/70 mb-4 leading-relaxed">{c.headline}</p>
-                  <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-mono text-[#0F172A]/60">
-                    <span>SPECS:</span>
-                    <span className="font-semibold text-[#142B20]">{c.deliverables}</span>
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Final CTA Card */}
-            <div className="bg-[#142B20] text-white rounded-lg p-6 flex flex-col justify-between">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
+            {/* Step 01 */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xs flex flex-col justify-between">
               <div>
-                <span className="text-xs font-mono font-bold text-[#FF5733] uppercase">CUSTOM INQUIRY</span>
-                <h3 className="text-lg font-bold mt-1 text-white">Need a Multi-Asset Campaign?</h3>
-                <p className="text-sm text-white/80 mt-2 leading-relaxed">
-                  Our team packages custom multi-coin deliverables for large-scale launches, events, and rebrands.
+                <div className="text-xs font-extrabold text-[#FF5733] tracking-wider uppercase mb-3">
+                  STEP 01
+                </div>
+                <h3 className="text-xl font-bold tracking-tight text-slate-950 mb-3">Chat &amp; Scope in 60s</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Describe what you need in plain English. We calculate exact coin requirements, set technical commercial print specs, and lock your scope upfront.
                 </p>
               </div>
-              <Link
-                href="/auth?mode=signup"
-                className="mt-6 inline-flex items-center justify-center gap-2 bg-[#FF5733] hover:bg-[#E04826] text-white text-sm font-semibold px-4 py-2.5 rounded-md transition"
-              >
-                Request Custom Scope <ArrowRight className="w-4 h-4" />
-              </Link>
+              <div className="mt-8 pt-5 border-t border-slate-100 text-xs font-semibold text-slate-800">
+                Zero scope creep &bull; Fixed coin rate
+              </div>
+            </div>
+
+            {/* Step 02 */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="text-xs font-extrabold text-[#FF5733] tracking-wider uppercase mb-3">
+                  STEP 02
+                </div>
+                <h3 className="text-xl font-bold tracking-tight text-slate-950 mb-3">Pick From 3 Curated Pros</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  No 40-proposal bidding wars. Review exactly three verified local commercial designers matched to your industry and pick your favorite.
+                </p>
+              </div>
+              <div className="mt-8 pt-5 border-t border-slate-100 text-xs font-semibold text-slate-800">
+                Hand-screened Birmingham talent
+              </div>
+            </div>
+
+            {/* Step 03 */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="text-xs font-extrabold text-[#FF5733] tracking-wider uppercase mb-3">
+                  STEP 03
+                </div>
+                <h3 className="text-xl font-bold tracking-tight text-slate-950 mb-3">Approve &amp; Print</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Collaborate on a transparent project canvas. Receive guaranteed 300 DPI CMYK pre-flight files and Brand Vault archival. Payout is released only after your final sign-off.
+                </p>
+              </div>
+              <div className="mt-8 pt-5 border-t border-slate-100 text-xs font-semibold text-slate-800">
+                Commercial press-ready &bull; Safe sign-off
+              </div>
             </div>
           </div>
-
         </div>
       </section>
 
-      {/* PRICING SECTION (Clean Corporate Pricing Cards) */}
-      <section id="pricing" className="py-20 bg-[#FAF8F5] border-b border-[#E2E8F0]">
+      {/* 4. PRICING & MEMBERSHIP SECTION */}
+      <section id="pricing" className="py-24 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs font-mono font-bold tracking-widest text-[#FF5733] uppercase">
-              TRANSPARENT PRICING
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#142B20] mt-2">
-              Peach Coin Packages
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950">
+              Transparent Creative Pricing
             </h2>
-            <p className="text-[#0F172A]/70 text-base mt-2">
-              1 Peach Coin = $50 Standard Creative Value. Choose how you want to work.
+            <p className="text-slate-600 text-base sm:text-lg mt-4 leading-relaxed">
+              Choose on-demand single projects or flexible monthly memberships with stackable rollover coin banking.
             </p>
 
-            {/* Toggle (Clean corporate rounded-md buttons, NO pills) */}
-            <div className="mt-6 inline-flex p-1 bg-white border border-[#E2E8F0] rounded-md shadow-xs">
+            {/* Interactive 2-Tab Switch */}
+            <div className="mt-8 inline-flex p-1 bg-[#FAF8F5] border border-slate-200 rounded-xl shadow-xs">
               <button
                 type="button"
                 onClick={() => setPricingTab("project")}
-                className={`px-4 py-2 text-sm font-semibold rounded transition ${
+                className={`px-6 py-2.5 text-sm font-bold rounded-lg transition-all ${
                   pricingTab === "project"
-                    ? "bg-[#142B20] text-white shadow-xs"
-                    : "text-[#0F172A]/70 hover:text-[#0F172A]"
+                    ? "bg-slate-950 text-white shadow-xs"
+                    : "text-slate-600 hover:text-slate-950"
                 }`}
               >
-                By the Project (Pay-As-You-Go)
+                Pay-As-You-Go (Single Projects)
               </button>
               <button
                 type="button"
                 onClick={() => setPricingTab("membership")}
-                className={`px-4 py-2 text-sm font-semibold rounded transition ${
+                className={`px-6 py-2.5 text-sm font-bold rounded-lg transition-all ${
                   pricingTab === "membership"
-                    ? "bg-[#142B20] text-white shadow-xs"
-                    : "text-[#0F172A]/70 hover:text-[#0F172A]"
+                    ? "bg-slate-950 text-white shadow-xs"
+                    : "text-slate-600 hover:text-slate-950"
                 }`}
               >
-                Monthly Memberships
+                Monthly Memberships (Save &amp; Stack)
               </button>
             </div>
           </div>
 
+          {/* TAB 1: PAY-AS-YOU-GO */}
           {pricingTab === "project" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              
-              {/* Package 1 */}
-              <div className="bg-white border border-[#E2E8F0] rounded-lg p-6 flex flex-col justify-between shadow-xs">
-                <div>
-                  <div className="text-xs font-mono font-bold text-[#FF5733] uppercase">Quick Tasks</div>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-3xl font-extrabold text-[#0F172A]">$50</span>
-                    <span className="text-xs font-mono text-slate-500">/ Flat Rate</span>
+            <div>
+              <p className="text-center text-xs font-semibold text-slate-500 mb-10 max-w-xl mx-auto">
+                No monthly commitment. Buy coins on demand from $50 and start immediately.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* 1. Quick Tasks */}
+                <div className="bg-[#FAF8F5] border border-slate-200 rounded-2xl p-7 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors">
+                  <div>
+                    <div className="text-xs font-bold text-slate-700 uppercase tracking-wide">Quick Tasks</div>
+                    <div className="mt-2.5 flex items-baseline gap-1">
+                      <span className="text-3xl font-extrabold text-slate-950">$50</span>
+                      <span className="text-xs font-semibold text-slate-500">/ 1 Coin</span>
+                    </div>
+                    <div className="mt-2 text-xs font-semibold text-[#FF5733]">
+                      Est. 1–2 Days
+                    </div>
+                    <p className="text-xs text-slate-600 mt-4 leading-relaxed">
+                      Small graphics, social revisions, vector cleanups, banner edits, and quick file format conversions.
+                    </p>
                   </div>
-                  <p className="text-xs text-[#0F172A]/70 mt-3 leading-relaxed">
-                    Social promo graphic, menu price updates, event banner adjustments, or high-res vector conversion.
-                  </p>
+                  <div className="mt-8 pt-4 border-t border-slate-200">
+                    <Link
+                      href="/login"
+                      className="w-full inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-900 font-bold text-xs py-2.5 rounded-lg border border-slate-300 transition-colors shadow-2xs"
+                    >
+                      Start Project &rarr;
+                    </Link>
+                  </div>
                 </div>
-                <div className="mt-6 pt-4 border-t border-[#E2E8F0] text-xs font-mono text-slate-500 flex items-center justify-between">
-                  <span>TURNAROUND</span>
-                  <span className="font-bold text-[#142B20]">Fast Delivery</span>
+
+                {/* 2. Launch Kit (Most Popular) */}
+                <div className="bg-white border-2 border-[#FF5733] rounded-2xl p-7 flex flex-col justify-between shadow-sm relative">
+                  <div className="absolute -top-3 right-5 bg-[#FF5733] text-white text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded">
+                    MOST POPULAR
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-[#FF5733] uppercase tracking-wide">Launch Kit</div>
+                    <div className="mt-2.5 flex items-baseline gap-1">
+                      <span className="text-3xl font-extrabold text-slate-950">$100</span>
+                      <span className="text-xs font-semibold text-slate-500">/ 2 Coins</span>
+                    </div>
+                    <div className="mt-2 text-xs font-semibold text-[#FF5733]">
+                      Est. 3–4 Days
+                    </div>
+                    <p className="text-xs text-slate-600 mt-4 leading-relaxed">
+                      Complete promotional drop: 1 Commercial Print Flyer (300 DPI CMYK) + 1:1 Instagram Square + 9:16 Story format.
+                    </p>
+                  </div>
+                  <div className="mt-8 pt-4 border-t border-slate-200">
+                    <Link
+                      href="/login"
+                      className="w-full inline-flex items-center justify-center bg-[#FF5733] hover:bg-[#E04826] text-white font-bold text-xs py-2.5 rounded-lg transition-colors shadow-xs"
+                    >
+                      Start Project &rarr;
+                    </Link>
+                  </div>
+                </div>
+
+                {/* 3. Brand Starter */}
+                <div className="bg-[#FAF8F5] border border-slate-200 rounded-2xl p-7 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors">
+                  <div>
+                    <div className="text-xs font-bold text-slate-700 uppercase tracking-wide">Brand Starter</div>
+                    <div className="mt-2.5 flex items-baseline gap-1">
+                      <span className="text-3xl font-extrabold text-slate-950">$300</span>
+                      <span className="text-xs font-semibold text-slate-500">/ 6 Coins</span>
+                    </div>
+                    <div className="mt-2 text-xs font-semibold text-[#FF5733]">
+                      Est. 4–5 Days
+                    </div>
+                    <p className="text-xs text-slate-600 mt-4 leading-relaxed">
+                      Primary corporate logo, secondary mark, typography pairing, vector color kit, and master scalable SVG/AI handoffs.
+                    </p>
+                  </div>
+                  <div className="mt-8 pt-4 border-t border-slate-200">
+                    <Link
+                      href="/login"
+                      className="w-full inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-900 font-bold text-xs py-2.5 rounded-lg border border-slate-300 transition-colors shadow-2xs"
+                    >
+                      Start Project &rarr;
+                    </Link>
+                  </div>
+                </div>
+
+                {/* 4. Web & Prototypes */}
+                <div className="bg-[#FAF8F5] border border-slate-200 rounded-2xl p-7 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors">
+                  <div>
+                    <div className="text-xs font-bold text-slate-700 uppercase tracking-wide">Web &amp; Prototypes</div>
+                    <div className="mt-2.5 flex items-baseline gap-1">
+                      <span className="text-3xl font-extrabold text-slate-950">$500</span>
+                      <span className="text-xs font-semibold text-slate-500">/ 10 Coins</span>
+                    </div>
+                    <div className="mt-2 text-xs font-semibold text-[#FF5733]">
+                      Est. 5–7 Days
+                    </div>
+                    <p className="text-xs text-slate-600 mt-4 leading-relaxed">
+                      Responsive landing page or mobile prototype in Figma with interactive transitions, component tokens, and developer specs.
+                    </p>
+                  </div>
+                  <div className="mt-8 pt-4 border-t border-slate-200">
+                    <Link
+                      href="/login"
+                      className="w-full inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-900 font-bold text-xs py-2.5 rounded-lg border border-slate-300 transition-colors shadow-2xs"
+                    >
+                      Start Project &rarr;
+                    </Link>
+                  </div>
                 </div>
               </div>
-
-              {/* Package 2 (Featured) */}
-              <div className="bg-white border-2 border-[#FF5733] rounded-lg p-6 flex flex-col justify-between shadow-md relative">
-                <div className="absolute -top-3 right-4 bg-[#FF5733] text-white text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded">
-                  MOST POPULAR
-                </div>
-                <div>
-                  <div className="text-xs font-mono font-bold text-[#FF5733] uppercase">Launch Kits</div>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-3xl font-extrabold text-[#0F172A]">$100</span>
-                    <span className="text-xs font-mono text-slate-500">/ Flat Rate</span>
-                  </div>
-                  <p className="text-xs text-[#0F172A]/70 mt-3 leading-relaxed">
-                    Event Flyer Kit: Print-ready 8.5x11 flyer (300 DPI CMYK) + matching Instagram square &amp; story assets.
-                  </p>
-                </div>
-                <div className="mt-6 pt-4 border-t border-[#E2E8F0] text-xs font-mono text-slate-500 flex items-center justify-between">
-                  <span>TURNAROUND</span>
-                  <span className="font-bold text-[#FF5733]">48 Hours</span>
-                </div>
-              </div>
-
-              {/* Package 3 */}
-              <div className="bg-white border border-[#E2E8F0] rounded-lg p-6 flex flex-col justify-between shadow-xs">
-                <div>
-                  <div className="text-xs font-mono font-bold text-[#FF5733] uppercase">Brand Starters</div>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-3xl font-extrabold text-[#0F172A]">$300</span>
-                    <span className="text-xs font-mono text-slate-500">/ Flat Rate</span>
-                  </div>
-                  <p className="text-xs text-[#0F172A]/70 mt-3 leading-relaxed">
-                    Mini Brand Kit: Primary corporate logo, secondary mark, typography guidelines, color system, and master SVGs.
-                  </p>
-                </div>
-                <div className="mt-6 pt-4 border-t border-[#E2E8F0] text-xs font-mono text-slate-500 flex items-center justify-between">
-                  <span>TURNAROUND</span>
-                  <span className="font-bold text-[#142B20]">4–5 Days</span>
-                </div>
-              </div>
-
-              {/* Package 4 */}
-              <div className="bg-white border border-[#E2E8F0] rounded-lg p-6 flex flex-col justify-between shadow-xs">
-                <div>
-                  <div className="text-xs font-mono font-bold text-[#FF5733] uppercase">Web &amp; Prototypes</div>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-3xl font-extrabold text-[#0F172A]">$500</span>
-                    <span className="text-xs font-mono text-slate-500">/ Flat Rate</span>
-                  </div>
-                  <p className="text-xs text-[#0F172A]/70 mt-3 leading-relaxed">
-                    Full responsive desktop &amp; mobile Figma design prototype with interactive transitions and developer handoff.
-                  </p>
-                </div>
-                <div className="mt-6 pt-4 border-t border-[#E2E8F0] text-xs font-mono text-slate-500 flex items-center justify-between">
-                  <span>TURNAROUND</span>
-                  <span className="font-bold text-[#142B20]">5–7 Days</span>
-                </div>
-              </div>
-
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {/* Membership 1 */}
-              <div className="bg-white border border-[#E2E8F0] rounded-lg p-7 flex flex-col justify-between shadow-xs">
-                <div>
-                  <div className="text-xs font-mono font-bold text-[#0F172A]/60 uppercase">ESSENTIALS</div>
-                  <div className="text-2xl font-black text-[#142B20] mt-1">$499 <span className="text-xs font-normal text-slate-500">/mo</span></div>
-                  <div className="text-xs font-bold text-[#FF5733] mt-1">10 Peach Coins Monthly</div>
-                  <p className="text-xs text-[#0F172A]/70 mt-4 leading-relaxed">
-                    Ideal for ongoing graphic updates, weekly social promos, and monthly promotional collateral.
-                  </p>
-                </div>
-                <Link
-                  href="/auth?mode=signup"
-                  className="mt-8 block text-center bg-[#FAF8F5] hover:bg-[#E2E8F0] text-[#0F172A] font-semibold text-sm py-2.5 rounded-md border border-[#E2E8F0] transition"
-                >
-                  Choose Essentials &rarr;
-                </Link>
-              </div>
+            /* TAB 2: MONTHLY MEMBERSHIPS */
+            <div>
+              <p className="text-center text-xs font-semibold text-slate-500 mb-10 max-w-xl mx-auto">
+                Unused coins never vanish. Bank rollover coins to deploy whenever you need them.
+              </p>
 
-              {/* Membership 2 (Growth) */}
-              <div className="bg-white border-2 border-[#FF5733] rounded-lg p-7 flex flex-col justify-between shadow-md relative">
-                <div className="absolute -top-3 right-4 bg-[#FF5733] text-white text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded">
-                  POPULAR
-                </div>
-                <div>
-                  <div className="text-xs font-mono font-bold text-[#FF5733] uppercase">GROWTH</div>
-                  <div className="text-2xl font-black text-[#142B20] mt-1">$1,099 <span className="text-xs font-normal text-slate-500">/mo</span></div>
-                  <div className="text-xs font-bold text-[#FF5733] mt-1">24 Coins (+4 Bonus Coins)</div>
-                  <p className="text-xs text-[#0F172A]/70 mt-4 leading-relaxed">
-                    For scaling companies needing parallel design tasks, priority dispatch, and faster turnaround times.
-                  </p>
-                </div>
-                <Link
-                  href="/auth?mode=signup"
-                  className="mt-8 block text-center bg-[#FF5733] hover:bg-[#E04826] text-white font-semibold text-sm py-2.5 rounded-md shadow-xs transition"
-                >
-                  Choose Growth &rarr;
-                </Link>
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                {/* 1. Essential Plan */}
+                <div className="bg-[#FAF8F5] border border-slate-200 rounded-2xl p-8 flex flex-col justify-between shadow-xs">
+                  <div>
+                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wide">ESSENTIAL PLAN</div>
+                    <div className="text-3xl font-extrabold tracking-tight text-slate-950 mt-2">
+                      $499 <span className="text-xs font-normal text-slate-500">/ month</span>
+                    </div>
+                    <div className="mt-2.5 inline-block text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md">
+                      Replaces $3,000/mo agency retainers
+                    </div>
 
-              {/* Membership 3 */}
-              <div className="bg-white border border-[#E2E8F0] rounded-lg p-7 flex flex-col justify-between shadow-xs">
-                <div>
-                  <div className="text-xs font-mono font-bold text-[#0F172A]/60 uppercase">PARTNER</div>
-                  <div className="text-2xl font-black text-[#142B20] mt-1">$2,199 <span className="text-xs font-normal text-slate-500">/mo</span></div>
-                  <div className="text-xs font-bold text-[#FF5733] mt-1">50 Coins (+10 Bonus Coins)</div>
-                  <p className="text-xs text-[#0F172A]/70 mt-4 leading-relaxed">
-                    Full creative team replacement for high-volume content, video graphics, packaging, and campaigns.
-                  </p>
+                    <div className="mt-6 space-y-3 text-xs text-slate-700">
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        <span><strong>10 Peach Coins monthly</strong> ($500 creative value)</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        <span>1 active request at a time</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        <span>Rollover banking up to <strong>20 coins</strong></span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        <span>Full editable source files (.AI, .SVG, .EPS)</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        <span>Standard creative matching</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 pt-5 border-t border-slate-200">
+                    <Link
+                      href="/login"
+                      className="w-full inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-900 font-bold text-sm py-3 rounded-lg border border-slate-300 transition-colors shadow-2xs"
+                    >
+                      Join Essential ($499/mo) &rarr;
+                    </Link>
+                  </div>
                 </div>
-                <Link
-                  href="/auth?mode=signup"
-                  className="mt-8 block text-center bg-[#FAF8F5] hover:bg-[#E2E8F0] text-[#0F172A] font-semibold text-sm py-2.5 rounded-md border border-[#E2E8F0] transition"
-                >
-                  Choose Partner &rarr;
-                </Link>
+
+                {/* 2. Growth Plan (Most Popular) */}
+                <div className="bg-white border-2 border-[#FF5733] rounded-2xl p-8 flex flex-col justify-between shadow-md relative">
+                  <div className="absolute -top-3 right-6 bg-[#FF5733] text-white text-[10px] font-bold tracking-wider uppercase px-3 py-0.5 rounded">
+                    MOST POPULAR
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-[#FF5733] uppercase tracking-wide">GROWTH PLAN</div>
+                    <div className="text-3xl font-extrabold tracking-tight text-slate-950 mt-2">
+                      $1,099 <span className="text-xs font-normal text-slate-500">/ month</span>
+                    </div>
+                    <div className="mt-2.5 inline-block text-[11px] font-bold text-[#C2410C] bg-orange-50 border border-orange-200 px-2.5 py-0.5 rounded-md">
+                      Replaces $55,000/yr in-house designer salary
+                    </div>
+
+                    <div className="mt-6 space-y-3 text-xs text-slate-700">
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-[#FF5733] shrink-0 mt-0.5" />
+                        <span><strong>24 Peach Coins monthly</strong> ($1,200 creative value)</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-[#FF5733] shrink-0 mt-0.5" />
+                        <span><strong>2 active projects</strong> running at once</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-[#FF5733] shrink-0 mt-0.5" />
+                        <span>Includes <strong>Brand Asset Vault</strong> archival</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-[#FF5733] shrink-0 mt-0.5" />
+                        <span>Priority creative match &amp; dedicated pairing</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-[#FF5733] shrink-0 mt-0.5" />
+                        <span>Rollover banking up to <strong>48 coins</strong></span>
+                      </div>
+                      <div className="flex items-start gap-2 text-slate-500">
+                        <Check className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                        <span>Includes everything in Essential</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 pt-5 border-t border-slate-200">
+                    <Link
+                      href="/login"
+                      className="w-full inline-flex items-center justify-center bg-[#FF5733] hover:bg-[#E04826] text-white font-bold text-sm py-3 rounded-lg shadow-sm hover:shadow transition-colors"
+                    >
+                      Join Growth ($1,099/mo) &rarr;
+                    </Link>
+                  </div>
+                </div>
+
+                {/* 3. Partner Plan (Full Agency Replacement) */}
+                <div className="bg-[#FAF8F5] border border-slate-200 rounded-2xl p-8 flex flex-col justify-between shadow-xs">
+                  <div>
+                    <div className="text-xs font-bold text-slate-700 uppercase tracking-wide">PARTNER PLAN</div>
+                    <div className="text-3xl font-extrabold tracking-tight text-slate-950 mt-2">
+                      $2,000 <span className="text-xs font-normal text-slate-500">/ month</span>
+                    </div>
+                    <div className="mt-2.5 inline-block text-[11px] font-bold text-blue-900 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-md">
+                      Full Agency Replacement
+                    </div>
+
+                    <div className="mt-6 space-y-3 text-xs text-slate-700">
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
+                        <span><strong>50 Peach Coins monthly</strong> ($2,500 creative value)</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
+                        <span><strong>3 to 4 active projects</strong> running at once</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
+                        <span>Dedicated Pod: Lead Art Director on call</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
+                        <span>Priority queue dispatch</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
+                        <span>Rollover banking up to <strong>100 coins</strong></span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
+                        <span>Quarterly 1-on-1 creative strategy review</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
+                        <span>15% discount on top-up coin packs</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 pt-5 border-t border-slate-200">
+                    <Link
+                      href="/login"
+                      className="w-full inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-900 font-bold text-sm py-3 rounded-lg border border-slate-300 transition-colors shadow-2xs"
+                    >
+                      Join Partner ($2,000/mo) &rarr;
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           )}
-
         </div>
       </section>
 
-      {/* REAL DELIVERABLES GALLERY */}
-      <section id="about" className="py-20 bg-white border-b border-[#E2E8F0]">
+      {/* 5. WHY CHOOSE US / ANTI-AI MANIFESTO */}
+      <section id="why-choose-us" className="py-24 bg-[#FAF8F5] border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            {/* Real human creative photo - Clean, no overlaid words, seamlessly integrated into page */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="rounded-2xl overflow-hidden shadow-md border border-slate-200/80 bg-white max-w-sm w-full">
+                <img
+                  src="/Creative5.jpg"
+                  alt="Real human creators collaborating in Birmingham, Alabama"
+                  className="w-full h-auto max-h-[360px] object-cover mx-auto block"
+                />
+              </div>
+            </div>
+
+            {/* Content & Manifesto */}
+            <div className="lg:col-span-7">
+              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950">
+                Why Real Human Artistry Beats AI Slop
+              </h2>
+
+              <p className="mt-5 text-base sm:text-lg text-slate-700 leading-relaxed">
+                Generative AI creates blurry, unprintable files and invented fonts that print shops reject. Peach Network gives you conversational speed backed by real human designers who master commercial print bleeds and authentic branding.
+              </p>
+
+              {/* 3 Pillars - Clean, modern typography without icon boxes */}
+              <div className="mt-8 space-y-5 text-sm text-slate-800">
+                <div className="pl-4 border-l-2 border-[#FF5733]">
+                  <strong className="text-slate-950 font-bold block mb-1">
+                    Commercial Print Bleeds &amp; 300 DPI CMYK
+                  </strong>
+                  <span className="text-slate-600">
+                    Every file passes technical pre-flight inspection so your prints are crisp and color-accurate the first time.
+                  </span>
+                </div>
+
+                <div className="pl-4 border-l-2 border-[#1E3A8A]">
+                  <strong className="text-slate-950 font-bold block mb-1">
+                    100% Scalable Vector Handoffs
+                  </strong>
+                  <span className="text-slate-600">
+                    You receive true .AI, .SVG, and .EPS source files you own outright—never low-res flattened rasters.
+                  </span>
+                </div>
+
+                <div className="pl-4 border-l-2 border-emerald-600">
+                  <strong className="text-slate-950 font-bold block mb-1">
+                    Permanent Brand Asset Vault
+                  </strong>
+                  <span className="text-slate-600">
+                    Fonts, color tokens, and asset history are preserved across projects for consistent brand equity.
+                  </span>
+                </div>
+              </div>
+
+              {/* For Creatives Sub-Box */}
+              <div className="mt-10 p-6 bg-white border border-slate-200 rounded-2xl shadow-xs">
+                <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+                  <span className="text-xs font-bold text-[#FF5733] tracking-wide uppercase">
+                    FOR BIRMINGHAM CREATORS
+                  </span>
+                  <Link
+                    href="/apply"
+                    className="text-xs font-bold text-slate-900 hover:text-[#FF5733] transition-colors"
+                  >
+                    Apply to the Roster &rarr;
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-semibold text-slate-900">
+                  <div className="p-3 bg-[#FAF8F5] rounded-xl border border-slate-200 text-center">
+                    <div className="text-[#FF5733] font-bold">Zero</div>
+                    <div className="text-slate-700">Bidding Wars</div>
+                  </div>
+                  <div className="p-3 bg-[#FAF8F5] rounded-xl border border-slate-200 text-center">
+                    <div className="text-[#1E3A8A] font-bold">Fair</div>
+                    <div className="text-slate-700">Work Rotation</div>
+                  </div>
+                  <div className="p-3 bg-[#FAF8F5] rounded-xl border border-slate-200 text-center">
+                    <div className="text-emerald-700 font-bold">Art Director</div>
+                    <div className="text-slate-700">Mentorship</div>
+                  </div>
+                  <div className="p-3 bg-[#FAF8F5] rounded-xl border border-slate-200 text-center">
+                    <div className="text-[#FF5733] font-bold">75% Payout</div>
+                    <div className="text-slate-700">Direct &bull; On Time</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. WHO WE ARE: BORN IN BIRMINGHAM */}
+      <section id="about" className="py-24 bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            {/* Story & Agency Credentials */}
+            <div className="lg:col-span-7">
+              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950">
+                Who We Are: Born in Birmingham
+              </h2>
+
+              <p className="mt-6 text-base sm:text-lg text-slate-700 leading-relaxed">
+                Peach Network is operated by Sweet As A Peach Creative Agency, an independent Birmingham agency led by commercial artists, art directors, and local business advocates. We built Peach Network to eliminate the friction of slow, expensive agencies and the exploitation of freelance bidding wars. We connect ambitious local businesses with accredited creators who care about craft.
+              </p>
+
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <Link
+                  href="/login"
+                  className="inline-flex items-center justify-center bg-[#FF5733] hover:bg-[#E04826] text-white font-semibold text-sm px-6 py-3 rounded-lg shadow-xs transition-colors"
+                >
+                  Start a Project &rarr;
+                </Link>
+                <Link
+                  href="#contact"
+                  className="inline-flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold text-sm px-6 py-3 rounded-lg transition-colors"
+                >
+                  Get in Touch
+                </Link>
+              </div>
+            </div>
+
+            {/* Seamless, unboxed photo integration: User-provided creative visual */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="max-w-md w-full flex items-center justify-center">
+                <img
+                  src="/assets/aistudio/Gemini_Generated_Image_h82sf4h82sf4h82s_d6d4759c.jpg"
+                  alt="Sweet As A Peach Creative Agency"
+                  className="w-full h-auto max-h-[380px] object-contain mx-auto mix-blend-multiply drop-shadow-sm transition-transform"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. REAL COMMERCIAL DELIVERABLES GALLERY */}
+      <section className="py-24 bg-[#FAF8F5] border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-14">
             <div>
-              <span className="text-xs font-mono font-bold tracking-widest text-[#FF5733] uppercase">
-                PORTFOLIO ARCHIVE
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#142B20] mt-2">
+              <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950">
                 Real Commercial Deliverables
               </h2>
-              <p className="text-[#0F172A]/70 text-base mt-2">
+              <p className="text-slate-600 text-base sm:text-lg mt-3">
                 Click any project deliverable to inspect scope, specs, and coin investment.
               </p>
             </div>
+            <Link
+              href="/login"
+              className="mt-4 md:mt-0 inline-flex items-center gap-1.5 text-sm font-semibold text-[#FF5733] hover:underline"
+            >
+              Start your project today &rarr;
+            </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {PROJECTS.map((p) => (
               <button
                 key={p.id}
                 type="button"
                 onClick={() => setSelected(p)}
-                className="group text-left bg-[#FAF8F5] border border-[#E2E8F0] rounded-lg overflow-hidden hover:border-slate-300 transition-all hover:shadow-md flex flex-col"
+                className="group text-left bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-slate-300 transition-colors shadow-2xs flex flex-col"
               >
-                <div className="h-52 w-full overflow-hidden bg-slate-100 relative">
+                <div className="h-56 w-full overflow-hidden bg-slate-100 relative">
                   <img
                     src={p.image}
                     alt={p.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-xs px-2 py-0.5 rounded text-[10px] font-mono font-bold text-[#142B20] border border-[#E2E8F0]">
-                    {p.coins} Peach Coins
+                  <div className="absolute top-3 right-3 bg-white/95 px-2.5 py-1 rounded-md text-xs font-bold text-slate-950 border border-slate-200 shadow-2xs">
+                    {p.coins} Coins (${p.coins * 50})
                   </div>
                 </div>
 
-                <div className="p-5 flex-1 flex flex-col justify-between">
+                <div className="p-6 flex-1 flex flex-col justify-between">
                   <div>
-                    <div className="text-[11px] font-mono font-bold text-[#FF5733] uppercase mb-1">
+                    <div className="text-xs font-bold text-[#FF5733] uppercase tracking-wide mb-1.5">
                       {p.category}
                     </div>
-                    <h3 className="text-base font-bold text-[#142B20] line-clamp-1 group-hover:text-[#FF5733] transition-colors">
+                    <h3 className="text-base font-bold tracking-tight text-slate-950 line-clamp-1 group-hover:text-[#FF5733] transition-colors">
                       {p.title}
                     </h3>
-                    <p className="text-xs text-[#0F172A]/70 mt-1 line-clamp-2">
+                    <p className="text-xs text-slate-600 mt-2 line-clamp-2 leading-relaxed">
                       {p.description}
                     </p>
 
                     {p.designer && (
-                      <div className="mt-2.5 pt-2 border-t border-slate-200/80 flex items-center gap-1.5 text-xs text-[#142B20]">
-                        <span className="w-5 h-5 rounded-full bg-[#142B20] text-[#38BDF8] text-[9px] font-bold flex items-center justify-center shrink-0">
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-900">
+                        <span className="w-5 h-5 rounded-full bg-slate-900 text-sky-300 text-[10px] font-bold flex items-center justify-center shrink-0">
                           {p.designer[0]}
                         </span>
                         <div className="truncate">
                           <span className="font-bold">{p.designer}</span>
                           <span className="text-slate-400 mx-1">&bull;</span>
-                          <span className="text-[11px] text-[#0284C7] font-medium">{p.designerRole}</span>
+                          <span className="text-xs text-[#0284C7] font-semibold">{p.designerRole}</span>
                         </div>
                       </div>
                     )}
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs font-mono text-slate-500">
-                    <span>{p.turnaround}</span>
-                    <span className="font-semibold text-[#142B20] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                      Inspect &rarr;
+                  <div className="mt-5 pt-3.5 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+                    <span>{p.timeline}</span>
+                    <span className="font-semibold text-slate-900 group-hover:text-[#FF5733] transition-colors">
+                      Inspect Scope &rarr;
                     </span>
                   </div>
                 </div>
               </button>
             ))}
           </div>
-
         </div>
       </section>
 
-      {/* BIRMINGHAM SKYLINE / CALL TO ACTION */}
-      <section className="py-20 bg-[#142B20] text-white relative overflow-hidden">
+      {/* 8. BASIC CONTACT & PARTNER FORM (Not talking about projects, just questions & partnerships) */}
+      <section id="contact" className="py-24 bg-white border-b border-slate-200">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950">
+              Have a Question or Want to Partner?
+            </h2>
+            <p className="text-slate-600 text-base sm:text-lg mt-3 leading-relaxed">
+              Send our Birmingham team a quick note and we&rsquo;ll get right back to you.
+            </p>
+          </div>
+
+          <div className="bg-[#FAF8F5] border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-xs">
+            {formSubmitted ? (
+              <div className="text-center py-8">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 mb-4 font-bold text-xl">
+                  ✓
+                </div>
+                <h3 className="text-xl font-bold tracking-tight text-slate-950 mb-2">Message Received!</h3>
+                <p className="text-sm text-slate-600 max-w-sm mx-auto leading-relaxed">
+                  Thanks for reaching out, <strong>{contactName}</strong>! Our Birmingham studio team will follow up at <strong>{contactEmail}</strong> shortly.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormSubmitted(false);
+                    setContactName("");
+                    setContactEmail("");
+                    setContactMessage("");
+                  }}
+                  className="mt-6 inline-flex items-center justify-center bg-white border border-slate-300 text-slate-900 text-xs font-semibold px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+                >
+                  Send Another Note
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleContactSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1.5">
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    placeholder="First & Last Name"
+                    className="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1.5">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    placeholder="you@email.com"
+                    className="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1.5">
+                    How Can We Help?
+                  </label>
+                  <select
+                    value={contactTopic}
+                    onChange={(e) => setContactTopic(e.target.value)}
+                    className="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
+                  >
+                    <option value="Question About the App">Question About the App</option>
+                    <option value="Partner with Peach Network">Partner with Peach Network</option>
+                    <option value="Creative Roster Inquiry">Creative Roster Inquiry</option>
+                    <option value="General Feedback">General Feedback</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1.5">
+                    Message
+                  </label>
+                  <textarea
+                    rows={4}
+                    required
+                    value={contactMessage}
+                    onChange={(e) => setContactMessage(e.target.value)}
+                    placeholder="How can we help you?"
+                    className="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors resize-none"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    className="w-full inline-flex items-center justify-center bg-[#FF5733] hover:bg-[#E04826] text-white font-bold text-sm py-3 rounded-lg shadow-xs transition-colors"
+                  >
+                    Send Note &rarr;
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* 9. CALL TO ACTION STRIP */}
+      <section className="py-24 bg-slate-950 text-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <span className="text-xs font-mono font-bold tracking-widest text-[#FF5733] uppercase">
-            POWERED BY SWEET AS A PEACH CREATIVE AGENCY
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-black mt-3 tracking-tight">
-            Ready to Elevate Your Brand Assets?
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+            Ready to Elevate Your Brand Collateral?
           </h2>
-          <p className="text-white/80 max-w-2xl mx-auto mt-4 text-base sm:text-lg leading-relaxed">
-            Get commercial-grade graphic design, branding, and marketing collateral with predictable coin pricing and pre-flight quality guarantees.
+          <p className="text-slate-300 max-w-2xl mx-auto mt-4 text-base sm:text-lg leading-relaxed">
+            Get commercial-grade graphic design, branding, and marketing collateral with predictable coin pricing and careful pre-flight checks.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="/auth?mode=signup"
-              className="inline-flex items-center gap-2 bg-[#FF5733] hover:bg-[#E04826] text-white font-semibold text-base px-8 py-3.5 rounded-md shadow-sm transition"
+              href="/login"
+              className="inline-flex items-center gap-2 bg-[#FF5733] hover:bg-[#E04826] text-white font-semibold text-base px-8 py-3.5 rounded-lg shadow-xs transition-colors"
             >
-              Start a Project <ArrowRight className="w-4 h-4" />
+              Start a Project &rarr;
             </Link>
             <Link
               href="/apply"
-              className="inline-flex items-center gap-2 bg-transparent hover:bg-white/10 text-white font-semibold text-base px-8 py-3.5 rounded-md border border-white/20 transition"
+              className="inline-flex items-center gap-2 bg-transparent hover:bg-white/10 text-white font-semibold text-base px-8 py-3.5 rounded-lg border border-white/20 transition-colors"
             >
-              Become a Creative
+              Apply as a Creative
             </Link>
           </div>
         </div>
@@ -784,13 +1046,13 @@ export default function HomePage() {
           onClick={() => setSelected(null)}
         >
           <div
-            className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-[#E2E8F0] shadow-2xl relative"
+            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 shadow-2xl relative"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               onClick={() => setSelected(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-[#0F172A] p-1.5 rounded-md hover:bg-slate-100 transition"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 p-1.5 rounded-md hover:bg-slate-100 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -803,25 +1065,25 @@ export default function HomePage() {
               />
             </div>
 
-            <div className="p-6">
-              <span className="text-xs font-mono font-bold text-[#FF5733] uppercase">
+            <div className="p-6 sm:p-8">
+              <span className="text-xs font-bold text-[#FF5733] uppercase tracking-wide">
                 {selected.category}
               </span>
-              <h3 className="text-2xl font-extrabold text-[#142B20] mt-1">
+              <h3 className="text-2xl font-extrabold tracking-tight text-slate-950 mt-1">
                 {selected.title}
               </h3>
-              <p className="text-xs text-slate-500 font-mono mt-1">
+              <p className="text-xs text-slate-500 font-medium mt-1">
                 Client: {selected.client}
               </p>
 
               {selected.designer && (
-                <div className="mt-3 p-3 rounded-lg bg-[#FAF8F5] border border-[#E2E8F0] flex items-center justify-between">
+                <div className="mt-4 p-3.5 rounded-xl bg-[#FAF8F5] border border-slate-200 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-[#142B20] text-[#38BDF8] text-xs font-bold flex items-center justify-center shadow-xs shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-slate-900 text-sky-300 text-xs font-bold flex items-center justify-center shrink-0">
                       {selected.designer[0]}
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-[#142B20]">
+                      <div className="text-xs font-bold text-slate-950">
                         Designed by {selected.designer}
                       </div>
                       <div className="text-[11px] text-[#0284C7] font-semibold">
@@ -829,40 +1091,44 @@ export default function HomePage() {
                       </div>
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
+                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
                     Verified Creative
                   </span>
                 </div>
               )}
 
-              <p className="text-sm text-[#0F172A]/80 mt-4 leading-relaxed">
+              <p className="text-sm text-slate-700 mt-4 leading-relaxed">
                 {selected.description}
               </p>
 
-              <div className="mt-5 pt-4 border-t border-[#E2E8F0]">
-                <div className="text-xs font-mono font-bold text-[#142B20] mb-2">DELIVERABLE SPECIFICATIONS:</div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-600">
+              <div className="mt-6 pt-4 border-t border-slate-200">
+                <div className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-2.5">
+                  DELIVERABLE SPECIFICATIONS:
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
                   {selected.specs.map((s, idx) => (
                     <div key={idx} className="flex items-center gap-1.5">
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-emerald-600 font-bold">✓</span>
                       <span>{s}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="mt-6 pt-5 border-t border-[#E2E8F0] flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-sm font-mono">
+              <div className="mt-6 pt-5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-sm">
                   <span className="text-slate-500">Fixed Scope: </span>
-                  <strong className="text-[#FF5733] font-bold">{selected.coins} Peach Coins (${selected.coins * 50})</strong>
+                  <strong className="text-[#FF5733] font-bold">
+                    {selected.coins} Peach Coins (${selected.coins * 50})
+                  </strong>
                 </div>
 
                 <Link
-                  href="/auth?mode=signup"
+                  href="/login"
                   onClick={() => setSelected(null)}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#FF5733] hover:bg-[#E04826] text-white text-sm font-semibold px-6 py-2.5 rounded-md transition shadow-sm"
+                  className="w-full sm:w-auto inline-flex items-center justify-center bg-[#FF5733] hover:bg-[#E04826] text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors shadow-xs"
                 >
-                  Start Similar Project <ArrowRight className="w-4 h-4" />
+                  Start Similar Project &rarr;
                 </Link>
               </div>
             </div>
@@ -870,26 +1136,113 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* FOOTER */}
-      <footer className="bg-white border-t border-[#E2E8F0] py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-center md:text-left">
-            <div className="text-base font-extrabold text-[#142B20]">Peach Network</div>
-            <div className="text-xs text-slate-500 mt-1">
-              Powered by Sweet As A Peach Creative Agency &bull; Birmingham, Alabama
+      {/* 10. COLORFUL & OPTIMIZED FOOTER WITH LOGO, CONTACT INFO & WARM PALETTE */}
+      <footer className="bg-[#0B2D22] text-white border-t-4 border-[#FF5733] pt-16 pb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-12 pb-14 border-b border-emerald-900/60">
+            {/* Column 1: Brand & Mission */}
+            <div className="md:col-span-5 space-y-4">
+              <Link href="/" className="inline-block bg-white p-2.5 rounded-xl shadow-xs">
+                <img
+                  src="/brand/peach-network-logo.png"
+                  alt="Peach Network"
+                  className="h-10 w-auto object-contain"
+                />
+              </Link>
+              <p className="text-emerald-100/80 text-sm leading-relaxed max-w-sm">
+                Birmingham&rsquo;s on-demand creative marketplace connecting local business owners with vetted commercial artists. High-converting craft, fixed coin rates, and zero bidding wars.
+              </p>
+              <div className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-300 bg-emerald-950/60 px-3 py-1.5 rounded-lg border border-emerald-800/60">
+                <span className="w-2 h-2 rounded-full bg-[#FF5733]" />
+                Operated by Sweet As A Peach Creative Agency
+              </div>
+            </div>
+
+            {/* Column 2: Studio Contact Info (Moved here per user request) */}
+            <div className="md:col-span-4 space-y-3">
+              <div className="text-xs font-extrabold uppercase tracking-wider text-[#FFD8C2]">
+                Studio Contact &amp; Headquarters
+              </div>
+              <ul className="space-y-2.5 text-xs text-emerald-100/90">
+                <li className="flex flex-col">
+                  <span className="text-emerald-400 font-semibold text-[11px] uppercase tracking-wide">Email</span>
+                  <a
+                    href="mailto:sweetasapeachcreativestudio@gmail.com"
+                    className="hover:text-[#FFD8C2] transition-colors break-all font-medium"
+                  >
+                    sweetasapeachcreativestudio@gmail.com
+                  </a>
+                </li>
+                <li className="flex flex-col">
+                  <span className="text-emerald-400 font-semibold text-[11px] uppercase tracking-wide">Website</span>
+                  <a
+                    href="https://www.sweetasapeachcreativeca.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#FFD8C2] transition-colors font-medium"
+                  >
+                    www.sweetasapeachcreativeca.com
+                  </a>
+                </li>
+                <li className="flex flex-col">
+                  <span className="text-emerald-400 font-semibold text-[11px] uppercase tracking-wide">Location</span>
+                  <span className="font-medium text-white">Birmingham, Alabama</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 3: Quick Navigation */}
+            <div className="md:col-span-3 space-y-3">
+              <div className="text-xs font-extrabold uppercase tracking-wider text-[#FFD8C2]">
+                Platform Navigation
+              </div>
+              <ul className="space-y-2 text-xs font-medium text-emerald-100/80">
+                <li>
+                  <a href="#about" className="hover:text-white transition-colors">About Us</a>
+                </li>
+                <li>
+                  <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
+                </li>
+                <li>
+                  <a href="#pricing" className="hover:text-white transition-colors">Pricing &amp; Memberships</a>
+                </li>
+                <li>
+                  <a href="#why-choose-us" className="hover:text-white transition-colors">Why Choose Us</a>
+                </li>
+                <li>
+                  <Link href="/login" className="hover:text-[#FFD8C2] transition-colors text-white font-semibold">
+                    Start a Project &rarr;
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/apply" className="hover:text-[#FFD8C2] transition-colors">
+                    Apply as a Creative
+                  </Link>
+                </li>
+              </ul>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 text-xs font-medium text-slate-600">
-            <Link href="/business" className="hover:text-[#FF5733] transition">Business Hub</Link>
-            <Link href="/creative" className="hover:text-[#FF5733] transition">Creative Portal</Link>
-            <Link href="/legal/terms" className="hover:text-[#FF5733] transition">Terms</Link>
-            <Link href="/legal/privacy" className="hover:text-[#FF5733] transition">Privacy</Link>
-            <Link href="/legal/peach-coins" className="hover:text-[#FF5733] transition">Coin Rules</Link>
+          {/* Bottom Sub-Footer Bar */}
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-emerald-300/70">
+            <div>
+              &copy; {new Date().getFullYear()} Peach Network &bull; Sweet As A Peach Creative Agency. All rights reserved.
+            </div>
+
+            <div className="flex items-center gap-6">
+              <Link href="/legal/terms" className="hover:text-white transition-colors">
+                Terms of Service
+              </Link>
+              <Link href="/legal/privacy" className="hover:text-white transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/legal/peach-coins" className="hover:text-white transition-colors">
+                Coin Rules
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
-
     </main>
   );
 }

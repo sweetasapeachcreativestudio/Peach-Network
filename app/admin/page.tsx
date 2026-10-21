@@ -25,10 +25,10 @@ export default async function AdminDashboardPage(){
     db.from("creative_payouts").select("amount_cents,status"),
     db.from("profiles").select("id,full_name,email,role,created_at").order("created_at",{ascending:false}).limit(6)
   ]);
-  const available=(wallets??[]).reduce((n,w)=>n+(w.available_coins??0),0);
-  const held=(wallets??[]).reduce((n,w)=>n+(w.held_coins??0),0);
-  const activeMemberships=(memberships??[]).filter(m=>m.status==="active").length;
-  const pendingPayout=(payouts??[]).filter(p=>p.status!=="paid").reduce((n,p)=>n+(p.amount_cents??0),0)/100;
+  const available=(wallets??[]).reduce((n: number, w: any)=>n+(w.available_coins??0),0);
+  const held=(wallets??[]).reduce((n: number, w: any)=>n+(w.held_coins??0),0);
+  const activeMemberships=(memberships??[]).filter((m: any)=>m.status==="active").length;
+  const pendingPayout=(payouts??[]).filter((p: any)=>p.status!=="paid").reduce((n: number, p: any)=>n+(p.amount_cents??0),0)/100;
 
   return <div className="hq">
     <aside className="hq-side">
@@ -57,8 +57,8 @@ export default async function AdminDashboardPage(){
       <section className="hq-grid">
         <div className="hq-card">
           <div className="hq-card-head"><div><span className="eyebrow">WORKFLOW</span><h2>Projects</h2></div><Link href="/admin/projects">View all →</Link></div>
-          <div className="hq-stat-row"><div><strong>{projects?.length??0}</strong><span>Recent projects</span></div><div><strong>{(projects??[]).reduce((n,p)=>n+(p.coin_amount??0),0)}</strong><span>Coins in recent work</span></div></div>
-          <div className="hq-list">{projects?.length?projects.map(p=><div className="hq-row" key={p.id}><div><strong>{p.title}</strong><small>{p.status?.replaceAll("_"," ")}</small></div><span>{p.coin_amount??0} coins</span></div>):<div className="hq-empty">No projects yet.</div>}</div>
+          <div className="hq-stat-row"><div><strong>{projects?.length??0}</strong><span>Recent projects</span></div><div><strong>{(projects??[]).reduce((n: number, p: any)=>n+(p.coin_amount??0),0)}</strong><span>Coins in recent work</span></div></div>
+          <div className="hq-list">{projects?.length?projects.map((p: any)=><div className="hq-row" key={p.id}><div><strong>{p.title}</strong><small>{p.status?.replaceAll("_"," ")}</small></div><span>{p.coin_amount??0} coins</span></div>):<div className="hq-empty">No projects yet.</div>}</div>
         </div>
 
         <div className="hq-card" id="coins">
@@ -72,7 +72,7 @@ export default async function AdminDashboardPage(){
       <section className="hq-card" id="people">
         <div className="hq-card-head"><div><span className="eyebrow">PEOPLE</span><h2>Newest accounts</h2></div><span>{totalUsers??0} total</span></div>
         <div className="hq-people-head"><span>Name</span><span>Role</span><span>Joined</span></div>
-        {(recentProfiles??[]).map(p=><div className="hq-person" key={p.id}><div><strong>{p.full_name||"Peach member"}</strong><small>{p.email}</small></div><span className={"hq-role "+p.role}>{p.role}</span><time>{new Date(p.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</time></div>)}
+        {(recentProfiles??[]).map((p: any)=><div className="hq-person" key={p.id}><div><strong>{p.full_name||"Peach member"}</strong><small>{p.email}</small></div><span className={"hq-role "+p.role}>{p.role}</span><time>{new Date(p.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}</time></div>)}
       </section>
     </main>
     <style>{`

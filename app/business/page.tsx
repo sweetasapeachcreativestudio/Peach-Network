@@ -40,24 +40,24 @@ export default async function BusinessDashboard() {
     admin.from("projects").select("id,title,category,status,coin_amount,due_at,created_at,assigned_creative_id,revision_rounds").eq("business_id",business.id).order("created_at",{ascending:false}),
     admin.from("business_brand_assets").select("id,kind,label,value,original_name").eq("business_id",business.id)
   ]);
-  const active = (projects??[]).filter(p=>!["completed","cancelled"].includes(p.status));
-  const accepted = active.find(p=>p.status==="accepted");
-  const attention = active.find(p=>reviewStatuses.includes(p.status));
+  const active = ((projects ?? []) as any[]).filter((p: any) => !["completed", "cancelled"].includes(p.status));
+  const accepted = active.find((p: any) => p.status === "accepted");
+  const attention = active.find((p: any) => reviewStatuses.includes(p.status));
   const lead = attention ?? active[0];
   const first = profile?.full_name?.trim().split(" ")[0] || business.name;
   const coins = wallet?.available_coins ?? 0;
-  const ids = active.map(p=>p.id);
-  const creativeIds = [...new Set(active.map(p=>p.assigned_creative_id).filter(Boolean))];
+  const ids = active.map((p: any) => p.id);
+  const creativeIds = [...new Set(active.map((p: any) => p.assigned_creative_id).filter(Boolean))];
   const [{data:messages},{data:creatives}] = await Promise.all([
     ids.length ? admin.from("project_messages").select("id,project_id,message,created_at,sender_user_id").in("project_id",ids).order("created_at",{ascending:false}).limit(3) : Promise.resolve({data:[]}),
     creativeIds.length ? admin.from("creatives").select("id,user_id").in("id",creativeIds) : Promise.resolve({data:[]})
   ]);
-  const peopleIds = [...new Set([...(creatives??[]).map(c=>c.user_id),...(messages??[]).map(m=>m.sender_user_id)].filter(Boolean))];
+  const peopleIds = [...new Set([...((creatives ?? []) as any[]).map((c: any) => c.user_id), ...((messages ?? []) as any[]).map((m: any) => m.sender_user_id)].filter(Boolean))];
   const {data:people} = peopleIds.length ? await admin.from("profiles").select("id,full_name,avatar_url").in("id",peopleIds) : {data:[]};
-  const peopleMap = new Map((people??[]).map(p=>[p.id,p]));
-  const creativeMap = new Map((creatives??[]).map(c=>[c.id,peopleMap.get(c.user_id)]));
+  const peopleMap = new Map(((people ?? []) as any[]).map((p: any) => [p.id, p]));
+  const creativeMap = new Map(((creatives ?? []) as any[]).map((c: any) => [c.id, peopleMap.get(c.user_id)]));
 
-  const projectCard = (project: typeof active[number]) => {
+  const projectCard = (project: any) => {
     const creative = creativeMap.get(project.assigned_creative_id);
     return <details className="bd-project" key={project.id}>
       <summary>
@@ -81,8 +81,8 @@ export default async function BusinessDashboard() {
       </div>
       <aside className="bd-dock" aria-label="Wallet, brand and messages">
         <details className="bd-panel" open><summary><span>WALLET & PEACH COINS</span><span className="bd-chevron">⌄</span></summary><div className="bd-panel-body"><div className="bd-wallet-value">{coins} <span>Coins</span></div><p>{wallet?.held_coins??0} Coins committed to active projects</p><Link href="/business/wallet" className="bd-button dock">+ Top-Up Coins</Link></div></details>
-        <details className="bd-panel" id="brand-vault" open><summary><span>BRAND VAULT</span><span>{brandAssets?.length??0} Assets <span className="bd-chevron">⌄</span></span></summary><div className="bd-panel-body"><div className="bd-brand-title">{business.logo_url&&<img src={business.logo_url} alt={`${business.name} logo`}/>}<strong>{business.name} Assets</strong></div><p>Saved once. Ready for your creative on every project.</p><div className="bd-vault-grid">{([['logo','Primary Logo'],['color','Brand Colors'],['font','Official Typefaces & Fonts Kit']] as const).map(([kind,title])=>{const items=(brandAssets??[]).filter(a=>a.kind===kind);return <Link key={kind} href={`/business/vault#${kind}`} className={`bd-vault-tile ${kind==='font'?'wide':''}`}><strong>{title}</strong><span>{items.length?kind==='logo'?`${items.length} saved · ${items[0].original_name?.split('.').pop()?.toUpperCase()??'Logo'}`:`${items.length} saved${kind==='color'?' · HEX':''}`:'+ Add to your vault'}</span></Link>})}</div><Link href="/business/vault" className="bd-text-link">Manage all assets →</Link></div></details>
-        <details className="bd-panel" open><summary><span>PROJECT MESSAGES</span><span className="bd-chevron">⌄</span></summary><div className="bd-panel-body">{messages?.length?messages.map(message=><Link key={message.id} href={`/projects/${message.project_id}#chat`} className="bd-message"><strong>{peopleMap.get(message.sender_user_id)?.full_name ?? "Project member"}</strong><span>{message.message}</span></Link>):<p>No project messages yet. Conversations appear here when work gets underway.</p>}<Link href="/business/messages" className="bd-button secondary dock">Open Messages →</Link></div></details>
+        <details className="bd-panel" id="brand-vault" open><summary><span>BRAND VAULT</span><span>{brandAssets?.length??0} Assets <span className="bd-chevron">⌄</span></span></summary><div className="bd-panel-body"><div className="bd-brand-title">{business.logo_url&&<img src={business.logo_url} alt={`${business.name} logo`}/>}<strong>{business.name} Assets</strong></div><p>Saved once. Ready for your creative on every project.</p><div className="bd-vault-grid">{([['logo','Primary Logo'],['color','Brand Colors'],['font','Official Typefaces & Fonts Kit']] as const).map(([kind,title])=>{const items=((brandAssets??[]) as any[]).filter((a: any)=>a.kind===kind);return <Link key={kind} href={`/business/vault#${kind}`} className={`bd-vault-tile ${kind==='font'?'wide':''}`}><strong>{title}</strong><span>{items.length?kind==='logo'?`${items.length} saved · ${items[0].original_name?.split('.').pop()?.toUpperCase()??'Logo'}`:`${items.length} saved${kind==='color'?' · HEX':''}`:'+ Add to your vault'}</span></Link>})}</div><Link href="/business/vault" className="bd-text-link">Manage all assets →</Link></div></details>
+        <details className="bd-panel" open><summary><span>PROJECT MESSAGES</span><span className="bd-chevron">⌄</span></summary><div className="bd-panel-body">{messages?.length?((messages as any[]).map((message: any)=><Link key={message.id} href={`/projects/${message.project_id}#chat`} className="bd-message"><strong>{peopleMap.get(message.sender_user_id)?.full_name ?? "Project member"}</strong><span>{message.message}</span></Link>)):<p>No project messages yet. Conversations appear here when work gets underway.</p>}<Link href="/business/messages" className="bd-button secondary dock">Open Messages →</Link></div></details>
         <details className="bd-help"><summary><span><strong>Need help scoping a project?</strong><small>Talk through your idea with Peach.</small></span><span className="bd-chevron">⌄</span></summary><p>Describe what you want to create and organize the brief before matching.</p><Link href="/business/ask-peach" className="bd-text-link">Ask Peach →</Link></details>
       </aside></div>
       <style>{`
