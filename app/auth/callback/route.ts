@@ -16,16 +16,13 @@ export async function GET(request: Request) {
     if (!error && data?.user) {
       const user = data.user;
 
-      // Determine target role:
-      // 1. Explicit role parameter
-      // 2. Path inspection (/hub or /creative)
-      // 3. User metadata
+      // 1. Determine target role from URL parameter, next path, or database
       let userRole: 'business' | 'creative' = 'business';
       if (roleParam === 'creative' || (next && (next.includes('hub') || next.includes('creative')))) {
         userRole = 'creative';
       }
 
-      // Check existing profile in Supabase
+      // 2. Check existing profile in Supabase
       try {
         const { data: profile } = await supabase
           .from('profiles')
@@ -43,9 +40,11 @@ export async function GET(request: Request) {
             role: userRole,
           });
         }
-      } catch {}
+      } catch (err) {
+        console.error('Profile sync error:', err);
+      }
 
-      // Guarantee business or creative record exists
+      // 3. Ensure business or creative supporting record exists
       try {
         if (userRole === 'business') {
           const { data: existingBiz } = await supabase
@@ -92,22 +91,28 @@ export async function GET(request: Request) {
             });
           }
         }
-      } catch {}
+      } catch (err) {
+        console.error('Record creation error:', err);
+      }
 
-      // Route directly to the corresponding home page!
-      const destination = userRole === 'creative' ? '/creative' : '/business';
+      // 4. 🎯 ROUTE TO THE REAL PAGES (Never send to broken /business):
+      let destination = next;
+      if (!destination || destination === '/' || destination === '/business') {
+        destination = userRole === 'creative' ? '/hub' : '/dashboard/business';
+      }
+
       const response = NextResponse.redirect(`${origin}${destination}`);
 
       response.cookies.set('peach_role', userRole, {
         path: '/',
         maxAge: 604800,
-        sameSite: 'none',
+        sameSite: 'lax',
         secure: true,
       });
       response.cookies.set('peach_session', encodeURIComponent(JSON.stringify(user)), {
         path: '/',
         maxAge: 604800,
-        sameSite: 'none',
+        sameSite: 'lax',
         secure: true,
       });
 
