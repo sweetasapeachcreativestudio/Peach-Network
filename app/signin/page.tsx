@@ -1,3 +1,32 @@
+// 🎯 CATCH GOOGLE ACCESS TOKEN & FORWARD TO DASHBOARD
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash;
+
+      // If Supabase returned an access_token:
+      if (hash && hash.includes("access_token")) {
+        // Parse the role from the hash if present, or fallback to saved choice
+        let targetRole = localStorage.getItem("peach_auth_role") || "business";
+        
+        // If metadata says business/creative, use it:
+        if (hash.includes('"role"%3A"creative"') || hash.includes('"role":"creative"')) {
+          targetRole = "creative";
+        } else if (hash.includes('"role"%3A"business"') || hash.includes('"role":"business"')) {
+          targetRole = "business";
+        }
+
+        // Clean up and forward immediately
+        localStorage.removeItem("peach_auth_role");
+        
+        if (targetRole === "creative") {
+          window.location.href = "/hub";
+        } else {
+          window.location.href = "/dashboard/business";
+        }
+      }
+    }
+  }, []);
+
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
