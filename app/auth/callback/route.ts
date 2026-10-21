@@ -95,7 +95,7 @@ export async function GET(request: Request) {
         console.error('Record creation error:', err);
       }
 
-      // 4. 🎯 ROUTE TO THE REAL PAGES (Never send to broken /business):
+      // 4. Route to the real dashboards
       let destination = next;
       if (!destination || destination === '/' || destination === '/business') {
         destination = userRole === 'creative' ? '/hub' : '/dashboard/business';
@@ -109,6 +109,7 @@ export async function GET(request: Request) {
         sameSite: 'lax',
         secure: true,
       });
+
       response.cookies.set('peach_session', encodeURIComponent(JSON.stringify(user)), {
         path: '/',
         maxAge: 604800,
@@ -120,7 +121,6 @@ export async function GET(request: Request) {
     }
   }
 
-  // NEW (Graceful fallback):
-// If no server code was present, let the client finish processing the hash
-const destination = roleParam === 'creative' ? '/hub' : '/dashboard/business';
-return NextResponse.redirect(`${origin}${destination}`);
+  // Fallback redirect if error or missing code
+  return NextResponse.redirect(`${origin}/signin?error=auth_failed`);
+}
