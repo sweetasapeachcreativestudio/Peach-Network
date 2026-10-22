@@ -16,13 +16,15 @@ export async function GET(request: Request) {
     if (!error && data?.user) {
       const user = data.user;
 
-      // 1. Determine target role from URL parameter, next path, or database
+      // 1. Check role from query param, cookies, or existing metadata
       let userRole: 'business' | 'creative' = 'business';
+      
+      // Check query param first
       if (roleParam === 'creative' || (next && (next.includes('hub') || next.includes('creative')))) {
         userRole = 'creative';
       }
 
-      // 2. Check existing profile in Supabase
+      // 2. Check existing profile in Supabase database
       try {
         const { data: profile } = await supabase
           .from('profiles')
@@ -33,6 +35,7 @@ export async function GET(request: Request) {
         if (profile?.role === 'creative' || profile?.role === 'business') {
           userRole = profile.role;
         } else {
+          // If new profile, save their chosen role
           await supabase.from('profiles').upsert({
             id: user.id,
             email: user.email,
@@ -41,7 +44,7 @@ export async function GET(request: Request) {
           });
         }
       } catch (err) {
-        console.error('Profile sync error:', err);
+        console.error('Error fetching/upserting profile:', err);
       }
 
       // 3. Ensure business or creative supporting record exists
@@ -92,19 +95,17 @@ export async function GET(request: Request) {
           }
         }
       } catch (err) {
-        console.error('Record creation error:', err);
+        console.error('Error ensuring role record:', err);
       }
 
-      // 4. Route to the real dashboards
+      // 4. ROUTE TO DASHBOARD
       let destination = next;
       if (!destination || destination === '/' || destination === '/business') {
         destination = userRole === 'creative' ? '/hub' : '/dashboard/business';
       }
 
-      const destination = userRole === 'creative' ? '/hub' : '/dashboard/business';
-const response = NextResponse.redirect(`${origin}${destination}`);
+      const response = NextResponse.redirect(`${origin}${destination}`);
 
-response.cookies.set('peach_role', userRole, {
       response.cookies.set('peach_role', userRole, {
         path: '/',
         maxAge: 604800,
