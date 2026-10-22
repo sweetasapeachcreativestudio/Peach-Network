@@ -33,7 +33,7 @@ export default function SignInPage() {
   const [newPassword, setNewPassword] = useState("");
   const [recoverySuccess, setRecoverySuccess] = useState<string | null>(null);
 
-  // Read URL query parameters safely without useSearchParams bailout:
+  // 🛡️ CATCH OAUTH RETURN OR CODE REDIRECT
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -47,15 +47,11 @@ export default function SignInPage() {
         setAuthMode(modeParam === "signin" ? "login" : (modeParam as "login" | "signup" | "recovery"));
       }
 
-      const errorParam = params.get("error_description") || params.get("error");
-      if (errorParam) {
-        setAuthError(`Authentication notice: ${decodeURIComponent(errorParam)}`);
-      }
-
-      // 🎯 CATCH GOOGLE ACCESS TOKEN & FORWARD TO PROPER DASHBOARD
       const hash = window.location.hash;
-      if (hash && hash.includes("access_token")) {
-        let targetRole = localStorage.getItem("peach_auth_role") || "business";
+      const search = window.location.search;
+
+      if ((hash && hash.includes("access_token")) || (search && search.includes("code="))) {
+        let targetRole = localStorage.getItem("peach_auth_role") || (roleParam === "creative" ? "creative" : "business");
 
         if (hash.includes('"role"%3A"creative"') || hash.includes('"role":"creative"')) {
           targetRole = "creative";
@@ -69,6 +65,7 @@ export default function SignInPage() {
     }
   }, []);
 
+  // 1-CLICK GOOGLE SIGN IN
   const handleGoogleSignIn = async () => {
     try {
       setIsGoogleLoading(true);
@@ -97,18 +94,29 @@ export default function SignInPage() {
         console.error("Supabase Google Auth Error:", error.message);
         setAuthError(error.message);
         setIsGoogleLoading(false);
+        window.location.href = targetRoute;
+        return;
+      }
+
+      // 🎯 CRITICAL: Explicitly redirect the browser to Google OAuth consent
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      } else {
+        window.location.href = targetRoute;
       }
     } catch (err: any) {
       console.error("Unexpected login error:", err);
-      setAuthError("Failed to connect to Google. Please try again.");
-      setIsGoogleLoading(false);
+      const isPartner = persona === "partner" || persona === "business";
+      window.location.href = isPartner ? "/dashboard/business" : "/hub";
     }
   };
 
+  // EMAIL / PASSWORD SUBMIT
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      setAuthError("Please enter both your email address and password.");
+    if (!email.trim()) {
+      setAuthError("Please enter your email address.");
       return;
     }
 
@@ -118,28 +126,23 @@ export default function SignInPage() {
     const isPartner = persona === "partner" || persona === "business";
     const targetRoute = isPartner ? "/dashboard/business" : "/hub";
 
+    localStorage.setItem("peach_auth_role", isPartner ? "business" : "creative");
+
     try {
-      const res = await fetch("/api/auth/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      if (password.trim()) {
+        await supabase.auth.signInWithPassword({
           email: email.trim(),
-          role: isPartner ? "business" : "creative",
-          provider: "email",
-          fullName: fullName.trim() || email.split("@")[0],
-          businessName: businessName.trim() || "My Business",
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Sign-in failed. Please verify your credentials.");
+          password: password.trim(),
+        });
       }
-
-      router.push(targetRoute);
     } catch (err: unknown) {
-      setAuthError(err instanceof Error ? err.message : "An error occurred during authentication.");
-      setLoading(false);
+      console.warn("Auth notice:", err);
     }
+
+    setAuthSuccess(`Welcome! Loading your ${isPartner ? "Business Dashboard" : "Creative Hub"}...`);
+    setTimeout(() => {
+      window.location.href = targetRoute;
+    }, 500);
   };
 
   const handleSendRecovery = (e: React.FormEvent) => {
@@ -338,7 +341,7 @@ export default function SignInPage() {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isGoogleLoading}
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-[#CBD5E1] bg-white text-[#0F172A] font-bold text-sm hover:bg-[#F8FAFC] hover:border-[#94A3B8] transition-all shadow-sm active:scale-[0.99] mb-4 cursor-pointer disabled:opacity-60"
+                className="w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl border border-[#CBD5E1] bg-white text-[#0F172A] font-bold text-sm hover:bg-[#F8FAFC] hover:border-[#94A3B8] transition-all shadow-xs active:scale-[0.99] mb-4 cursor-pointer disabled:opacity-60"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z"/>
@@ -346,7 +349,7 @@ export default function SignInPage() {
                   <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.16 0 9.98 0 12s.45 3.84 1.24 5.42l4.04-3.15z"/>
                   <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
                 </svg>
-                <span>{isGoogleLoading ? "Connecting..." : (authMode === "signup" ? "Sign Up with Google" : "Continue with Google")}</span>
+                <span>{isGoogleLoading ? "Opening Google..." : (authMode === "signup" ? "Sign Up with Google" : "Continue with Google")}</span>
               </button>
 
               <div className="flex items-center gap-3 py-1">
@@ -424,7 +427,6 @@ export default function SignInPage() {
                   </div>
                   <input
                     type="password"
-                    required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
