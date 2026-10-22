@@ -7,123 +7,113 @@ export async function GET(request: Request) {
   const next = searchParams.get('next');
   const roleParam = searchParams.get('role');
 
+  // Determine intended destination
+  let destination = next;
+  if (!destination || destination === '/' || destination === '/business') {
+    destination = roleParam === 'creative' ? '/hub' : '/dashboard/business';
+  }
+
+  // 1. If server received a PKCE code, attempt server-side session exchange
   if (code) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder-project.supabase.co';
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key';
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    try {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder-project.supabase.co';
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key';
+      const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error && data?.user) {
-      const user = data.user;
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+      if (!error && data?.user) {
+        const user = data.user;
+        let userRole: 'business' | 'creative' = roleParam === 'creative' ? 'creative' : 'business';
 
-      // 1. Check role from query param, cookies, or existing metadata
-      let userRole: 'business' | 'creative' = 'business';
-      
-      // Check query param first
-      if (roleParam === 'creative' || (next && (next.includes('hub') || next.includes('creative')))) {
-        userRole = 'creative';
-      }
-
-      // 2. Check existing profile in Supabase database
-      try {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (profile?.role === 'creative' || profile?.role === 'business') {
-          userRole = profile.role;
-        } else {
-          // If new profile, save their chosen role
-          await supabase.from('profiles').upsert({
-            id: user.id,
-            email: user.email,
-            full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
-            role: userRole,
-          });
-        }
-      } catch (err) {
-        console.error('Error fetching/upserting profile:', err);
-      }
-
-      // 3. Ensure business or creative supporting record exists
-      try {
-        if (userRole === 'business') {
-          const { data: existingBiz } = await supabase
-            .from('businesses')
-            .select('id')
-            .eq('owner_user_id', user.id)
+        // Check profile
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
             .maybeSingle();
 
-          if (!existingBiz) {
-            const bizName = user.user_metadata?.business_name || (user.user_metadata?.full_name ? `${user.user_metadata.full_name}'s Business` : 'My Business');
-            const { data: createdBiz } = await supabase
-              .from('businesses')
-              .insert({
-                owner_user_id: user.id,
-                name: bizName,
-                industry: 'Commercial & Creative',
-              })
-              .select('id')
-              .single();
-
-            if (createdBiz) {
-              await supabase.from('coin_wallets').insert({
-                business_id: createdBiz.id,
-                available_coins: 0,
-                held_coins: 0,
-              });
-            }
-          }
-        } else {
-          const { data: existingCr } = await supabase
-            .from('creatives')
-            .select('id')
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-          if (!existingCr) {
-            await supabase.from('creatives').insert({
-              user_id: user.id,
-              application_status: 'approved',
-              peach_level: 'fresh',
-              primary_specialty: 'Graphic Design & Branding',
-              city: 'Birmingham',
-              state: 'AL',
+          if (profile?.role === 'creative' || profile?.role === 'business') {
+            userRole = profile.role;
+          } else {
+            await supabase.from('profiles').upsert({
+              id: user.id,
+              email: user.email,
+              full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
+              role: userRole,
             });
           }
+        } catch (err) {
+          console.error('Profile fetch error:', err);
         }
-      } catch (err) {
-        console.error('Error ensuring role record:', err);
+
+        // Final destination based on actual role
+        const finalDest = userRole === 'creative' ? '/hub' : '/dashboard/business';
+        const response = NextResponse.redirect(`${origin}${finalDest}`);
+
+        response.cookies.set('peach_role', userRole, {
+          path: '/',
+          maxAge: 604800,
+          sameSite: 'lax',
+          secure: true,
+        });
+
+        response.cookies.set('peach_session', encodeURIComponent(JSON.stringify(user)), {
+          path: '/',
+          maxAge: 604800,
+          sameSite: 'lax',
+          secure: true,
+        });
+
+        return response;
       }
-
-      // 4. ROUTE TO DASHBOARD
-      let destination = next;
-      if (!destination || destination === '/' || destination === '/business') {
-        destination = userRole === 'creative' ? '/hub' : '/dashboard/business';
-      }
-
-      const response = NextResponse.redirect(`${origin}${destination}`);
-
-      response.cookies.set('peach_role', userRole, {
-        path: '/',
-        maxAge: 604800,
-        sameSite: 'lax',
-        secure: true,
-      });
-
-      response.cookies.set('peach_session', encodeURIComponent(JSON.stringify(user)), {
-        path: '/',
-        maxAge: 604800,
-        sameSite: 'lax',
-        secure: true,
-      });
-
-      return response;
+    } catch (err) {
+      console.warn('Server code exchange notice:', err);
     }
   }
 
-  // Fallback redirect if error or missing code
-  return NextResponse.redirect(`${origin}/signin?error=auth_failed`);
+  // 2. Client-side Bridge:
+  // Catches hash fragments (#access_token=...) and routes straight to your dashboard
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Connecting to Peach Network...</title>
+  <script>
+    (function() {
+      try {
+        var hash = window.location.hash || '';
+        var search = window.location.search || '';
+        var savedRole = localStorage.getItem('peach_auth_role');
+        var targetRole = '${roleParam || ''}' || savedRole || 'business';
+
+        if (hash.indexOf('role%22%3A%22creative') !== -1 || hash.indexOf('role":"creative') !== -1) {
+          targetRole = 'creative';
+        } else if (hash.indexOf('role%22%3A%22business') !== -1 || hash.indexOf('role":"business') !== -1) {
+          targetRole = 'business';
+        }
+
+        localStorage.removeItem('peach_auth_role');
+
+        var dest = targetRole === 'creative' ? '/hub' : '/dashboard/business';
+        window.location.replace(dest);
+      } catch (e) {
+        window.location.replace('${destination}');
+      }
+    })();
+  </script>
+</head>
+<body style="background-color:#FAF8F5;font-family:system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;color:#0B2D22;">
+  <div style="text-align:center;">
+    <div style="font-size:36px;margin-bottom:12px;">🍑</div>
+    <div style="font-size:18px;font-weight:bold;margin-bottom:6px;">Welcome to Peach Network</div>
+    <div style="font-size:13px;color:#64748B;">Routing you to your dashboard...</div>
+  </div>
+</body>
+</html>`;
+
+  return new NextResponse(html, {
+    status: 200,
+    headers: { 'Content-Type': 'text/html' },
+  });
 }
