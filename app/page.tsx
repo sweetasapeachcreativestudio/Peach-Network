@@ -49,7 +49,7 @@ const PROJECTS: ProjectItem[] = [
     timeline: "Est. 5–7 Days",
     image: "/lillian-project.jpg",
     designer: "Stephanie Stewart",
-    designerRole: "UI/UX Designer & Art Director (Troy University)",
+    designerRole: "UI/UX Designer & Art Direction (Troy University)",
     description:
       "Designed by Stephanie Stewart, UI/UX Designer & Art Director at Troy University for Lillian Hewitt's Empower Her Heart initiative.",
     specs: [
@@ -261,7 +261,7 @@ export default function HomePage() {
             </a>
           </nav>
 
-          {/* Header Right: Sign In + High-converting Coral Start a Project CTA (No coin badge clutter) */}
+          {/* Header Right: Sign In + Start a Project CTA */}
           <div className="flex items-center gap-3 sm:gap-4 shrink-0">
             <Link
               href="/login"
@@ -298,7 +298,7 @@ export default function HomePage() {
                 </span>
               </h1>
 
-              {/* Subhead with comfortable breathing room */}
+              {/* Subhead */}
               <p className="mt-6 text-base sm:text-lg text-slate-700 leading-relaxed max-w-xl">
                 Describe what you need in plain English. Get matched with top commercial designers at transparent coin pricing&mdash;with zero bidding wars, no hourly bloat, and no low-quality AI shortcuts.
               </p>
@@ -332,7 +332,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* HERO RIGHT COLUMN (3D Smartphone Mockup — Intact & Untouched) */}
+            {/* HERO RIGHT COLUMN (3D Smartphone Mockup) */}
             <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
               <PhoneHeroMockup />
             </div>
@@ -754,7 +754,7 @@ export default function HomePage() {
       <section id="why-choose-us" className="py-24 bg-[#FAF8F5] border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            {/* Real human creative photo - Clean, no overlaid words, seamlessly integrated into page */}
+            {/* Real human creative photo */}
             <div className="lg:col-span-5 flex justify-center">
               <div className="rounded-2xl overflow-hidden shadow-md border border-slate-200/80 bg-white max-w-sm w-full">
                 <img
@@ -775,7 +775,7 @@ export default function HomePage() {
                 Generative AI creates blurry, unprintable files and invented fonts that print shops reject. Peach Network gives you conversational speed backed by real human designers who master commercial print bleeds and authentic branding.
               </p>
 
-              {/* 3 Pillars - Clean, modern typography without icon boxes */}
+              {/* 3 Pillars */}
               <div className="mt-8 space-y-5 text-sm text-slate-800">
                 <div className="pl-4 border-l-2 border-[#FF5733]">
                   <strong className="text-slate-950 font-bold block mb-1">
@@ -873,7 +873,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Seamless, unboxed photo integration: User-provided creative visual */}
+            {/* Photo integration */}
             <div className="lg:col-span-5 flex justify-center">
               <div className="max-w-md w-full flex items-center justify-center">
                 <img
@@ -1220,4 +1220,91 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Column
+            {/* Column 2: Studio Contact Info */}
+            <div className="md:col-span-4 space-y-3">
+              <div className="text-xs font-extrabold uppercase tracking-wider text-[#FFD8C2]">
+                Studio Contact &amp; Headquarters
+              </div>
+              <ul className="space-y-2.5 text-xs text-emerald-100/90">
+                <li className="flex flex-col">
+                  <span className="text-emerald-400 font-semibold text-[11px] uppercase tracking-wide">Email</span>
+                  <a
+                    href="mailto:sweetasapeachcreativestudio@gmail.com"
+                    className="hover:text-[#FFD8C2] transition-colors break-all font-medium"
+                  >
+                    sweetasapeachcreativestudio@gmail.com
+                  </a>
+                </li>
+                <li className="flex flex-col">
+                  <span className="text-emerald-400 font-semibold text-[11px] uppercase tracking-wide">Website</span>
+                  <a
+                    href="https://www.sweetasapeachcreativeca.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#FFD8C2] transition-colors font-medium"
+                  >
+                    www.sweetasapeachcreativeca.com
+                  </a>
+                </li>
+                <li className="flex flex-col">
+                  <span className="text-emerald-400 font-semibold text-[11px] uppercase tracking-wide">Location</span>
+                  <span className="font-medium text-white">Birmingham, Alabama</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 3: Quick Navigation */}
+            <div className="md:col-span-3 space-y-3">
+              <div className="text-xs font-extrabold uppercase tracking-wider text-[#FFD8C2]">
+                Platform Navigation
+              </div>
+              <ul className="space-y-2 text-xs font-medium text-emerald-100/80">
+                <li>
+                  <a href="#about" className="hover:text-white transition-colors">About Us</a>
+                </li>
+                <li>
+                  <a href="#how-it-works" className="hover:text-white transition-colors">How It Works</a>
+                </li>
+                <li>
+                  <a href="#pricing" className="hover:text-white transition-colors">Pricing &amp; Memberships</a>
+                </li>
+                <li>
+                  <a href="#why-choose-us" className="hover:text-white transition-colors">Why Choose Us</a>
+                </li>
+                <li>
+                  <Link href="/login" className="hover:text-[#FFD8C2] transition-colors text-white font-semibold">
+                    Start a Project &rarr;
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/apply" className="hover:text-[#FFD8C2] transition-colors">
+                    Apply as a Creative
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Sub-Footer Bar */}
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-emerald-300/70">
+            <div>
+              &copy; {new Date().getFullYear()} Peach Network &bull; Sweet As A Peach Creative Agency. All rights reserved.
+            </div>
+
+            <div className="flex items-center gap-6">
+              <Link href="/legal/terms" className="hover:text-white transition-colors">
+                Terms of Service
+              </Link>
+              <Link href="/legal/privacy" className="hover:text-white transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/legal/peach-coins" className="hover:text-white transition-colors">
+                Coin Rules
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+  );
+}
