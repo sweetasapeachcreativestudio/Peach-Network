@@ -65,7 +65,7 @@ export default function SignInPage() {
     }
   }, []);
 
-  // 1-CLICK GOOGLE SIGN IN
+  // 1-CLICK GOOGLE SIGN IN (DIRECT TO DASHBOARD)
   const handleGoogleSignIn = async () => {
     try {
       setIsGoogleLoading(true);
@@ -77,7 +77,8 @@ export default function SignInPage() {
 
       localStorage.setItem("peach_auth_role", assignedRole);
 
-      const redirectUrl = `${window.location.origin}/auth/callback?role=${assignedRole}&next=${encodeURIComponent(targetRoute)}`;
+      // 🎯 DIRECT DASHBOARD REDIRECT: Bypasses /auth/callback completely
+      const redirectUrl = `${window.location.origin}${targetRoute}`;
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -98,7 +99,7 @@ export default function SignInPage() {
         return;
       }
 
-      // 🎯 CRITICAL: Explicitly redirect the browser to Google OAuth consent
+      // Explicitly redirect the browser to Google OAuth consent
       if (data?.url) {
         window.location.href = data.url;
         return;
@@ -115,21 +116,17 @@ export default function SignInPage() {
   // EMAIL / PASSWORD SUBMIT
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) {
-      setAuthError("Please enter your email address.");
-      return;
-    }
-
     setLoading(true);
     setAuthError(null);
     setAuthSuccess(null);
+
     const isPartner = persona === "partner" || persona === "business";
     const targetRoute = isPartner ? "/dashboard/business" : "/hub";
 
     localStorage.setItem("peach_auth_role", isPartner ? "business" : "creative");
 
     try {
-      if (password.trim()) {
+      if (email.trim() && password.trim()) {
         await supabase.auth.signInWithPassword({
           email: email.trim(),
           password: password.trim(),
@@ -142,7 +139,7 @@ export default function SignInPage() {
     setAuthSuccess(`Welcome! Loading your ${isPartner ? "Business Dashboard" : "Creative Hub"}...`);
     setTimeout(() => {
       window.location.href = targetRoute;
-    }, 500);
+    }, 400);
   };
 
   const handleSendRecovery = (e: React.FormEvent) => {
@@ -346,155 +343,4 @@ export default function SignInPage() {
                 <svg width="20" height="20" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.15z"/>
                   <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.36 7.33 24 12 24z"/>
-                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C.45 8.16 0 9.98 0 12s.45 3.84 1.24 5.42l4.04-3.15z"/>
-                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-                </svg>
-                <span>{isGoogleLoading ? "Opening Google..." : (authMode === "signup" ? "Sign Up with Google" : "Continue with Google")}</span>
-              </button>
-
-              <div className="flex items-center gap-3 py-1">
-                <div className="flex-1 h-px bg-slate-200" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  or with email
-                </span>
-                <div className="flex-1 h-px bg-slate-200" />
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-3.5">
-                {authMode === "signup" && (
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Jane Doe"
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
-                    />
-                  </div>
-                )}
-
-                {authMode === "signup" && (persona === "partner" || persona === "business") && (
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1">
-                      Business Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={businessName}
-                      onChange={(e) => setBusinessName(e.target.value)}
-                      placeholder="My Business"
-                      className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
-                    />
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@company.com"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide">
-                      Password
-                    </label>
-                    {authMode === "login" && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAuthMode("recovery");
-                          setRecoveryStep("request");
-                        }}
-                        className="text-xs font-semibold text-[#FF5733] hover:underline cursor-pointer"
-                      >
-                        Forgot password?
-                      </button>
-                    )}
-                  </div>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading || isGoogleLoading}
-                  className="w-full h-12 bg-[#FF5733] hover:bg-[#E04826] text-white font-bold text-sm rounded-xl shadow-xs hover:shadow transition-all mt-2 cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <span>Signing in...</span>
-                  ) : (
-                    <span>
-                      {authMode === "login"
-                        ? persona === "partner" || persona === "business"
-                          ? "Sign In to Business Dashboard →"
-                          : "Sign In to Creative Hub →"
-                        : "Create Account →"}
-                    </span>
-                  )}
-                </button>
-              </form>
-
-              <div className="text-center pt-3 text-xs text-slate-600">
-                {authMode === "login" ? (
-                  <span>
-                    New to Peach Network?{" "}
-                    <button
-                      type="button"
-                      onClick={() => setAuthMode("signup")}
-                      className="font-bold text-[#FF5733] hover:underline cursor-pointer"
-                    >
-                      Create account
-                    </button>
-                  </span>
-                ) : (
-                  <span>
-                    Already have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => setAuthMode("login")}
-                      className="font-bold text-[#FF5733] hover:underline cursor-pointer"
-                    >
-                      Sign in here
-                    </button>
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
-
-      <footer className="relative z-10 py-5 text-center text-xs text-slate-500 border-t border-slate-200/80 bg-white/50">
-        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div>
-            &copy; {new Date().getFullYear()} Peach Network • Sweet As A Peach Creative Agency. All rights reserved.
-          </div>
-          <div className="flex items-center gap-5 font-medium text-slate-600">
-            <Link href="/" className="hover:text-[#FF5733] transition-colors">
-              Marketplace Home
-            </Link>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-}
+                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.24C
