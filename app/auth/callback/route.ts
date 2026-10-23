@@ -52,7 +52,31 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // 2. Fallback to existing session cookie if code exchange was not used or failed
+  // If Google returned an OAuth code but the exchange did not produce a real
+  // Supabase user, do not treat an old Peach session or a demo persona as login.
+  // Send the person back to sign-in with a clear, non-sensitive error instead.
+  if (code && !user) {
+    const failedRole =
+      roleParam === "creative" || targetRoleCookie === "creative" || roleCookie === "creative"
+        ? "creative"
+        : "partner";
+    const signInUrl = new URL("/signin", request.url);
+    signInUrl.searchParams.set("error", "google_auth_failed");
+    signInUrl.searchParams.set("role", failedRole);
+    const response = NextResponse.redirect(signInUrl);
+    cookiesToSetOnResponse.forEach(({ name, value, options }) => {
+      response.cookies.set(name, value, {
+        ...options,
+        path: "/",
+        sameSite: "lax",
+        secure: request.url.startsWith("https://"),
+      });
+    });
+    response.cookies.delete("peach_target_role");
+    return response;
+  }
+
+  // For non-OAuth visits only, allow an existing Peach session to be reused.
   if (!user) {
     const existingSession = cookieStore.get("peach_session")?.value;
     if (existingSession) {
@@ -66,24 +90,11 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // 3. Fallback default user structure so legitimate testers are never locked out
+  // Never fabricate an authenticated user in the OAuth callback.
   if (!user) {
-    const fallbackRole =
-      roleParam === "creative" || targetRoleCookie === "creative" || roleCookie === "creative"
-        ? "creative"
-        : "business";
-    user = {
-      id: fallbackRole === "creative" ? "usr_creative_demo" : "usr_business_demo",
-      email: fallbackRole === "creative" ? "creative@peachnetwork.com" : "partner@peachnetwork.com",
-      app_metadata: { provider: "google" },
-      user_metadata: {
-        full_name: fallbackRole === "creative" ? "Peach Creative" : "Peach Partner",
-        role: fallbackRole,
-        business_name: fallbackRole === "business" ? "Magic City Brands" : undefined,
-      },
-      aud: "authenticated",
-      created_at: new Date().toISOString(),
-    };
+    const signInUrl = new URL("/signin", request.url);
+    signInUrl.searchParams.set("error", "google_auth_failed");
+    return NextResponse.redirect(signInUrl);
   }
 
   // 4. CHECK USER ROLE FROM DATABASE PROFILE
