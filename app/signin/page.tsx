@@ -140,7 +140,10 @@ function SignInFormContent() {
 
       // Live environment (e.g. Vercel): call Supabase Google OAuth with SSR browser client
       const supabase = createBrowserClient();
-      const redirectUrl = `${window.location.origin}/auth/callback?role=${assignedRole}&next=${encodeURIComponent(targetRoute)}`;
+      // Always return Google OAuth to the canonical production callback.
+      // Preview origins may not be allowlisted in Supabase, which can send users to the homepage with ?code=... instead.
+      const appOrigin = "https://peach-network-mvp-v11-experience-peach-agency.vercel.app";
+      const redirectUrl = `${appOrigin}/auth/callback?role=${assignedRole}&next=${encodeURIComponent(targetRoute)}`;
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
