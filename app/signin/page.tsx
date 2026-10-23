@@ -74,34 +74,9 @@ function SignInFormContent() {
       setAuthError(`Authentication notice: ${decodeURIComponent(errorParam)}`);
     }
 
-    // Auto-detect if user is already authenticated so they never get trapped on signin screen
-    if (!errorParam) {
-      try {
-        const cookies = document.cookie.split("; ");
-        const roleCookie = cookies.find((r) => r.startsWith("peach_role="))?.split("=")[1];
-        const sessionCookie = cookies.find((r) => r.startsWith("peach_session="))?.split("=")[1];
-        const nextParam = searchParams.get("next");
-
-        if (sessionCookie && roleCookie) {
-          const dest = nextParam && nextParam.startsWith("/") && !nextParam.includes("auth") && !nextParam.includes("signin")
-            ? nextParam
-            : roleCookie === "creative" ? "/creative" : "/business";
-          window.location.href = dest;
-          return;
-        }
-
-        const supabase = createBrowserClient();
-        supabase.auth.getUser().then(({ data }) => {
-          if (data?.user) {
-            const resolvedRole = roleCookie || data.user.user_metadata?.role || (initialRole === "creative" ? "creative" : "business");
-            const dest = nextParam && nextParam.startsWith("/") && !nextParam.includes("auth") && !nextParam.includes("signin")
-              ? nextParam
-              : resolvedRole === "creative" ? "/creative" : "/business";
-            window.location.href = dest;
-          }
-        }).catch(() => {});
-      } catch {}
-    }
+    // Intentionally do not auto-redirect from the sign-in page based on an existing
+    // Supabase or legacy Peach session. Let the user choose to sign in; the OAuth callback
+    // itself routes to the dashboard after a successful, explicit sign-in.
   }, [searchParams, initialRole]);
 
   // Google Sign-In with role-based routing (Vercel Supabase OAuth + Preview iframe support)
