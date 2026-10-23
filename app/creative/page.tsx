@@ -11,6 +11,8 @@ function prettyLevel(level?: string | null) {
   return `Peach ${level[0].toUpperCase() + level.slice(1)}`;
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function CreativeDashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

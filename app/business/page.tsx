@@ -27,6 +27,8 @@ function dueText(value: string | null) {
 
 import { cookies } from "next/headers";
 
+export const dynamic = "force-dynamic";
+
 export default async function BusinessDashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

@@ -4,6 +4,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { AppHeader, BottomNav } from "../components/app-nav";
 import ProfileEditor from "./profile-editor";
 
+export const dynamic = "force-dynamic";
+
 export default async function AccountPage({searchParams}:{searchParams?:Promise<{edit?:string}>}){
  const supabase=await createClient();const{data:{user}}=await supabase.auth.getUser();if(!user)redirect("/auth?mode=signin");
  const admin=createAdminClient();let{data:profile}=await admin.from("profiles").select("full_name,email,role,phone,avatar_url").eq("id",user.id).maybeSingle();
