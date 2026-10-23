@@ -26,6 +26,7 @@ export async function middleware(request: NextRequest) {
 
   if (
     supabaseUrl &&
+    (supabaseUrl.startsWith("http://") || supabaseUrl.startsWith("https://")) &&
     supabaseAnonKey &&
     !supabaseUrl.includes("placeholder")
   ) {

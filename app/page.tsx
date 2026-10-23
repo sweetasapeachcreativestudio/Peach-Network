@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import PhoneHeroMockup from "@/components/PhoneHeroMockup";
 import { X, Check } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 interface ProjectItem {
   id: number;
@@ -49,7 +48,7 @@ const PROJECTS: ProjectItem[] = [
     timeline: "Est. 5–7 Days",
     image: "/lillian-project.jpg",
     designer: "Stephanie Stewart",
-    designerRole: "UI/UX Designer & Art Direction (Troy University)",
+    designerRole: "UI/UX Designer & Art Director (Troy University)",
     description:
       "Designed by Stephanie Stewart, UI/UX Designer & Art Director at Troy University for Lillian Hewitt's Empower Her Heart initiative.",
     specs: [
@@ -142,67 +141,6 @@ export default function HomePage() {
   const [contactMessage, setContactMessage] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  // 🎯 CATCH GOOGLE OAUTH ACCESS TOKEN & FORWARD DIRECTLY TO DASHBOARD
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const hash = window.location.hash;
-      const search = window.location.search;
-
-      // 1. If Supabase returned an access_token in the URL hash fragment:
-      if (hash && hash.includes("access_token")) {
-        let targetRole = localStorage.getItem("peach_auth_role") || "business";
-
-        // Check if role metadata was embedded in the token hash:
-        if (hash.includes('"role"%3A"creative"') || hash.includes('"role":"creative"')) {
-          targetRole = "creative";
-        } else if (
-          hash.includes('"role"%3A"business"') ||
-          hash.includes('"role":"business"') ||
-          hash.includes('"role"%3A"partner"') ||
-          hash.includes('"role":"partner"')
-        ) {
-          targetRole = "business";
-        }
-
-        localStorage.removeItem("peach_auth_role");
-
-        // Forward immediately without stopping on homepage
-        if (targetRole === "creative") {
-          window.location.href = "/hub";
-        } else {
-          window.location.href = "/dashboard/business";
-        }
-        return;
-      }
-
-      // 2. If Supabase returned with a PKCE code in query params:
-      if (search && search.includes("code=")) {
-        const params = new URLSearchParams(search);
-        const code = params.get("code");
-        if (code) {
-          const targetRole = localStorage.getItem("peach_auth_role") || "business";
-          const next = targetRole === "creative" ? "/hub" : "/dashboard/business";
-          window.location.href = `/auth/callback?code=${code}&next=${encodeURIComponent(next)}&role=${targetRole}`;
-          return;
-        }
-      }
-
-      // 3. Safety listener: If user just initiated Google auth and Supabase session establishes:
-      const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-        const pendingAuthRole = localStorage.getItem("peach_auth_role");
-        if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session?.user && pendingAuthRole) {
-          localStorage.removeItem("peach_auth_role");
-          const destination = pendingAuthRole === "creative" ? "/hub" : "/dashboard/business";
-          window.location.href = destination;
-        }
-      });
-
-      return () => {
-        authListener?.subscription.unsubscribe();
-      };
-    }
-  }, []);
-
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!contactName.trim() || !contactEmail.trim() || !contactMessage.trim()) return;
@@ -261,7 +199,7 @@ export default function HomePage() {
             </a>
           </nav>
 
-          {/* Header Right: Sign In + Start a Project CTA */}
+          {/* Header Right: Sign In + High-converting Coral Start a Project CTA (No coin badge clutter) */}
           <div className="flex items-center gap-3 sm:gap-4 shrink-0">
             <Link
               href="/login"
@@ -298,7 +236,7 @@ export default function HomePage() {
                 </span>
               </h1>
 
-              {/* Subhead */}
+              {/* Subhead with comfortable breathing room */}
               <p className="mt-6 text-base sm:text-lg text-slate-700 leading-relaxed max-w-xl">
                 Describe what you need in plain English. Get matched with top commercial designers at transparent coin pricing&mdash;with zero bidding wars, no hourly bloat, and no low-quality AI shortcuts.
               </p>
@@ -332,7 +270,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* HERO RIGHT COLUMN (3D Smartphone Mockup) */}
+            {/* HERO RIGHT COLUMN (3D Smartphone Mockup — Intact & Untouched) */}
             <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
               <PhoneHeroMockup />
             </div>
@@ -754,7 +692,7 @@ export default function HomePage() {
       <section id="why-choose-us" className="py-24 bg-[#FAF8F5] border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            {/* Real human creative photo */}
+            {/* Real human creative photo - Clean, no overlaid words, seamlessly integrated into page */}
             <div className="lg:col-span-5 flex justify-center">
               <div className="rounded-2xl overflow-hidden shadow-md border border-slate-200/80 bg-white max-w-sm w-full">
                 <img
@@ -775,7 +713,7 @@ export default function HomePage() {
                 Generative AI creates blurry, unprintable files and invented fonts that print shops reject. Peach Network gives you conversational speed backed by real human designers who master commercial print bleeds and authentic branding.
               </p>
 
-              {/* 3 Pillars */}
+              {/* 3 Pillars - Clean, modern typography without icon boxes */}
               <div className="mt-8 space-y-5 text-sm text-slate-800">
                 <div className="pl-4 border-l-2 border-[#FF5733]">
                   <strong className="text-slate-950 font-bold block mb-1">
@@ -873,7 +811,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Photo integration */}
+            {/* Seamless, unboxed photo integration: User-provided creative visual */}
             <div className="lg:col-span-5 flex justify-center">
               <div className="max-w-md w-full flex items-center justify-center">
                 <img
@@ -965,7 +903,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 8. BASIC CONTACT & PARTNER FORM */}
+      {/* 8. BASIC CONTACT & PARTNER FORM (Not talking about projects, just questions & partnerships) */}
       <section id="contact" className="py-24 bg-white border-b border-slate-200">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
@@ -1198,7 +1136,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* 10. COLORFUL & OPTIMIZED FOOTER */}
+      {/* 10. COLORFUL & OPTIMIZED FOOTER WITH LOGO, CONTACT INFO & WARM PALETTE */}
       <footer className="bg-[#0B2D22] text-white border-t-4 border-[#FF5733] pt-16 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-12 pb-14 border-b border-emerald-900/60">
@@ -1220,7 +1158,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Column 2: Studio Contact Info */}
+            {/* Column 2: Studio Contact Info (Moved here per user request) */}
             <div className="md:col-span-4 space-y-3">
               <div className="text-xs font-extrabold uppercase tracking-wider text-[#FFD8C2]">
                 Studio Contact &amp; Headquarters

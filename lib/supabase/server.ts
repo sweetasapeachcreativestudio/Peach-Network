@@ -1,4 +1,5 @@
 import { cookies, headers } from "next/headers";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -8,7 +9,41 @@ export async function createClient() {
   const roleCookie = cookieStore.get("peach_role");
   let user: any = null;
 
-  if (sessionCookie?.value) {
+  // Try real Supabase SSR session if env vars are present
+  const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const envKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (
+    envUrl &&
+    (envUrl.startsWith("http://") || envUrl.startsWith("https://")) &&
+    envKey &&
+    !envUrl.includes("placeholder") &&
+    !envUrl.includes("your-project")
+  ) {
+    try {
+      const ssrClient = createServerClient(envUrl, envKey, {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {}
+          },
+        },
+      });
+      const { data } = await ssrClient.auth.getUser();
+      if (data?.user) {
+        user = data.user;
+      }
+    } catch {}
+  }
+
+  // Parse custom session cookie
+  if (!user && sessionCookie?.value) {
     try {
       user = JSON.parse(decodeURIComponent(sessionCookie.value));
     } catch {
@@ -18,7 +53,7 @@ export async function createClient() {
     }
   }
 
-  // If no cookie was transmitted, infer authentication from route context or role cookie
+  // If no cookie was transmitted, infer user from role cookie or route context
   if (!user) {
     const pathname = reqHeaders.get("x-pathname") || "";
     const referer = reqHeaders.get("referer") || "";
@@ -84,6 +119,7 @@ export async function createClient() {
         try {
           cookieStore.delete("peach_session");
           cookieStore.delete("peach_role");
+          cookieStore.delete("peach_target_role");
         } catch {}
         return { error: null };
       },

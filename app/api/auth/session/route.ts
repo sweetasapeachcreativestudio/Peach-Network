@@ -21,22 +21,22 @@ export async function POST(req: NextRequest) {
 
     const res = NextResponse.json({ success: true, user, role: assignedRole });
 
-    // Set auth cookie with SameSite=None and Secure for iframe embedding
-    const isProduction = process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
+    // Set auth cookie: secure when HTTPS, lax for iframe and top-level navigation
+    const isHttps = req.url.startsWith("https://") || req.headers.get("x-forwarded-proto") === "https";
     
     res.cookies.set("peach_session", JSON.stringify(user), {
       path: "/",
       httpOnly: false,
-      sameSite: "none",
-      secure: true,
+      sameSite: "lax",
+      secure: isHttps,
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     res.cookies.set("peach_role", assignedRole, {
       path: "/",
       httpOnly: false,
-      sameSite: "none",
-      secure: true,
+      sameSite: "lax",
+      secure: isHttps,
       maxAge: 60 * 60 * 24 * 7,
     });
 

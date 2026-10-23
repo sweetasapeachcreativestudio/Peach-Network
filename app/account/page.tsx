@@ -6,7 +6,8 @@ import ProfileEditor from "./profile-editor";
 
 export default async function AccountPage({searchParams}:{searchParams?:Promise<{edit?:string}>}){
  const supabase=await createClient();const{data:{user}}=await supabase.auth.getUser();if(!user)redirect("/auth?mode=signin");
- const admin=createAdminClient();const{data:profile}=await admin.from("profiles").select("full_name,email,role,phone,avatar_url").eq("id",user.id).single();if(!profile)redirect("/auth?mode=signin");
+ const admin=createAdminClient();let{data:profile}=await admin.from("profiles").select("full_name,email,role,phone,avatar_url").eq("id",user.id).maybeSingle();
+ if(!profile){const defaultRole=(user.user_metadata?.role||"business") as "business"|"creative";profile={full_name:user.user_metadata?.full_name||(user.email?user.email.split("@")[0]:"Peach Member"),email:user.email||"",role:defaultRole,phone:"",avatar_url:""};}
  if(profile.role==="admin")redirect("/admin");
  const params=searchParams?await searchParams:{};
  const role=profile.role==="creative"?"creative":"business";

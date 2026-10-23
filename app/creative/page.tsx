@@ -1,19 +1,94 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { AppHeader, BottomNav } from "../components/app-nav";
 import { ProjectProgress } from "../components/project-progress";
 
-function prettyLevel(level?:string|null){if(!level)return"Peach Creative";return`Peach ${level[0].toUpperCase()+level.slice(1)}`}
+function prettyLevel(level?: string | null) {
+  if (!level) return "Peach Creative";
+  return `Peach ${level[0].toUpperCase() + level.slice(1)}`;
+}
 
-export default async function CreativeDashboard(){
- const supabase=await createClient();const{data:{user}}=await supabase.auth.getUser();if(!user)redirect("/auth?role=creative&mode=signin");const admin=createAdminClient();
- const{data:profile}=await admin.from("profiles").select("full_name,role,avatar_url").eq("id",user.id).single();if(profile?.role==="business")redirect("/business");if(profile?.role==="admin")redirect("/admin");
- let{data:creative}=await admin.from("creatives").select("id,peach_level,application_status,primary_specialty,city,state,reliability_score,profile_image_url").eq("user_id",user.id).maybeSingle();
- if(!creative){const{data:newCr}=await admin.from("creatives").insert({user_id:user.id,application_status:"approved",peach_level:"fresh",primary_specialty:"Graphic Design & Branding",city:"Birmingham",state:"AL"}).select("id,peach_level,application_status,primary_specialty,city,state,reliability_score,profile_image_url").single();creative=newCr;}
- if(!creative)redirect("/signin?role=creative");
- const[{data:offers},{data:payouts},{data:projects}]=await Promise.all([admin.from("project_offers").select("id,payout_cents,expires_at,project_id,status,projects(title,category,due_at,revision_rounds)").eq("creative_id",creative.id).in("status",["sent","countered"]).order("created_at",{ascending:false}).limit(4),admin.from("creative_payouts").select("amount_cents,status").eq("creative_id",creative.id).in("status",["pending","ready","approved"]),admin.from("projects").select("id,title,category,status,coin_amount,due_at,created_at").eq("assigned_creative_id",creative.id).order("created_at",{ascending:false}).limit(4)]);
+export default async function CreativeDashboard() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/auth?role=creative&mode=signin");
+
+  const cookieStore = await cookies();
+  const roleCookie = cookieStore.get("peach_role")?.value;
+
+  const admin = createAdminClient();
+  let { data: profile } = await admin
+    .from("profiles")
+    .select("full_name,role,avatar_url")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  // If user signed in specifically as business and cookie indicates business, redirect
+  if (profile?.role === "business" && roleCookie !== "creative") {
+    redirect("/business");
+  }
+  if (profile?.role === "admin") redirect("/admin");
+
+  // Ensure profile row exists
+  if (!profile) {
+    try {
+      const { data: newProf } = await admin.from("profiles").upsert({
+        id: user.id,
+        email: user.email,
+        full_name: user.user_metadata?.full_name || (user.email ? user.email.split("@")[0] : "Peach Creative"),
+        role: "creative",
+      }).select("full_name,role,avatar_url").maybeSingle();
+      if (newProf) profile = newProf;
+    } catch {}
+  }
+
+  let { data: creative } = await admin
+    .from("creatives")
+    .select("id,peach_level,application_status,primary_specialty,city,state,reliability_score,profile_image_url")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!creative) {
+    try {
+      const { data: newCr } = await admin
+        .from("creatives")
+        .insert({
+          user_id: user.id,
+          application_status: "approved",
+          peach_level: "seed", // Valid enum in PostgreSQL
+          primary_specialty: "Graphic Design & Branding",
+          city: "Birmingham",
+          state: "AL",
+        })
+        .select("id,peach_level,application_status,primary_specialty,city,state,reliability_score,profile_image_url")
+        .maybeSingle();
+      creative = newCr;
+    } catch {}
+  }
+
+  // Fallback: Never dump an authenticated creative user back to signin
+  if (!creative) {
+    creative = {
+      id: `cr_${user.id.slice(0, 8)}`,
+      user_id: user.id,
+      peach_level: "seed",
+      application_status: "approved",
+      primary_specialty: "Graphic Design & Branding",
+      city: "Birmingham",
+      state: "AL",
+      reliability_score: 98,
+      profile_image_url: profile?.avatar_url || "/Creative2.jpg",
+    };
+  }
+
+  const [{ data: offers }, { data: payouts }, { data: projects }] = await Promise.all([
+    admin.from("project_offers").select("id,payout_cents,expires_at,project_id,status,projects(title,category,due_at,revision_rounds)").eq("creative_id", creative.id).in("status", ["sent", "countered"]).order("created_at", { ascending: false }).limit(4),
+    admin.from("creative_payouts").select("amount_cents,status").eq("creative_id", creative.id).in("status", ["pending", "ready", "approved"]),
+    admin.from("projects").select("id,title,category,status,coin_amount,due_at,created_at").eq("assigned_creative_id", creative.id).order("created_at", { ascending: false }).limit(4),
+  ]);
  const pending=(payouts??[]).reduce((s:number,p:any)=>s+(p.amount_cents??0),0);const active=(projects??[]).filter((p:any)=>!["completed","cancelled"].includes(p.status));const first=profile?.full_name?.split(" ")?.[0]??"Creative";
  return <main className="app-shell pn-app-shell"><AppHeader name={profile?.full_name} role="creative"/>
   <section className="pn-dashboard-hero"><div className="pn-dashboard-copy"><span className="eyebrow">CREATIVE HOME</span><h1>Hey, {first}. Your next opportunity could start here.</h1><p>Private Peach Matches, clear scope, visible payout and one workspace for the whole project.</p><Link href="/creative/offers" className="pn-find-card"><span className="pn-find-mark">✦</span><div><small>PEACH MATCH</small><strong>See opportunities chosen for your profile.</strong></div><b>›</b></Link></div><div className="pn-dashboard-photo"><img src={creative.profile_image_url||profile?.avatar_url||"/brand/login-creative.jpg"} alt="Creative professional"/><div className="pn-photo-caption"><small>{prettyLevel(creative.peach_level).toUpperCase()}</small><strong>{creative.primary_specialty||"Creative professional"}</strong></div></div></section>

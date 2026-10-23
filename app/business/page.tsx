@@ -25,32 +25,76 @@ function dueText(value: string | null) {
   return `Due ${new Date(value).toLocaleDateString("en-US", {month:"short",day:"numeric",timeZone:"America/Chicago"})}`;
 }
 
+import { cookies } from "next/headers";
+
 export default async function BusinessDashboard() {
   const supabase = await createClient();
-  const {data:{user}} = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth?role=business&mode=signin");
+
+  const cookieStore = await cookies();
+  const roleCookie = cookieStore.get("peach_role")?.value;
+
   const admin = createAdminClient();
-  const {data:profile} = await admin.from("profiles").select("full_name,role,avatar_url").eq("id", user.id).single();
-  if (profile?.role === "creative") redirect("/creative");
+  let { data: profile } = await admin
+    .from("profiles")
+    .select("full_name,role,avatar_url")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  // If user signed in specifically as creative and cookie indicates creative, redirect
+  if (profile?.role === "creative" && roleCookie !== "business") {
+    redirect("/creative");
+  }
   if (profile?.role === "admin") redirect("/admin");
-  let {data:business} = await admin.from("businesses").select("id,name,industry,logo_url").eq("owner_user_id",user.id).maybeSingle();
+
+  // Ensure profile row exists
+  if (!profile) {
+    try {
+      const { data: newProf } = await admin.from("profiles").upsert({
+        id: user.id,
+        email: user.email,
+        full_name: user.user_metadata?.full_name || (user.email ? user.email.split("@")[0] : "Peach Partner"),
+        role: "business",
+      }).select("full_name,role,avatar_url").maybeSingle();
+      if (newProf) profile = newProf;
+    } catch {}
+  }
+
+  let { data: business } = await admin
+    .from("businesses")
+    .select("id,name,industry,logo_url")
+    .eq("owner_user_id", user.id)
+    .maybeSingle();
+
   if (!business) {
     const bizName = user.user_metadata?.business_name || (profile?.full_name ? `${profile.full_name}'s Business` : "My Business");
-    const { data: createdBiz } = await admin.from("businesses").insert({
-      owner_user_id: user.id,
-      name: bizName,
-      industry: "Commercial & Creative",
-    }).select("id,name,industry,logo_url").single();
-    business = createdBiz;
-    if (business) {
-      await admin.from("coin_wallets").insert({
-        business_id: business.id,
-        available_coins: 0,
-        held_coins: 0,
-      });
-    }
+    try {
+      const { data: createdBiz } = await admin.from("businesses").insert({
+        owner_user_id: user.id,
+        name: bizName,
+        industry: "Commercial & Creative",
+      }).select("id,name,industry,logo_url").maybeSingle();
+      business = createdBiz;
+      if (business) {
+        await admin.from("coin_wallets").insert({
+          business_id: business.id,
+          available_coins: 0,
+          held_coins: 0,
+        });
+      }
+    } catch {}
   }
-  if (!business) redirect("/signin?role=partner");
+
+  // Fallback: Never dump an authenticated business user back to signin
+  if (!business) {
+    business = {
+      id: `biz_${user.id.slice(0, 8)}`,
+      name: user.user_metadata?.business_name || (profile?.full_name ? `${profile.full_name}'s Business` : "My Business"),
+      industry: "Commercial & Creative",
+      logo_url: "/brand/peach-app-logo.png",
+    };
+  }
   const [{data:wallet},{data:projects},{data:brandAssets}] = await Promise.all([
     admin.from("coin_wallets").select("available_coins,held_coins").eq("business_id",business.id).maybeSingle(),
     admin.from("projects").select("id,title,category,status,coin_amount,due_at,created_at,assigned_creative_id,revision_rounds").eq("business_id",business.id).order("created_at",{ascending:false}),

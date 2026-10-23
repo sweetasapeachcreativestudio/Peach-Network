@@ -7,6 +7,7 @@ export function createAdminClient() {
 
   const isRealSupabase = Boolean(
     url &&
+    (url.startsWith("http://") || url.startsWith("https://")) &&
     key &&
     !url.includes("placeholder") &&
     !url.includes("your-project") &&
@@ -47,6 +48,27 @@ export function createAdminClient() {
           return query;
         },
         limit() {
+          return query;
+        },
+        upsert(payload: any) {
+          if (payload && typeof payload === "object") {
+            Object.assign(filters, payload);
+          }
+          return query;
+        },
+        insert(payload: any) {
+          if (payload && typeof payload === "object") {
+            Object.assign(filters, payload);
+          }
+          return query;
+        },
+        update(payload: any) {
+          if (payload && typeof payload === "object") {
+            Object.assign(filters, payload);
+          }
+          return query;
+        },
+        delete() {
           return query;
         },
         single() {
