@@ -17,6 +17,20 @@ function SignInFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Keep OAuth on the same host that stores Supabase's PKCE verifier cookie.
+  // If someone opens a per-deployment Vercel URL, move them to the production alias
+  // before they start Google sign-in; the callback cannot read cookies from another host.
+  useEffect(() => {
+    const canonicalHost = "peach-network-mvp-v11-experience-peach-agency.vercel.app";
+    const isVercelHost = window.location.hostname.endsWith(".vercel.app");
+    if (isVercelHost && window.location.hostname !== canonicalHost) {
+      const canonicalUrl = new URL(window.location.href);
+      canonicalUrl.hostname = canonicalHost;
+      canonicalUrl.port = "";
+      window.location.replace(canonicalUrl.toString());
+    }
+  }, []);
+
   // Read URL params: ?role=partner|creative & mode=login|signup
   const initialRole = searchParams.get("role") === "creative" ? "creative" : "partner";
   const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
