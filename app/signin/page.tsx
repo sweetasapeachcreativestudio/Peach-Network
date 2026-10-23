@@ -11,7 +11,7 @@ import {
   AlertCircle,
   CheckCircle2,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { createClient as createBrowserClient } from "@/lib/supabase/client";
 
 function SignInFormContent() {
   const router = useRouter();
@@ -59,7 +59,36 @@ function SignInFormContent() {
     if (errorParam) {
       setAuthError(`Authentication notice: ${decodeURIComponent(errorParam)}`);
     }
-  }, [searchParams]);
+
+    // Auto-detect if user is already authenticated so they never get trapped on signin screen
+    if (!errorParam) {
+      try {
+        const cookies = document.cookie.split("; ");
+        const roleCookie = cookies.find((r) => r.startsWith("peach_role="))?.split("=")[1];
+        const sessionCookie = cookies.find((r) => r.startsWith("peach_session="))?.split("=")[1];
+        const nextParam = searchParams.get("next");
+
+        if (sessionCookie && roleCookie) {
+          const dest = nextParam && nextParam.startsWith("/") && !nextParam.includes("auth") && !nextParam.includes("signin")
+            ? nextParam
+            : roleCookie === "creative" ? "/creative" : "/business";
+          window.location.href = dest;
+          return;
+        }
+
+        const supabase = createBrowserClient();
+        supabase.auth.getUser().then(({ data }) => {
+          if (data?.user) {
+            const resolvedRole = roleCookie || data.user.user_metadata?.role || (initialRole === "creative" ? "creative" : "business");
+            const dest = nextParam && nextParam.startsWith("/") && !nextParam.includes("auth") && !nextParam.includes("signin")
+              ? nextParam
+              : resolvedRole === "creative" ? "/creative" : "/business";
+            window.location.href = dest;
+          }
+        }).catch(() => {});
+      } catch {}
+    }
+  }, [searchParams, initialRole]);
 
   // Google Sign-In with role-based routing (Vercel Supabase OAuth + Preview iframe support)
   const handleGoogleSignIn = async () => {
@@ -83,7 +112,7 @@ function SignInFormContent() {
       const isIframe = typeof window !== "undefined" && window.self !== window.top;
 
       if (isIframe) {
-        setAuthSuccess(`Preview mode: Connecting to ${isPartner ? "Business" : "Creative"} Home...`);
+        setAuthSuccess(`Connecting to ${isPartner ? "Business" : "Creative"} Dashboard...`);
         const user = {
           id: isPartner ? "usr_business_demo" : "usr_creative_demo",
           email: isPartner ? "partner@peachnetwork.com" : "creative@peachnetwork.com",
@@ -104,12 +133,13 @@ function SignInFormContent() {
         } catch {}
 
         setTimeout(() => {
-          router.push(targetRoute);
-        }, 500);
+          window.location.href = targetRoute;
+        }, 300);
         return;
       }
 
-      // Live environment (e.g. Vercel): call Supabase Google OAuth
+      // Live environment (e.g. Vercel): call Supabase Google OAuth with SSR browser client
+      const supabase = createBrowserClient();
       const redirectUrl = `${window.location.origin}/auth/callback?role=${assignedRole}&next=${encodeURIComponent(targetRoute)}`;
 
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -179,7 +209,7 @@ function SignInFormContent() {
         localStorage.setItem("peach_role", assignedRole);
       } catch {}
 
-      router.push(targetRoute);
+      window.location.href = targetRoute;
     } catch (err: unknown) {
       setAuthError(err instanceof Error ? err.message : "An error occurred during authentication.");
       setLoading(false);

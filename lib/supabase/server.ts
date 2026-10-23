@@ -9,19 +9,29 @@ export async function createClient() {
   const roleCookie = cookieStore.get("peach_role");
   let user: any = null;
 
-  // Try real Supabase SSR session if env vars are present
+  // Try real Supabase SSR session if env vars or cookies are present
   const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const envKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const cookieUrl = cookieStore.get("peach_sb_url")?.value ? decodeURIComponent(cookieStore.get("peach_sb_url")!.value) : null;
+  const cookieKey = cookieStore.get("peach_sb_anon_key")?.value ? decodeURIComponent(cookieStore.get("peach_sb_anon_key")!.value) : null;
+
+  const supabaseUrl = (envUrl && !envUrl.includes("placeholder") && !envUrl.includes("your-project"))
+    ? envUrl
+    : (cookieUrl && !cookieUrl.includes("placeholder") ? cookieUrl : envUrl);
+
+  const supabaseAnonKey = (envKey && !envKey.includes("placeholder") && !envKey.includes("your-anon"))
+    ? envKey
+    : (cookieKey && !cookieKey.includes("placeholder") ? cookieKey : envKey);
 
   if (
-    envUrl &&
-    (envUrl.startsWith("http://") || envUrl.startsWith("https://")) &&
-    envKey &&
-    !envUrl.includes("placeholder") &&
-    !envUrl.includes("your-project")
+    supabaseUrl &&
+    (supabaseUrl.startsWith("http://") || supabaseUrl.startsWith("https://")) &&
+    supabaseAnonKey &&
+    !supabaseUrl.includes("placeholder") &&
+    !supabaseUrl.includes("your-project")
   ) {
     try {
-      const ssrClient = createServerClient(envUrl, envKey, {
+      const ssrClient = createServerClient(supabaseUrl, supabaseAnonKey, {
         cookies: {
           getAll() {
             return cookieStore.getAll();

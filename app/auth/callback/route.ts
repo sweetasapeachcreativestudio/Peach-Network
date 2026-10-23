@@ -92,11 +92,24 @@ export async function GET(request: NextRequest) {
   let existingProfile: any = null;
 
   try {
-    const { data: profile } = await admin
+    // 4a. Check profiles table by user.id
+    let { data: profile } = await admin
       .from("profiles")
       .select("id, role, full_name, email, avatar_url")
       .eq("id", user.id)
       .maybeSingle();
+
+    // 4b. Check profiles table by email if not found by id
+    if (!profile && user.email) {
+      const { data: profileByEmail } = await admin
+        .from("profiles")
+        .select("id, role, full_name, email, avatar_url")
+        .eq("email", user.email)
+        .maybeSingle();
+      if (profileByEmail) {
+        profile = profileByEmail;
+      }
+    }
 
     if (profile) {
       existingProfile = profile;
@@ -112,22 +125,42 @@ export async function GET(request: NextRequest) {
     console.warn("Error querying profile in callback:", profileErr);
   }
 
-  // Also verify in creatives or businesses tables if dbProfileRole was not found
+  // 4c. Also check creatives or businesses tables if role was not determined
   if (!dbProfileRole) {
     try {
-      const { data: creativeRecord } = await admin
+      let { data: creativeRecord } = await admin
         .from("creatives")
         .select("id")
         .eq("user_id", user.id)
         .maybeSingle();
+
+      if (!creativeRecord && existingProfile?.id) {
+        const { data: crByExistingId } = await admin
+          .from("creatives")
+          .select("id")
+          .eq("user_id", existingProfile.id)
+          .maybeSingle();
+        creativeRecord = crByExistingId;
+      }
+
       if (creativeRecord) {
         dbProfileRole = "creative";
       } else {
-        const { data: businessRecord } = await admin
+        let { data: businessRecord } = await admin
           .from("businesses")
           .select("id")
           .eq("owner_user_id", user.id)
           .maybeSingle();
+
+        if (!businessRecord && existingProfile?.id) {
+          const { data: bizByExistingId } = await admin
+            .from("businesses")
+            .select("id")
+            .eq("owner_user_id", existingProfile.id)
+            .maybeSingle();
+          businessRecord = bizByExistingId;
+        }
+
         if (businessRecord) {
           dbProfileRole = "business";
         }
@@ -263,6 +296,7 @@ export async function GET(request: NextRequest) {
   cookiesToSetOnResponse.forEach(({ name, value, options }) => {
     response.cookies.set(name, value, {
       ...options,
+      path: "/",
       sameSite: "lax",
       secure: isHttps,
     });
