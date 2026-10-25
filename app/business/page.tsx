@@ -1,4 +1,4 @@
-import {ProjectRefresh} from "@/app/components/project-refresh";
+import { ProjectRefresh } from "@/app/components/project-refresh";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -6,28 +6,58 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { PeachAppShell } from "../components/peach-app-shell";
 import { AcceptedProject } from "../components/accepted-project";
 import { ProjectProgress } from "../components/project-progress";
-
-const reviewStatuses = ["proof_uploaded", "submitted", "waiting_on_client"];
-function statusLabel(status: string) {
-  return ({matching:"Matching",offer_sent:"Awaiting acceptance",accepted:"Creative accepted",in_progress:"In progress",proof_uploaded:"Proof ready",submitted:"Delivery ready",waiting_on_client:"Waiting on you",revisions:"Revision in progress",approved:"Approved",dispute:"Support needed",dispute_review:"Support reviewing"} as Record<string,string>)[status] ?? status.replaceAll("_", " ");
-}
-function nextStep(status: string) {
-  if (reviewStatuses.includes(status)) return "Review the work or respond to your creative.";
-  if (status === "matching" || status === "offer_sent") return "Peach is arranging your creative match.";
-  if (status === "revisions") return "Your creative is working through the requested changes.";
-  return "Open the project for the latest progress and files.";
-}
-function dueText(value: string | null) {
-  if (!value) return "Deadline not set";
-  const hours = Math.ceil((new Date(value).getTime() - Date.now()) / 3600000);
-  if (hours < 0) return "Past due";
-  if (hours < 24) return `${hours}h remaining`;
-  return `Due ${new Date(value).toLocaleDateString("en-US", {month:"short",day:"numeric",timeZone:"America/Chicago"})}`;
-}
-
+import { EventAnnouncements } from "./components/event-announcements";
+import { PeachMatchAIBox } from "./components/peach-match-ai-box";
+import {
+  Sparkles,
+  Coins,
+  ArrowRight,
+  ShieldCheck,
+  FolderArchive,
+  Wallet,
+  MessageSquare,
+  Plus,
+  AlertCircle,
+  ExternalLink,
+} from "lucide-react";
 import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
+
+const reviewStatuses = ["proof_uploaded", "submitted", "waiting_on_client"];
+
+function statusLabel(status: string) {
+  return (
+    ({
+      matching: "Matching",
+      offer_sent: "Awaiting acceptance",
+      accepted: "Kickoff ready",
+      in_progress: "In progress",
+      proof_uploaded: "Proof ready",
+      submitted: "Delivery ready",
+      waiting_on_client: "Waiting on you",
+      revisions: "Revision in progress",
+      approved: "Approved",
+      dispute: "Support needed",
+      dispute_review: "Support reviewing",
+    } as Record<string, string>)[status] ?? status.replaceAll("_", " ")
+  );
+}
+
+function nextStep(status: string) {
+  if (reviewStatuses.includes(status)) return "Review proof or respond to your creative in the room.";
+  if (status === "matching" || status === "offer_sent") return "Peach is arranging your 3 creative matches.";
+  if (status === "revisions") return "Your creative is implementing agreed revisions.";
+  return "Open the project room for the latest proofs and deliverables.";
+}
+
+function dueText(value: string | null) {
+  if (!value) return "Flexible timeline";
+  const hours = Math.ceil((new Date(value).getTime() - Date.now()) / 3600000);
+  if (hours < 0) return "Past due";
+  if (hours < 24) return `${hours}h remaining`;
+  return `Due ${new Date(value).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+}
 
 export default async function BusinessDashboard() {
   const supabase = await createClient();
@@ -44,21 +74,23 @@ export default async function BusinessDashboard() {
     .eq("id", user.id)
     .maybeSingle();
 
-  // If user signed in specifically as creative and cookie indicates creative, redirect
   if (profile?.role === "creative" && roleCookie !== "business") {
     redirect("/creative");
   }
   if (profile?.role === "admin") redirect("/admin");
 
-  // Ensure profile row exists
   if (!profile) {
     try {
-      const { data: newProf } = await admin.from("profiles").upsert({
-        id: user.id,
-        email: user.email,
-        full_name: user.user_metadata?.full_name || (user.email ? user.email.split("@")[0] : "Peach Partner"),
-        role: "business",
-      }).select("full_name,role,avatar_url").maybeSingle();
+      const { data: newProf } = await admin
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || (user.email ? user.email.split("@")[0] : "Peach Partner"),
+          role: "business",
+        })
+        .select("full_name,role,avatar_url")
+        .maybeSingle();
       if (newProf) profile = newProf;
     } catch {}
   }
@@ -70,13 +102,19 @@ export default async function BusinessDashboard() {
     .maybeSingle();
 
   if (!business) {
-    const bizName = user.user_metadata?.business_name || (profile?.full_name ? `${profile.full_name}'s Business` : "My Business");
+    const bizName =
+      user.user_metadata?.business_name ||
+      (profile?.full_name ? `${profile.full_name}'s Business` : "My Business");
     try {
-      const { data: createdBiz } = await admin.from("businesses").insert({
-        owner_user_id: user.id,
-        name: bizName,
-        industry: "Commercial & Creative",
-      }).select("id,name,industry,logo_url").maybeSingle();
+      const { data: createdBiz } = await admin
+        .from("businesses")
+        .insert({
+          owner_user_id: user.id,
+          name: bizName,
+          industry: "Commercial & Creative",
+        })
+        .select("id,name,industry,logo_url")
+        .maybeSingle();
       business = createdBiz;
       if (business) {
         await admin.from("coin_wallets").insert({
@@ -88,7 +126,6 @@ export default async function BusinessDashboard() {
     } catch {}
   }
 
-  // Fallback: Never dump an authenticated business user back to signin
   if (!business) {
     business = {
       id: `biz_${user.id.slice(0, 8)}`,
@@ -97,62 +134,377 @@ export default async function BusinessDashboard() {
       logo_url: "/brand/peach-app-logo.png",
     };
   }
-  const [{data:wallet},{data:projects},{data:brandAssets}] = await Promise.all([
-    admin.from("coin_wallets").select("available_coins,held_coins").eq("business_id",business.id).maybeSingle(),
-    admin.from("projects").select("id,title,category,status,coin_amount,due_at,created_at,assigned_creative_id,revision_rounds").eq("business_id",business.id).order("created_at",{ascending:false}),
-    admin.from("business_brand_assets").select("id,kind,label,value,original_name").eq("business_id",business.id)
+
+  const [{ data: wallet }, { data: projects }, { data: brandAssets }] = await Promise.all([
+    admin.from("coin_wallets").select("available_coins,held_coins").eq("business_id", business.id).maybeSingle(),
+    admin
+      .from("projects")
+      .select("id,title,description,category,status,coin_amount,due_at,created_at,assigned_creative_id,revision_rounds")
+      .eq("business_id", business.id)
+      .order("created_at", { ascending: false }),
+    admin.from("business_brand_assets").select("id,kind,label,value,original_name").eq("business_id", business.id),
   ]);
+
   const active = ((projects ?? []) as any[]).filter((p: any) => !["completed", "cancelled"].includes(p.status));
   const accepted = active.find((p: any) => p.status === "accepted");
   const attention = active.find((p: any) => reviewStatuses.includes(p.status));
   const lead = attention ?? active[0];
   const first = profile?.full_name?.trim().split(" ")[0] || business.name;
   const coins = wallet?.available_coins ?? 0;
-  const ids = active.map((p: any) => p.id);
+
   const creativeIds = [...new Set(active.map((p: any) => p.assigned_creative_id).filter(Boolean))];
-  const [{data:messages},{data:creatives}] = await Promise.all([
-    ids.length ? admin.from("project_messages").select("id,project_id,message,created_at,sender_user_id").in("project_id",ids).order("created_at",{ascending:false}).limit(3) : Promise.resolve({data:[]}),
-    creativeIds.length ? admin.from("creatives").select("id,user_id").in("id",creativeIds) : Promise.resolve({data:[]})
+  const activeIds = active.map((p: any) => p.id);
+
+  const [{ data: messages }, { data: creatives }] = await Promise.all([
+    activeIds.length
+      ? admin
+          .from("project_messages")
+          .select("id,project_id,message,created_at,sender_user_id")
+          .in("project_id", activeIds)
+          .order("created_at", { ascending: false })
+          .limit(4)
+      : Promise.resolve({ data: [] }),
+    creativeIds.length ? admin.from("creatives").select("id,user_id").in("id", creativeIds) : Promise.resolve({ data: [] }),
   ]);
-  const peopleIds = [...new Set([...((creatives ?? []) as any[]).map((c: any) => c.user_id), ...((messages ?? []) as any[]).map((m: any) => m.sender_user_id)].filter(Boolean))];
-  const {data:people} = peopleIds.length ? await admin.from("profiles").select("id,full_name,avatar_url").in("id",peopleIds) : {data:[]};
+
+  const peopleIds = [
+    ...new Set([
+      ...((creatives ?? []) as any[]).map((c: any) => c.user_id),
+      ...((messages ?? []) as any[]).map((m: any) => m.sender_user_id),
+    ].filter(Boolean)),
+  ];
+
+  const { data: people } = peopleIds.length
+    ? await admin.from("profiles").select("id,full_name,avatar_url").in("id", peopleIds)
+    : { data: [] };
+
   const peopleMap = new Map(((people ?? []) as any[]).map((p: any) => [p.id, p]));
   const creativeMap = new Map(((creatives ?? []) as any[]).map((c: any) => [c.id, peopleMap.get(c.user_id)]));
 
-  const projectCard = (project: any) => {
-    const creative = creativeMap.get(project.assigned_creative_id);
-    return <details className="bd-project" key={project.id}>
-      <summary>
-        <span className="bd-project-art" aria-hidden="true">{business.logo_url ? <img src={business.logo_url} alt=""/> : <span>{business.name.slice(0,2).toUpperCase()}</span>}</span>
-        <span className="bd-project-info"><span className="bd-meta"><span className={`bd-status ${reviewStatuses.includes(project.status)?"review":""}`}>{statusLabel(project.status)}</span><span>{project.category} · {project.coin_amount} Coins</span></span><strong>{project.title}</strong><span className="bd-assigned">{creative?.avatar_url&&<img src={creative.avatar_url} alt=""/>}{creative?.full_name ? `Assigned: ${creative.full_name}` : project.assigned_creative_id ? "Creative connected" : "Finding your creative"}</span><span className="bd-next">Next: {nextStep(project.status)} · {dueText(project.due_at)}</span></span>
-        <span className="bd-expand">Details <span className="bd-chevron">⌄</span></span>
-      </summary>
-      <div className="bd-project-expanded"><ProjectProgress status={project.status} compact/><Link href={`/projects/${project.id}`} className="bd-button">{reviewStatuses.includes(project.status)?"Review project":"Open Project Room"} →</Link><Link href={`/projects/${project.id}#chat`} className="bd-text-link">Message your creative</Link></div>
-    </details>;
-  }
+  return (
+    <PeachAppShell
+      role="business"
+      active="home"
+      name={profile?.full_name}
+      coinCount={coins}
+      businessName={business.name}
+      logoUrl={business.logo_url}
+    >
+      <ProjectRefresh />
+      <div className="space-y-6">
+        {/* Top Event & Opportunity Announcement Section */}
+        <EventAnnouncements />
 
-  return <PeachAppShell role="business" active="home" name={profile?.full_name} coinCount={coins} businessName={business.name} logoUrl={business.logo_url}>
-    <ProjectRefresh/><main className="bd-dashboard">
-      <header className="bd-heading"><div><h1>Welcome back, {first}</h1><p>Here is what needs your review today across your active design requests.</p></div><Link href="/business/new-project" className="bd-button">+ Start a Project</Link></header>
-      {accepted&&<AcceptedProject project={accepted} creativeName={creativeMap.get(accepted.assigned_creative_id)?.full_name} assetCount={brandAssets?.length??0}/>}
-      <div className="bd-layout"><div className="bd-main">
-        <section className="bd-attention"><div className="bd-meta"><span className="bd-attention-label">{attention?"NEEDS YOUR ATTENTION":active.length?"PROJECTS IN MOTION":"YOUR NEXT BIG IDEA"}</span><span className="bd-status">{lead?statusLabel(lead.status):"Ready when you are"}</span>{lead&&<span>{dueText(lead.due_at)}</span>}</div><h2>{lead?.title ?? "Good work starts with a clear idea."}</h2><p>{lead?`${lead.coin_amount} Peach Coins · ${nextStep(lead.status)}`:"Tell us what you need. Peach connects your business with a vetted creative."}</p><div className="bd-actions"><Link href={lead?`/projects/${lead.id}`:"/business/new-project"} className="bd-button peach">{attention?"Review project":lead?"Open Project Room":"Find my creative"} →</Link>{lead&&<Link href="/business/projects" className="bd-button secondary">View all projects</Link>}</div></section>
-        <div className="bd-section-heading"><h2>Active Projects <span>({active.length})</span></h2><Link href="/business/projects" className="bd-text-link">All Projects & Archive →</Link></div>
-        <section className="bd-project-list" aria-label="Active projects">{active.length?active.slice(0,2).map(projectCard):<div className="bd-empty"><h3>A little room for something great.</h3><p>Your projects, creative and next steps will appear here.</p><Link href="/business/new-project" className="bd-text-link">Start your first project →</Link></div>}{active.length>2&&<details className="bd-more"><summary>{active.length-2} more active projects <span className="bd-chevron">⌄</span></summary><div>{active.slice(2).map(projectCard)}</div></details>}</section>
-        <details className="bd-guarantee"><summary><span className="bd-check">✓</span><span><strong>Protected payments. Clear next steps.</strong><small>Review the work before final sign-off.</small></span><span className="bd-chevron">⌄</span></summary><p>Track your brief, proofs, revisions and final delivery in the Project Room. Approval and payment actions stay attached to your project.</p></details>
+        {/* Dashboard Welcome Header */}
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-stone-200/70">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#EB6244] mb-1">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Sweet As A Peach Creative Network</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-950 tracking-tight">
+              Welcome back, {first}
+            </h1>
+            <p className="text-xs sm:text-sm text-stone-600 mt-1 flex items-center gap-2 flex-wrap">
+              <span>
+                <strong className="text-stone-900 tabular-nums">{active.length}</strong> active collaboration{active.length === 1 ? "" : "s"}
+              </span>
+              <span className="text-stone-300 font-normal">·</span>
+              <span>
+                <strong className="text-stone-900 tabular-nums">{coins}</strong> Peach Coins available
+              </span>
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <Link
+              href="/business/projects"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-stone-700 hover:text-stone-950 bg-white hover:bg-stone-50 border border-stone-200 rounded-xl transition-all shadow-2xs"
+            >
+              <span>View All Projects</span>
+              <ArrowRight className="w-3.5 h-3.5 text-stone-400" />
+            </Link>
+          </div>
+        </header>
+
+        {/* 1. PEACH MATCH AI CONTAINER (Direct on Dashboard for immediate access) */}
+        <PeachMatchAIBox
+          initialAvailableCoins={coins}
+          businessName={business.name}
+        />
+
+        {/* Kickoff Banner if a project was just accepted */}
+        {accepted && (
+          <AcceptedProject
+            project={accepted}
+            creativeName={creativeMap.get(accepted.assigned_creative_id)?.full_name}
+            assetCount={brandAssets?.length ?? 0}
+          />
+        )}
+
+        {/* Two-Column Layout: Active Projects on Left, Side Dock on Right */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 sm:gap-6 items-start">
+          {/* Main Column */}
+          <main className="xl:col-span-8 space-y-5 min-w-0">
+            {/* Attention Banner if an action is needed */}
+            {lead && (
+              <section
+                className={`rounded-2xl border p-5 shadow-xs transition-all ${
+                  attention
+                    ? "bg-[#FFFDF7] border-amber-300/80 ring-1 ring-amber-100"
+                    : "bg-white border-stone-200/90"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2 mb-2 flex-wrap text-xs">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`font-bold ${
+                        attention ? "text-amber-800" : "text-stone-700"
+                      }`}
+                    >
+                      {attention ? "Action Needed" : "Active Focus"}
+                    </span>
+                    <span className="text-stone-300">·</span>
+                    <span className="font-semibold text-stone-600">{statusLabel(lead.status)}</span>
+                  </div>
+                  <span className="text-stone-500 font-medium">{dueText(lead.due_at)}</span>
+                </div>
+
+                <h2 className="text-lg font-extrabold text-stone-950 tracking-tight leading-snug">
+                  {lead.title}
+                </h2>
+                <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                  {lead.coin_amount} Peach Coins in escrow · {nextStep(lead.status)}
+                </p>
+
+                <div className="pt-3 flex items-center gap-2.5">
+                  <Link
+                    href={`/projects/${lead.id}`}
+                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs ${
+                      attention
+                        ? "bg-[#EB6244] hover:bg-[#d85538] text-white"
+                        : "bg-[#173328] hover:bg-[#234b3c] text-white"
+                    }`}
+                  >
+                    <span>{attention ? "Review Proof" : "Open Project Room"}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+
+                  <Link
+                    href={`/projects/${lead.id}#chat`}
+                    className="px-3 py-2 text-stone-600 hover:text-stone-950 text-xs font-bold hover:bg-stone-100 rounded-xl transition-colors"
+                  >
+                    Message Creative
+                  </Link>
+                </div>
+              </section>
+            )}
+
+            {/* Active Projects List */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-extrabold text-stone-950 flex items-center gap-2">
+                  <span>Current Collaborations</span>
+                  <span className="text-xs font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full tabular-nums">
+                    {active.length}
+                  </span>
+                </h2>
+                <Link
+                  href="/business/projects"
+                  className="text-xs font-bold text-[#EB6244] hover:text-[#d85538] hover:underline"
+                >
+                  All Projects &amp; Archive →
+                </Link>
+              </div>
+
+              {active.length > 0 ? (
+                <div className="space-y-2.5">
+                  {active.map((p: any) => {
+                    const creative = creativeMap.get(p.assigned_creative_id);
+                    const isReview = reviewStatuses.includes(p.status);
+
+                    return (
+                      <article
+                        key={p.id}
+                        className="bg-white border border-stone-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs hover:shadow-xs transition-shadow"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="space-y-1 min-w-0 flex-1">
+                            <div className="flex items-center gap-2 text-xs flex-wrap">
+                              <span
+                                className={`font-bold ${
+                                  isReview ? "text-amber-800" : "text-stone-700"
+                                }`}
+                              >
+                                {statusLabel(p.status)}
+                              </span>
+                              <span className="text-stone-300">·</span>
+                              <span className="font-semibold text-stone-600">{p.category}</span>
+                              <span className="text-stone-300">·</span>
+                              <span className="text-stone-500 font-medium">{dueText(p.due_at)}</span>
+                            </div>
+
+                            <h3 className="text-sm sm:text-base font-extrabold text-stone-950 truncate">
+                              <Link
+                                href={`/projects/${p.id}`}
+                                className="hover:text-[#EB6244] transition-colors"
+                              >
+                                {p.title}
+                              </Link>
+                            </h3>
+
+                            <div className="flex items-center gap-3 text-xs text-stone-600 pt-0.5">
+                              <span>
+                                Creative:{" "}
+                                <strong className="text-stone-900 font-bold">
+                                  {creative?.full_name ? `✦ ${creative.full_name}` : "Finding match"}
+                                </strong>
+                              </span>
+                              <span className="text-stone-300">·</span>
+                              <span className="tabular-nums font-semibold text-stone-700">
+                                {p.coin_amount} Coins
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                            <Link
+                              href={`/projects/${p.id}#chat`}
+                              className="px-2.5 py-1.5 text-xs font-bold text-stone-600 hover:text-stone-950 hover:bg-stone-100 rounded-xl transition-colors"
+                            >
+                              Chat
+                            </Link>
+                            <Link
+                              href={`/projects/${p.id}`}
+                              className={`inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs ${
+                                isReview
+                                  ? "bg-[#EB6244] hover:bg-[#d85538] text-white"
+                                  : "bg-[#173328] hover:bg-[#234b3c] text-white"
+                              }`}
+                            >
+                              <span>{isReview ? "Review Proof" : "Open Room"}</span>
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </Link>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="bg-white border border-stone-200 rounded-2xl p-6 text-center space-y-2">
+                  <p className="text-xs text-stone-500">
+                    No active design requests right now. Use Peach Match AI above to start your next brief.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Escrow Guarantee Accordion */}
+            <details className="border border-stone-200/90 bg-white rounded-2xl p-4 sm:p-5 text-xs text-stone-600 group cursor-pointer shadow-2xs">
+              <summary className="font-bold text-stone-900 flex items-center justify-between list-none">
+                <span className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Peach Escrow &amp; Dispute Protection</span>
+                </span>
+                <span className="text-stone-400 group-open:rotate-180 transition-transform">⌄</span>
+              </summary>
+              <p className="mt-3 text-xs leading-relaxed text-stone-600 border-t border-stone-100 pt-3">
+                All collaborations follow fixed scope and revision rounds. Peach Coins remain held in secure escrow
+                until you approve the final delivery. If an issue ever arises, projects can be disputed directly to
+                Peach admins for full refund, 50/50 split resolution, or reassignment of a new creative from our ecosystem.
+              </p>
+            </details>
+          </main>
+
+          {/* Side Dock: Wallet, Brand Vault, Messages */}
+          <aside className="xl:col-span-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-4 sm:gap-5 min-w-0">
+            {/* Wallet Panel */}
+            <section className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-bold text-stone-900 flex items-center gap-2">
+                  <Wallet className="w-4 h-4 text-[#EB6244]" />
+                  <span>Peach Wallet</span>
+                </h2>
+                <span className="text-[11px] font-semibold text-stone-500">1 Coin = $50 USD</span>
+              </div>
+
+              <div className="bg-[#fff8f4] border border-[#ffd1c2] rounded-xl p-4 text-[#c45439] mb-3.5">
+                <div className="text-2xl font-extrabold text-stone-950 tabular-nums">
+                  {coins} <span className="text-xs font-bold text-stone-600">Peach Coins available</span>
+                </div>
+                <p className="text-xs text-stone-600 mt-1 tabular-nums">
+                  {wallet?.held_coins ?? 0} Coins committed in escrow across active collaborations.
+                </p>
+              </div>
+
+              <Link
+                href="/business/wallet"
+                className="w-full inline-flex items-center justify-center py-2 px-3 text-xs font-bold text-white bg-[#0B2D22] hover:bg-[#164e3c] rounded-xl transition-colors shadow-2xs"
+              >
+                Manage Wallet &amp; Buy Coins →
+              </Link>
+            </section>
+
+            {/* Brand Vault Panel */}
+            <section className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-bold text-stone-900 flex items-center gap-2">
+                  <FolderArchive className="w-4 h-4 text-[#167b5c]" />
+                  <span>Brand Vault</span>
+                </h2>
+                <span className="text-[11px] font-semibold text-emerald-700">
+                  {brandAssets?.length ?? 0} saved
+                </span>
+              </div>
+              <p className="text-xs text-stone-600 leading-relaxed mb-3">
+                Your logos, vector marks, and color codes are automatically available to your assigned creative.
+              </p>
+
+              <Link
+                href="/business/vault"
+                className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold text-[#EB6244] hover:text-[#d85538] hover:bg-orange-50 rounded-xl transition-colors"
+              >
+                <span>Open Brand Vault →</span>
+              </Link>
+            </section>
+
+            {/* Project Messages Panel */}
+            <section className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-bold text-stone-900 flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-[#173328]" />
+                  <span>Recent Messages</span>
+                </h2>
+                <Link href="/business/messages" className="text-[11px] font-bold text-[#EB6244] hover:underline">
+                  All →
+                </Link>
+              </div>
+
+              {messages?.length ? (
+                <div className="space-y-2.5">
+                  {(messages as any[]).map((msg: any) => (
+                    <Link
+                      key={msg.id}
+                      href={`/projects/${msg.project_id}#chat`}
+                      className="block p-2 rounded-xl hover:bg-stone-50 border border-stone-100 transition-colors"
+                    >
+                      <strong className="text-xs text-stone-900 block truncate">
+                        {peopleMap.get(msg.sender_user_id)?.full_name || "Project Member"}
+                      </strong>
+                      <p className="text-xs text-stone-600 line-clamp-1 mt-0.5">{msg.message}</p>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-stone-500">
+                  No active project messages. Messages will appear here once matching begins.
+                </p>
+              )}
+            </section>
+          </aside>
+        </div>
       </div>
-      <aside className="bd-dock" aria-label="Wallet, brand and messages">
-        <details className="bd-panel" open><summary><span>WALLET & PEACH COINS</span><span className="bd-chevron">⌄</span></summary><div className="bd-panel-body"><div className="bd-wallet-value">{coins} <span>Coins</span></div><p>{wallet?.held_coins??0} Coins committed to active projects</p><Link href="/business/wallet" className="bd-button dock">+ Top-Up Coins</Link></div></details>
-        <details className="bd-panel" id="brand-vault" open><summary><span>BRAND VAULT</span><span>{brandAssets?.length??0} Assets <span className="bd-chevron">⌄</span></span></summary><div className="bd-panel-body"><div className="bd-brand-title">{business.logo_url&&<img src={business.logo_url} alt={`${business.name} logo`}/>}<strong>{business.name} Assets</strong></div><p>Saved once. Ready for your creative on every project.</p><div className="bd-vault-grid">{([['logo','Primary Logo'],['color','Brand Colors'],['font','Official Typefaces & Fonts Kit']] as const).map(([kind,title])=>{const items=((brandAssets??[]) as any[]).filter((a: any)=>a.kind===kind);return <Link key={kind} href={`/business/vault#${kind}`} className={`bd-vault-tile ${kind==='font'?'wide':''}`}><strong>{title}</strong><span>{items.length?kind==='logo'?`${items.length} saved · ${items[0].original_name?.split('.').pop()?.toUpperCase()??'Logo'}`:`${items.length} saved${kind==='color'?' · HEX':''}`:'+ Add to your vault'}</span></Link>})}</div><Link href="/business/vault" className="bd-text-link">Manage all assets →</Link></div></details>
-        <details className="bd-panel" open><summary><span>PROJECT MESSAGES</span><span className="bd-chevron">⌄</span></summary><div className="bd-panel-body">{messages?.length?((messages as any[]).map((message: any)=><Link key={message.id} href={`/projects/${message.project_id}#chat`} className="bd-message"><strong>{peopleMap.get(message.sender_user_id)?.full_name ?? "Project member"}</strong><span>{message.message}</span></Link>)):<p>No project messages yet. Conversations appear here when work gets underway.</p>}<Link href="/business/messages" className="bd-button secondary dock">Open Messages →</Link></div></details>
-        <details className="bd-help"><summary><span><strong>Need help scoping a project?</strong><small>Talk through your idea with Peach.</small></span><span className="bd-chevron">⌄</span></summary><p>Describe what you want to create and organize the brief before matching.</p><Link href="/business/ask-peach" className="bd-text-link">Ask Peach →</Link></details>
-      </aside></div>
-      <style>{`
-        .peach-business-workspace .peach-workspace-content{max-width:1600px;padding:22px 28px 28px}.peach-business-workspace .peach-workspace-topbar{height:52px}.bd-dashboard{font-size:14px;color:#263c32}.bd-dashboard h1,.bd-dashboard h2,.bd-dashboard h3,.bd-dashboard p{margin:0}.bd-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:22px}.bd-heading h1{font-size:28px;font-weight:800;letter-spacing:-.025em}.bd-heading p{font-size:14px;color:#69776f;margin-top:7px}.bd-layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:22px;align-items:start}.bd-main,.bd-dock{min-width:0}.bd-dock{display:grid;gap:16px}.bd-button{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid transparent;border-radius:14px;background:#263e33;color:white;padding:11px 18px;font-size:12px;font-weight:800;text-decoration:none;white-space:nowrap}.bd-button.peach{background:#e85d3f}.bd-button.secondary{background:#fff;color:#263e33;border-color:#e5dfd7}.bd-button.dock{width:100%;margin-top:12px}.bd-button:hover{filter:brightness(.96)}.bd-text-link{color:#c04c32;font-size:12px;font-weight:800;text-decoration:none}.bd-attention{border:1px solid #ef9c82;border-left:5px solid #e85d3f;border-radius:16px;background:#fff8f4;padding:20px 22px}.bd-meta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:11px;color:#64746a}.bd-attention-label{color:#bb482f;font-size:10px;font-weight:850;letter-spacing:.03em}.bd-status{display:inline-flex;border-radius:9px;padding:5px 10px;background:#edf4fa;color:#385c78;font-size:10px;font-weight:800;text-transform:uppercase}.bd-status.review{background:#fff5df;color:#95610e}.bd-attention h2{font-size:22px;line-height:1.3;margin:15px 0 8px}.bd-attention p{color:#607067;font-size:13px;line-height:1.5}.bd-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}.bd-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 12px}.bd-section-heading h2{font-size:20px}.bd-section-heading h2 span{font-weight:500}.bd-project-list{display:grid;gap:12px}.bd-project{background:#fff;border:1px solid #e7e1d9;border-radius:16px;overflow:hidden}.bd-dashboard summary{list-style:none;cursor:pointer}.bd-dashboard summary::-webkit-details-marker{display:none}.bd-project>summary{display:flex;align-items:center;gap:16px;padding:16px}.bd-project-art{width:80px;height:90px;flex-shrink:0;display:grid;place-items:center;background:#edf4fa;border-radius:10px;color:#607d91;font-size:22px;font-weight:800;overflow:hidden}.bd-project-art img{width:100%;height:100%;object-fit:contain;padding:10px}.bd-project-info{display:grid;gap:8px;min-width:0;flex:1}.bd-project-info>strong{font-size:16px;line-height:1.3;overflow-wrap:anywhere}.bd-assigned{display:flex;align-items:center;gap:7px;font-size:12px;color:#69776f}.bd-assigned img{width:22px;height:22px;border-radius:50%;object-fit:cover}.bd-next{font-size:11px;font-weight:650;color:#526459;line-height:1.5}.bd-expand{display:flex;align-items:center;gap:6px;color:#7a817b;font-size:11px}.bd-chevron{display:inline-block;font-size:17px;color:#65776b;transition:transform .16s}.bd-dashboard details[open]>summary .bd-chevron{transform:rotate(180deg)}.bd-dashboard summary:focus-visible,.bd-dashboard a:focus-visible{outline:3px solid #69a6cf;outline-offset:3px}.bd-project-expanded{border-top:1px solid #ece7e1;padding:14px 18px;display:flex;align-items:center;flex-wrap:wrap;gap:12px}.bd-project-expanded .progress-system{width:100%}.bd-more>summary{padding:12px;color:#a74c34;font-weight:750}.bd-more>div{display:grid;gap:12px}.bd-guarantee{margin-top:18px;border:1px solid #e7e1d9;border-radius:16px;background:#fff;padding:16px}.bd-guarantee summary{display:flex;align-items:center;gap:12px}.bd-guarantee summary>span:nth-child(2){display:grid;gap:4px;flex:1}.bd-guarantee strong{font-size:13px}.bd-guarantee small{font-size:11px;color:#6e7d73}.bd-check{width:32px;height:32px;border-radius:50%;background:#edf6f0;color:#4f8e70;display:grid;place-items:center}.bd-guarantee p{font-size:12px;line-height:1.6;color:#69776f;margin-top:14px}.bd-panel{background:#fff;border:1px solid #e7e1d9;border-radius:16px;padding:16px 18px;scroll-margin-top:70px}.bd-panel>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:10px;font-weight:850;letter-spacing:.04em;color:#65776b}.bd-panel-body{padding-top:14px}.bd-wallet-value{font-size:30px;font-weight:800}.bd-wallet-value span{font-size:23px}.bd-panel-body p{font-size:12px;line-height:1.6;color:#69776f;margin-top:8px}.bd-panel-body>small{display:block;font-size:10px;color:#7a817b;line-height:1.5;margin-top:10px}.bd-vault-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.bd-vault-tile{display:grid;gap:6px;padding:12px 9px;background:#f4f8fc;border:1px solid #dce7ee;border-radius:10px;text-decoration:none;color:#385c78}.bd-vault-tile strong{font-size:11px}.bd-vault-tile span{font-size:10px;color:#69776f}.bd-vault-tile.wide{grid-column:1/-1;background:#fff6ef;border-color:#efddcf}.bd-brand-title{display:flex;align-items:center;gap:10px;font-size:14px}.bd-brand-title img{width:36px;height:36px;object-fit:contain}.bd-message{display:grid;gap:5px;padding:0 0 10px;margin-bottom:10px;border-bottom:1px solid #eee7df;color:#263e33;text-decoration:none}.bd-message strong{font-size:12px}.bd-message span{font-size:11px;color:#69776f;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}.bd-help{border:1px solid #e7e1d9;border-radius:16px;padding:16px 18px;background:#faf8f5}.bd-help summary{display:flex;align-items:center;justify-content:space-between;gap:10px}.bd-help summary>span:first-child{display:grid;gap:5px}.bd-help strong{font-size:12px}.bd-help small{font-size:11px;color:#69776f}.bd-help p{margin:12px 0;font-size:12px;line-height:1.6;color:#69776f}.bd-empty{border:1px dashed #dfc9bb;border-radius:16px;padding:30px;background:#fff}.bd-empty h3{font-size:17px}.bd-empty p{font-size:13px;margin:8px 0 14px;color:#69776f}
-        @media(min-width:1400px){.bd-layout{grid-template-columns:minmax(0,1fr) 320px}.bd-project-art{width:95px;height:96px}}
-        @media(max-width:1100px){.bd-layout{grid-template-columns:minmax(0,1fr) 250px;gap:16px}.bd-project-art{width:60px;height:76px}.bd-project>summary{gap:10px;padding:12px}.bd-expand{font-size:0}.bd-next{font-size:10px}}
-        @media(max-width:700px){.peach-business-workspace .peach-workspace-content{padding:20px 16px 90px}.bd-layout{grid-template-columns:1fr}.bd-heading{align-items:flex-start;flex-direction:column;gap:12px}.bd-heading h1{font-size:25px}.bd-attention{padding:18px}.bd-attention h2{font-size:20px}.bd-section-heading h2{font-size:18px}.bd-dock{grid-template-columns:1fr}.bd-project-info>strong{font-size:14px}.bd-project-art{width:52px;height:70px}.bd-project-info .bd-meta{gap:5px}.bd-project-info .bd-meta>span:last-child{font-size:10px}}
-      `}</style>
-    </main>
-  </PeachAppShell>;
+    </PeachAppShell>
+  );
 }

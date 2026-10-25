@@ -17,8 +17,10 @@ import {
   AlertCircle,
   Archive,
   ChevronRight,
+  ShieldAlert,
 } from "lucide-react";
 import { roomStatus } from "@/lib/project-room";
+import { DisputeModal } from "@/app/business/components/dispute-modal";
 
 export interface ProjectItem {
   id: string;
@@ -44,6 +46,16 @@ interface ProjectViewManagerProps {
 const reviewStatuses = ["proof_uploaded", "submitted", "waiting_on_client"];
 
 function getStatusMeta(status: string) {
+  if (status === "dispute_review") {
+    return {
+      text: "HQ Review",
+      subtext: "Dispute in progress",
+      textColor: "text-red-700",
+      dotColor: "bg-red-500",
+      priority: 1,
+      isReview: false,
+    };
+  }
   if (status === "proof_uploaded" || status === "submitted") {
     return {
       text: "Action Needed",
@@ -157,6 +169,7 @@ export function ProjectViewManager({
   const [activeSubFilter, setActiveSubFilter] = useState<string>("all");
   const [archiveSubFilter, setArchiveSubFilter] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [disputingProject, setDisputingProject] = useState<ProjectItem | null>(null);
 
   // Keep state synchronized if URL view parameter changes
   useEffect(() => {
@@ -645,6 +658,20 @@ export function ProjectViewManager({
                           >
                             Message
                           </Link>
+                          {project.status !== "dispute_review" ? (
+                            <button
+                              type="button"
+                              onClick={() => setDisputingProject(project)}
+                              className="px-2.5 py-2 text-stone-500 hover:text-red-700 font-bold text-xs hover:bg-red-50 rounded-xl transition-colors whitespace-nowrap cursor-pointer"
+                              title="Active projects cannot be cancelled directly, but can be submitted for admin dispute resolution."
+                            >
+                              Dispute
+                            </button>
+                          ) : (
+                            <span className="text-[11px] font-bold text-red-600 bg-red-50 border border-red-200 px-2.5 py-1.5 rounded-xl">
+                              Dispute Open
+                            </span>
+                          )}
                           <Link
                             href={`/projects/${project.id}`}
                             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow whitespace-nowrap ${
@@ -904,6 +931,16 @@ export function ProjectViewManager({
             );
           })}
         </div>
+      )}
+
+      {disputingProject && (
+        <DisputeModal
+          projectId={disputingProject.id}
+          projectTitle={disputingProject.title}
+          coinAmount={disputingProject.coin_amount}
+          isOpen={true}
+          onClose={() => setDisputingProject(null)}
+        />
       )}
     </div>
   );
