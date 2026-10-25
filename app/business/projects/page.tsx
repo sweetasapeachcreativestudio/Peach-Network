@@ -117,9 +117,9 @@ export default async function BusinessProjectsPage({ searchParams }: BusinessPro
         )}
 
         {/* Main Two-Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 sm:gap-6 items-start">
           {/* Main Column: Project View Manager (Active vs Archived Tabs) */}
-          <main className="lg:col-span-8 space-y-6">
+          <main className="xl:col-span-8 space-y-5 sm:space-y-6 min-w-0">
             {error ? (
               <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-red-800 text-sm">
                 Projects could not be loaded at this time. Please refresh the page to retry.
@@ -138,7 +138,7 @@ export default async function BusinessProjectsPage({ searchParams }: BusinessPro
             <details className="border border-[#e7e1d9] bg-white rounded-2xl p-4 sm:p-5 text-xs text-slate-600 group cursor-pointer shadow-2xs">
               <summary className="font-extrabold text-slate-900 flex items-center justify-between list-none">
                 <span className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>Peach Project &amp; Escrow Guarantee</span>
                 </span>
                 <span className="text-slate-400 group-open:rotate-180 transition-transform">⌄</span>
@@ -151,8 +151,8 @@ export default async function BusinessProjectsPage({ searchParams }: BusinessPro
             </details>
           </main>
 
-          {/* Side Dock: Room Guide & Wallet/Brand Vault Summary */}
-          <aside className="lg:col-span-4 space-y-5">
+          {/* Side Dock: Room Guide & Wallet/Brand Vault Summary (Organized into responsive 2-col on iPad, 1-col on Desktop) */}
+          <aside className="xl:col-span-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-4 sm:gap-5 min-w-0">
             {/* Quick Archive Summary Card */}
             <section className="bg-white border border-[#e7e1d9] rounded-2xl p-5 shadow-2xs">
               <div className="flex items-center justify-between mb-3">
