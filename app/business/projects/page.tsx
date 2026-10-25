@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { PeachAppShell } from "../../components/peach-app-shell";
 import { AcceptedProject } from "../../components/accepted-project";
 import { ProjectViewManager, ProjectItem } from "./project-view-manager";
+import { ArchiveToggleButton } from "./archive-toggle-button";
 import { FolderArchive, Plus, ShieldCheck, Wallet, Sparkles, Layers } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -180,13 +181,7 @@ export default async function BusinessProjectsPage({ searchParams }: BusinessPro
               </div>
 
               <div className="flex flex-col gap-2">
-                <Link
-                  href="/business/projects?view=archived"
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
-                >
-                  <FolderArchive className="w-3.5 h-3.5 text-[#167b5c]" />
-                  <span>Switch to Archive View</span>
-                </Link>
+                <ArchiveToggleButton />
                 <Link
                   href="/business/vault"
                   className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold text-[#EB6244] hover:text-[#d85538] hover:bg-orange-50 rounded-xl transition-colors"

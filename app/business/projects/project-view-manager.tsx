@@ -2,13 +2,12 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   FolderArchive,
   Layers,
   Sparkles,
   CheckCircle2,
-  Clock,
   Search,
   Filter,
   ArrowRight,
@@ -17,10 +16,10 @@ import {
   FileCheck,
   Plus,
   AlertCircle,
-  ShieldCheck,
-  RefreshCw,
   Archive,
   ChevronRight,
+  Clock,
+  RotateCcw,
 } from "lucide-react";
 import { roomStatus } from "@/lib/project-room";
 
@@ -50,16 +49,16 @@ const reviewStatuses = ["proof_uploaded", "submitted", "waiting_on_client"];
 function getUrgencyBadge(status: string) {
   if (status === "proof_uploaded" || status === "submitted") {
     return {
-      text: "Action Required: Proof Ready for Review",
-      color: "bg-amber-50 text-amber-900 border-amber-200",
+      text: "Action Needed: Proof Ready for Review",
+      color: "bg-amber-50 text-amber-900 border-amber-300 ring-1 ring-amber-200",
       dot: "bg-amber-500",
       priority: 1,
     };
   }
   if (status === "waiting_on_client") {
     return {
-      text: "Creative Waiting on Your Feedback",
-      color: "bg-amber-50 text-amber-900 border-amber-200",
+      text: "Action Needed: Waiting on Your Feedback",
+      color: "bg-amber-50 text-amber-900 border-amber-300 ring-1 ring-amber-200",
       dot: "bg-amber-500",
       priority: 1,
     };
@@ -99,14 +98,14 @@ function getUrgencyBadge(status: string) {
   if (status === "completed") {
     return {
       text: "Delivered & Approved",
-      color: "bg-emerald-50 text-emerald-900 border-emerald-200",
+      color: "bg-emerald-50 text-emerald-900 border-emerald-300",
       dot: "bg-emerald-600",
       priority: 5,
     };
   }
   if (status === "cancelled") {
     return {
-      text: "Cancelled & Coins Credited",
+      text: "Cancelled & Refunded",
       color: "bg-slate-100 text-slate-600 border-slate-200",
       dot: "bg-slate-400",
       priority: 6,
@@ -127,41 +126,58 @@ export function ProjectViewManager({
   businessName,
   assetCount = 0,
 }: ProjectViewManagerProps) {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Read view from URL query param if present
-  const queryView = searchParams.get("view");
-  const [activeTab, setActiveTab] = useState<"active" | "archived" | "all">(
-    queryView === "archived" || queryView === "archive"
+  // Primary React state for toggling views without page reload
+  const [viewMode, setViewMode] = useState<"active" | "archived" | "all">(
+    initialView === "archived" || initialView === "archive"
       ? "archived"
-      : queryView === "all"
+      : initialView === "all"
       ? "all"
-      : (initialView as "active" | "archived" | "all") || "active"
+      : "active"
   );
 
+  // Sub-filters & Search state
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSubFilter, setActiveSubFilter] = useState<string>("all");
   const [archiveSubFilter, setArchiveSubFilter] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  // Keep state synchronized if URL view parameter changes
+  // Sync initial query param if user lands with ?view=archived
   useEffect(() => {
     const v = searchParams.get("view");
     if (v === "archived" || v === "archive") {
-      setActiveTab("archived");
+      setViewMode("archived");
     } else if (v === "all") {
-      setActiveTab("all");
+      setViewMode("all");
     } else if (v === "active") {
-      setActiveTab("active");
+      setViewMode("active");
     }
   }, [searchParams]);
 
-  // Tab switch handler with URL update
-  const handleTabChange = (tab: "active" | "archived" | "all") => {
-    setActiveTab(tab);
-    const params = new URLSearchParams(window.location.search);
-    params.set("view", tab);
-    window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+  // Listen for global custom event so external elements can trigger state switch
+  useEffect(() => {
+    const handleCustomViewSwitch = (e: Event) => {
+      const customEvent = e as CustomEvent<"active" | "archived" | "all">;
+      if (customEvent.detail) {
+        setViewMode(customEvent.detail);
+      }
+    };
+    window.addEventListener("peach:switch-project-view", handleCustomViewSwitch);
+    return () => {
+      window.removeEventListener("peach:switch-project-view", handleCustomViewSwitch);
+    };
+  }, []);
+
+  // Handler for visual filter bar tabs (toggles view state with zero page reload)
+  const handleToggleView = (mode: "active" | "archived" | "all") => {
+    setViewMode(mode);
+    // Quietly update the browser history URL without triggering a Next.js RSC fetch or reload
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      params.set("view", mode);
+      window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+    }
   };
 
   // Groupings
@@ -180,16 +196,22 @@ export function ProjectViewManager({
     [archivedProjects]
   );
 
-  const archivedCoinsTotal = useMemo(
-    () => archivedProjects.reduce((sum, p) => sum + (p.coin_amount || 0), 0),
-    [archivedProjects]
+  const needsReviewCount = useMemo(
+    () => activeProjects.filter((p) => reviewStatuses.includes(p.status)).length,
+    [activeProjects]
   );
 
-  // Sorting & Filtering for Active View
+  // Available categories for dropdown filter
+  const allCategories = useMemo(() => {
+    const set = new Set(initialProjects.map((p) => p.category).filter(Boolean));
+    return Array.from(set);
+  }, [initialProjects]);
+
+  // Filtered Active Projects
   const filteredActive = useMemo(() => {
     let list = [...activeProjects];
 
-    // Priority sort: Review ready first, then accepted, then in_progress, then matching
+    // Priority sort: items needing review first, then kickoff, in_progress, matching
     list.sort((a, b) => {
       const pA = getUrgencyBadge(a.status).priority;
       const pB = getUrgencyBadge(b.status).priority;
@@ -205,6 +227,10 @@ export function ProjectViewManager({
       list = list.filter((p) => ["accepted", "matching", "offer_sent"].includes(p.status));
     }
 
+    if (selectedCategory !== "all") {
+      list = list.filter((p) => p.category === selectedCategory);
+    }
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
@@ -218,9 +244,9 @@ export function ProjectViewManager({
     }
 
     return list;
-  }, [activeProjects, activeSubFilter, searchQuery, creativeNames]);
+  }, [activeProjects, activeSubFilter, selectedCategory, searchQuery, creativeNames]);
 
-  // Filtering for Archived View
+  // Filtered Archived Projects
   const filteredArchived = useMemo(() => {
     let list = [...archivedProjects];
 
@@ -233,6 +259,10 @@ export function ProjectViewManager({
       list = list.filter((p) => p.status === "cancelled");
     }
 
+    if (selectedCategory !== "all") {
+      list = list.filter((p) => p.category === selectedCategory);
+    }
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
@@ -246,12 +276,16 @@ export function ProjectViewManager({
     }
 
     return list;
-  }, [archivedProjects, archiveSubFilter, searchQuery, creativeNames]);
+  }, [archivedProjects, archiveSubFilter, selectedCategory, searchQuery, creativeNames]);
 
-  // Combined View
+  // All Projects
   const filteredAll = useMemo(() => {
     let list = [...initialProjects];
     list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    if (selectedCategory !== "all") {
+      list = list.filter((p) => p.category === selectedCategory);
+    }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -262,30 +296,41 @@ export function ProjectViewManager({
           (p.description && p.description.toLowerCase().includes(q))
       );
     }
+
     return list;
-  }, [initialProjects, searchQuery]);
+  }, [initialProjects, selectedCategory, searchQuery]);
 
   return (
     <div className="space-y-6">
-      {/* Top Controls: Dedicated Filter Tabs + Search */}
-      <div className="bg-white border border-[#e7e1d9] rounded-2xl p-4 sm:p-5 shadow-2xs">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-          {/* Main View Tabs */}
-          <div className="flex items-center gap-1.5 p-1 bg-[#FAF8F5] border border-[#e7e1d9] rounded-xl self-start md:self-auto shadow-2xs">
+      {/* ============================================================== */}
+      {/* VISUAL FILTER BAR: SEPARATES ACTIVE TASKS FROM ARCHIVED WORK   */}
+      {/* ============================================================== */}
+      <div className="bg-white border-2 border-[#e7e1d9] rounded-2xl p-4 sm:p-5 shadow-xs transition-all">
+        {/* Top Filter Bar Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          {/* Main Segmented Mode Switcher (Pure React State, Zero Reload) */}
+          <div className="inline-flex p-1.5 bg-[#FAF8F5] border border-slate-200 rounded-xl shadow-2xs self-start sm:self-auto">
+            {/* Active Projects Tab */}
             <button
               type="button"
-              onClick={() => handleTabChange("active")}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                activeTab === "active"
-                  ? "bg-[#0B2D22] text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
+              onClick={() => handleToggleView("active")}
+              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === "active"
+                  ? "bg-[#0B2D22] text-white shadow-sm ring-1 ring-[#0B2D22]"
+                  : "text-slate-600 hover:text-slate-950 hover:bg-white/70"
               }`}
+              aria-label="View active projects"
             >
-              <Layers className="w-3.5 h-3.5" />
+              <div className="relative flex items-center justify-center">
+                <Layers className="w-4 h-4" />
+                {needsReviewCount > 0 && viewMode !== "active" && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                )}
+              </div>
               <span>Active Tasks</span>
               <span
-                className={`text-[10px] px-1.5 py-0.5 rounded-full font-extrabold ${
-                  activeTab === "active"
+                className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${
+                  viewMode === "active"
                     ? "bg-[#167b5c] text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
@@ -294,20 +339,22 @@ export function ProjectViewManager({
               </span>
             </button>
 
+            {/* Archived Projects Tab */}
             <button
               type="button"
-              onClick={() => handleTabChange("archived")}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                activeTab === "archived"
-                  ? "bg-[#0B2D22] text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
+              onClick={() => handleToggleView("archived")}
+              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === "archived"
+                  ? "bg-[#0B2D22] text-white shadow-sm ring-1 ring-[#0B2D22]"
+                  : "text-slate-600 hover:text-slate-950 hover:bg-white/70"
               }`}
+              aria-label="View archived projects"
             >
-              <FolderArchive className="w-3.5 h-3.5" />
+              <FolderArchive className="w-4 h-4 text-[#167b5c]" />
               <span>Archived Projects</span>
               <span
-                className={`text-[10px] px-1.5 py-0.5 rounded-full font-extrabold ${
-                  activeTab === "archived"
+                className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${
+                  viewMode === "archived"
                     ? "bg-[#167b5c] text-white"
                     : "bg-slate-200 text-slate-700"
                 }`}
@@ -316,51 +363,73 @@ export function ProjectViewManager({
               </span>
             </button>
 
+            {/* All Projects Tab */}
             <button
               type="button"
-              onClick={() => handleTabChange("all")}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                activeTab === "all"
-                  ? "bg-[#0B2D22] text-white shadow-xs"
-                  : "text-slate-600 hover:text-slate-900"
+              onClick={() => handleToggleView("all")}
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                viewMode === "all"
+                  ? "bg-[#0B2D22] text-white shadow-sm ring-1 ring-[#0B2D22]"
+                  : "text-slate-600 hover:text-slate-950 hover:bg-white/70"
               }`}
+              aria-label="View all projects"
             >
               <span>All ({initialProjects.length})</span>
             </button>
           </div>
 
-          {/* Quick Search Bar */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={
-                activeTab === "archived"
-                  ? "Search archived titles, categories, or creatives..."
-                  : "Search active projects, categories, or keywords..."
-              }
-              className="w-full bg-[#FAF8F5] border border-slate-200 rounded-xl pl-9 pr-3.5 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-[#EB6244] transition-colors"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-700"
+          {/* Search & Category Filter Controls */}
+          <div className="flex items-center gap-2.5 flex-1 max-w-lg">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={
+                  viewMode === "archived"
+                    ? "Search archived titles or creatives..."
+                    : "Search active projects or keywords..."
+                }
+                className="w-full bg-[#FAF8F5] border border-slate-200 rounded-xl pl-9 pr-7 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-[#EB6244] transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-700"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Category Dropdown Filter */}
+            {allCategories.length > 0 && (
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="bg-[#FAF8F5] border border-slate-200 rounded-xl px-2.5 py-2 text-xs text-slate-700 font-semibold focus:outline-hidden focus:border-[#EB6244] cursor-pointer"
               >
-                ✕
-              </button>
+                <option value="all">All Categories</option>
+                {allCategories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
             )}
           </div>
         </div>
 
-        {/* Sub-Filters: Specific to current view */}
+        {/* Sub-Filters Ribbon: Mode-Specific Filters */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-3 mt-3 border-t border-slate-100 text-xs">
-          {activeTab === "active" && (
+          {/* Active Mode Sub-Filters */}
+          {viewMode === "active" && (
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mr-1">
-                Filter Active:
+                Filter:
               </span>
               <button
                 type="button"
@@ -383,9 +452,7 @@ export function ProjectViewManager({
                 }`}
               >
                 <AlertCircle className="w-3 h-3 text-amber-600" />
-                <span>
-                  Needs Review ({activeProjects.filter((p) => reviewStatuses.includes(p.status)).length})
-                </span>
+                <span>Needs Review ({needsReviewCount})</span>
               </button>
               <button
                 type="button"
@@ -407,15 +474,16 @@ export function ProjectViewManager({
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >
-                Matching & Kickoff ({activeProjects.filter((p) => ["accepted", "matching", "offer_sent"].includes(p.status)).length})
+                Matching &amp; Kickoff ({activeProjects.filter((p) => ["accepted", "matching", "offer_sent"].includes(p.status)).length})
               </button>
             </div>
           )}
 
-          {activeTab === "archived" && (
+          {/* Archived Mode Sub-Filters */}
+          {viewMode === "archived" && (
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mr-1">
-                Filter Archive:
+                Archive Filter:
               </span>
               <button
                 type="button"
@@ -456,39 +524,50 @@ export function ProjectViewManager({
             </div>
           )}
 
-          {activeTab === "all" && (
+          {viewMode === "all" && (
             <div className="text-[11px] text-slate-500 font-medium">
-              Showing complete workspace history ({initialProjects.length} total projects)
+              Showing all historical projects across active and archived states ({initialProjects.length} total)
             </div>
           )}
 
-          {/* Quick Stats Pill */}
-          <div className="flex items-center gap-3 text-[11px] font-bold text-slate-600">
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              {activeProjects.length} Active Collaborations
-            </span>
-            <span className="text-slate-300">|</span>
-            <span className="flex items-center gap-1">
-              <FolderArchive className="w-3 h-3 text-[#167b5c]" />
-              {completedCount} Delivered Projects
-            </span>
+          {/* Mode Description & Direct Switch Link */}
+          <div className="text-[11px] text-slate-600 font-medium flex items-center gap-2">
+            {viewMode === "active" ? (
+              <button
+                type="button"
+                onClick={() => handleToggleView("archived")}
+                className="text-emerald-700 hover:text-emerald-900 font-bold hover:underline cursor-pointer flex items-center gap-1"
+              >
+                <span>View {completedCount} completed project{completedCount === 1 ? "" : "s"} in archive →</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => handleToggleView("active")}
+                className="text-[#EB6244] hover:text-[#d85538] font-bold hover:underline cursor-pointer flex items-center gap-1"
+              >
+                <span>← Back to {activeProjects.length} active task{activeProjects.length === 1 ? "" : "s"}</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
 
       {/* ============================================================== */}
-      {/* 1. ACTIVE TASKS VIEW (Prioritizes Active & Action-Needed Work)   */}
+      {/* VIEW 1: ACTIVE TASKS (Prioritizes Active & Action-Needed Work)   */}
       {/* ============================================================== */}
-      {activeTab === "active" && (
+      {viewMode === "active" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-extrabold text-slate-900">
-                Active Projects in Motion
+              <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                <span>Active Collaborations in Motion</span>
+                <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">
+                  {filteredActive.length} shown
+                </span>
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Proof reviews, creative check-ins, and active project rooms requiring your attention.
+                Tasks sorted by urgency: proof reviews and client check-ins are prioritized first.
               </p>
             </div>
             <Link
@@ -514,13 +593,13 @@ export function ProjectViewManager({
                     key={project.id}
                     className={`bg-white rounded-2xl border p-5 transition-all shadow-xs hover:shadow-md ${
                       isActionNeeded
-                        ? "border-amber-300 bg-[#fffdf9] ring-2 ring-amber-100"
+                        ? "border-amber-400 bg-[#fffdf9] ring-2 ring-amber-100"
                         : project.status === "accepted"
                         ? "border-emerald-300 bg-[#fafdfb]"
                         : "border-[#e7e1d9]"
                     }`}
                   >
-                    {/* Header Row: Status & Badge */}
+                    {/* Top Row: Urgency Badge, Category, Peach Coins */}
                     <div className="flex flex-wrap items-center justify-between gap-2.5 mb-2.5">
                       <div className="flex items-center gap-2">
                         <span
@@ -553,11 +632,11 @@ export function ProjectViewManager({
                         {project.title}
                       </h3>
                       <p className="text-xs text-slate-600 line-clamp-2 mt-1 leading-relaxed">
-                        {project.description || "Open the project room to review files, feedback, and active timelines."}
+                        {project.description || "Open the project room to review briefs, proofs, and communication."}
                       </p>
                     </div>
 
-                    {/* Footer Row: Creative attribution & Action Link */}
+                    {/* Footer Row: Creative Name & Action Button */}
                     <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs">
                       <div className="flex items-center gap-2 text-slate-600">
                         <span className="font-semibold text-slate-500 text-[11px]">Creative:</span>
@@ -608,20 +687,29 @@ export function ProjectViewManager({
                 <Sparkles className="w-6 h-6" />
               </div>
               <h3 className="text-base font-extrabold text-slate-900">
-                {searchQuery ? "No active projects match your search." : "No active projects right now."}
+                {searchQuery || selectedCategory !== "all"
+                  ? "No active projects match your filters."
+                  : "No active projects in motion."}
               </h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                {searchQuery
-                  ? "Try adjusting your search terms or switch to the Archived tab to view finished work."
-                  : "Every project starts with an idea. Submit a request to get matched with vetted local commercial designers."}
+                {searchQuery || selectedCategory !== "all"
+                  ? "Try resetting your search query or category filter."
+                  : "All current requests may be completed. You can view finished projects in the archive or start a new request."}
               </p>
-              <div className="pt-2">
+              <div className="pt-2 flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleToggleView("archived")}
+                  className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                >
+                  View Completed Archive ({archivedProjects.length})
+                </button>
                 <Link
                   href="/business/new-project"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#EB6244] hover:bg-[#d85538] text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#EB6244] hover:bg-[#d85538] text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Start a New Project</span>
+                  <span>Start New Project</span>
                 </Link>
               </div>
             </div>
@@ -630,24 +718,24 @@ export function ProjectViewManager({
       )}
 
       {/* ============================================================== */}
-      {/* 2. DEDICATED ARCHIVE VIEW (Completed Deliverables & History)    */}
+      {/* VIEW 2: ARCHIVED & COMPLETED PROJECTS (Dedicated Archive View)  */}
       {/* ============================================================== */}
-      {activeTab === "archived" && (
+      {viewMode === "archived" && (
         <div className="space-y-4">
-          {/* Archive Explainer Hero */}
-          <div className="bg-gradient-to-br from-[#FAF8F5] to-[#F3EDE2] border border-[#e7e1d9] rounded-2xl p-5 shadow-2xs">
+          {/* Archive Explainer Banner */}
+          <div className="bg-gradient-to-br from-[#FAF8F5] via-[#F8F4EE] to-[#EFE7DA] border-2 border-[#e7e1d9] rounded-2xl p-5 shadow-2xs">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="space-y-1">
                 <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold text-[#167b5c] uppercase tracking-wider">
                   <FolderArchive className="w-3.5 h-3.5" />
-                  <span>Permanent Project Archive</span>
+                  <span>Permanent Project Archive &bull; {businessName}</span>
                 </div>
                 <h2 className="text-lg font-extrabold text-slate-900">
-                  Completed &amp; Delivered Projects
+                  Completed &amp; Delivered Work
                 </h2>
                 <p className="text-xs text-slate-600 max-w-xl leading-relaxed">
-                  All approved final vector files, proofs, production packages, and commercial licenses remain
-                  safely archived here. You can revisit any Project Room, download deliverables, or find assets in your Brand Vault anytime.
+                  Every completed collaboration is permanently archived here. All final vector files, approved
+                  proofs, and commercial production packages remain downloadable anytime and sync directly into your Brand Vault.
                 </p>
               </div>
 
@@ -656,11 +744,11 @@ export function ProjectViewManager({
                   href="/business/vault"
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-bold rounded-xl shadow-2xs transition-colors"
                 >
-                  <span>Brand Vault ({assetCount})</span>
+                  <span>Brand Vault ({assetCount} assets)</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                 </Link>
                 <span className="text-[11px] font-semibold text-slate-500">
-                  {completedCount} approved deliverable{completedCount === 1 ? "" : "s"}
+                  {completedCount} approved project{completedCount === 1 ? "" : "s"}
                 </span>
               </div>
             </div>
@@ -723,7 +811,7 @@ export function ProjectViewManager({
                       </div>
                     </div>
 
-                    {/* Project Title & Deliverable Summary */}
+                    {/* Title & Description */}
                     <div className="mb-3">
                       <h3 className="text-base font-extrabold text-slate-900 leading-snug">
                         {project.title}
@@ -754,7 +842,7 @@ export function ProjectViewManager({
                         </Link>
 
                         <Link
-                          href={`/business/vault`}
+                          href="/business/vault"
                           className="px-3 py-1.5 text-slate-700 hover:text-slate-950 font-bold text-xs hover:bg-slate-100 rounded-lg transition-colors"
                         >
                           Vault Assets
@@ -779,21 +867,23 @@ export function ProjectViewManager({
                 <FolderArchive className="w-6 h-6" />
               </div>
               <h3 className="text-base font-extrabold text-slate-900">
-                {searchQuery ? "No archived projects match your search." : "No completed projects in the archive yet."}
+                {searchQuery || selectedCategory !== "all"
+                  ? "No archived projects match your search."
+                  : "No completed projects in the archive yet."}
               </h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                {searchQuery
-                  ? "Try checking your search terms or switch back to Active Tasks."
-                  : "Once active tasks reach final sign-off and approval, their complete deliverable rooms, vectors, and font kits will be organized here."}
+                {searchQuery || selectedCategory !== "all"
+                  ? "Try adjusting your search terms or clearing the category filter."
+                  : "Once active tasks reach final approval and sign-off, their complete deliverables will be permanently archived here."}
               </p>
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => handleTabChange("active")}
+                  onClick={() => handleToggleView("active")}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer"
                 >
                   <Layers className="w-4 h-4" />
-                  <span>View Active Tasks ({activeProjects.length})</span>
+                  <span>Switch to Active Tasks ({activeProjects.length})</span>
                 </button>
               </div>
             </div>
@@ -802,17 +892,20 @@ export function ProjectViewManager({
       )}
 
       {/* ============================================================== */}
-      {/* 3. ALL PROJECTS VIEW (Complete Workspace Index)                 */}
+      {/* VIEW 3: ALL PROJECTS (Complete Workspace Index)                 */}
       {/* ============================================================== */}
-      {activeTab === "all" && (
+      {viewMode === "all" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-extrabold text-slate-900">
-                Complete Project Workspace
+              <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                <span>Complete Project Index</span>
+                <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">
+                  {filteredAll.length} total
+                </span>
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Every active and historical project created for {businessName}.
+                Full chronological overview of active and historical requests for {businessName}.
               </p>
             </div>
             <Link
@@ -849,7 +942,7 @@ export function ProjectViewManager({
                         {project.category}
                       </span>
                       {isArchived && (
-                        <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
                           Archived
                         </span>
                       )}
