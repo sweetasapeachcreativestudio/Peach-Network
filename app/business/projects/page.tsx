@@ -1,20 +1,256 @@
-import {ProjectRefresh} from "@/app/components/project-refresh";
-import Link from 'next/link';
-import {redirect} from 'next/navigation';
-import {createClient} from '@/lib/supabase/server';
-import {createAdminClient} from '@/lib/supabase/admin';
-import {PeachAppShell} from '../../components/peach-app-shell';
-import {AcceptedProject} from '../../components/accepted-project';
-import {roomStatus} from '@/lib/project-room';
-export default async function BusinessProjectsPage(){
- const supabase=await createClient();const {data:{user}}=await supabase.auth.getUser();if(!user)redirect('/auth?role=business&mode=signin');const admin=createAdminClient();
- const [{data:profile},{data:business}]=await Promise.all([admin.from('profiles').select('full_name,role').eq('id',user.id).single(),admin.from('businesses').select('id,name,logo_url').eq('owner_user_id',user.id).single()]);if(profile?.role==='creative')redirect('/creative');if(!business)redirect('/business');
- const [{data:wallet},{data:projects,error},{data:assets}]=await Promise.all([admin.from('coin_wallets').select('available_coins,held_coins').eq('business_id',business.id).maybeSingle(),admin.from('projects').select('id,title,description,category,status,coin_amount,due_at,created_at,assigned_creative_id,revision_rounds').eq('business_id',business.id).order('created_at',{ascending:false}),admin.from('business_brand_assets').select('id,label,original_name').eq('business_id',business.id)]);
- const list = (projects ?? []) as any[], active = list.filter((p: any) => !['completed', 'cancelled'].includes(p.status)), archive = list.filter((p: any) => ['completed', 'cancelled'].includes(p.status)), accepted = active.find((p: any) => p.status === 'accepted');
- const creativeIds=[...new Set(list.map((p: any)=>p.assigned_creative_id).filter(Boolean))];const {data:creatives}=creativeIds.length?await admin.from('creatives').select('id,user_id').in('id',creativeIds):{data:[]};const userIds=((creatives??[]) as any[]).map((c: any)=>c.user_id);const {data:people}=userIds.length?await admin.from('profiles').select('id,full_name').in('id',userIds):{data:[]};const names=new Map(((creatives??[]) as any[]).map((c: any)=>[c.id,((people??[]) as any[]).find((p: any)=>p.id===c.user_id)?.full_name]));
- const row=(p: any)=><article key={p.id} className={`bp-project ${p.status==='accepted'?'kickoff':''}`}><div className="bp-row"><span className="bp-status">{roomStatus(p.status)}</span><small>{p.category}</small></div><h3>{p.title}</h3><p>Assigned creative: {names.get(p.assigned_creative_id)??'Finding your creative'}</p><p className="bp-description">{p.description||'Open the room to see your brief and next steps.'}</p><div className="bp-row bottom"><span>{p.coin_amount} Peach Coins{p.due_at?` · Due ${new Date(p.due_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})}`:''}</span><Link href={`/projects/${p.id}`} className="bp-button">{p.status==='completed'?'View Room & Files':'Open Project Room'} →</Link></div></article>;
- return <PeachAppShell role="business" active="projects" name={profile?.full_name} businessName={business.name} logoUrl={business.logo_url} coinCount={wallet?.available_coins??0}><ProjectRefresh/><div className="bp-page"><header className="bp-heading"><div><h1>Business Client Dashboard</h1><p>{business.name} · {active.length} active collaboration{active.length===1?'':'s'}</p></div><Link className="bp-button" href="/business/new-project">+ Start a Project</Link></header>{accepted&&<AcceptedProject project={accepted} creativeName={names.get(accepted.assigned_creative_id)} assetCount={assets?.length??0}/>}
- <div className="bp-layout"><section className="bp-panel"><h2>Active Projects <span>({active.length} Active · {list.filter((p: any)=>p.status==='completed').length} Completed)</span></h2><p>Manage messages, proof reviews and final deliverables for your business.</p>{error?<p role="alert">Projects could not load. Please refresh and try again.</p>:<><div className="bp-list">{active.slice(0,2).map(row)}{!active.length&&<p>Your next idea has room to grow. Start a project when you are ready.</p>}</div>{active.length>2&&<details className="bp-more"><summary>{active.length-2} more active projects</summary>{active.slice(2).map(row)}</details>}<details className="bp-more"><summary>Completed & Archived ({archive.length})</summary>{archive.map(row)}{!archive.length&&<p>Completed projects and their files will appear here.</p>}</details></>}<details className="bp-guarantee"><summary>Peach Project Guarantee</summary><p>Follow the agreed scope, included revision rounds and proof reviews in each Project Room. Your creative payout follows Peach’s approval process.</p></details></section>
- <aside className="bp-dock"><section className="bp-panel"><h2>Project Room & Collaboration</h2><p>What to expect inside your active room:</p><ol><li><strong>Direct messaging</strong><p>Talk with your assigned creative in one project thread.</p></li><li><strong>Brand Vault integration</strong><p>Your saved logos, fonts and colors are ready to use.</p></li><li><strong>Proof review & revisions</strong><p>View the proof, request changes and approve the work.</p></li><li><strong>Final delivery</strong><p>Approved downloads stay in your project and can be saved to Brand Vault.</p></li></ol></section><section className="bp-panel"><h2>Wallet & Brand Vault Summary</h2><div className="bp-wallet"><strong>{wallet?.held_coins??0} Coins committed to projects</strong><p>{wallet?.available_coins??0} Coins available in your wallet</p><Link href="/business/wallet">View Wallet →</Link></div><div className="bp-assets"><strong>Brand Vault: {business.name}</strong><ul>{((assets??[]) as any[]).slice(0,3).map((a: any)=><li key={a.id}>{a.label}{a.original_name?` · ${a.original_name.split('.').pop()?.toUpperCase()}`:''}</li>)}</ul>{!assets?.length&&<p>Save your logos, colors and fonts once.</p>}</div><Link className="bp-secondary" href="/business/vault">Manage Brand Vault →</Link></section></aside></div></div><style>{`
- .peach-business-workspace .peach-workspace-content{max-width:1650px;padding:24px 28px 40px}.bp-page h1,.bp-page h2,.bp-page h3,.bp-page p{margin:0}.bp-page h1{font-size:27px}.bp-page h2{font-size:19px;margin-bottom:9px}.bp-page h2 span{font-size:13px;font-weight:500}.bp-page p{font-size:12px;color:#718077;line-height:1.65;margin:7px 0}.bp-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}.bp-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(270px,1fr);gap:22px}.bp-panel{border:1px solid #e7e1d9;background:white;border-radius:18px;padding:22px}.bp-list{display:grid;gap:14px;margin-top:18px}.bp-project{padding:20px;border:1px solid #e9e2da;border-radius:15px;background:#faf8f5;margin:12px 0}.bp-project.kickoff{background:#fff8f4;border-color:#ffcbbb}.bp-row{display:flex;align-items:center;gap:12px;font-size:11px}.bp-row small{color:#78867d}.bp-row.bottom{justify-content:space-between;margin-top:14px;color:#547161;flex-wrap:wrap}.bp-status{border:1px solid #b6e4cd;background:#effbf5;color:#167b5c;font-size:9px;padding:6px 10px;border-radius:9px;font-weight:800;text-transform:uppercase}.bp-project h3{margin:15px 0 7px;font-size:17px}.bp-description{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}.bp-button,.bp-secondary{display:inline-flex;justify-content:center;padding:12px 18px;border-radius:14px;background:#eb6244;color:white;text-decoration:none;font-weight:800;font-size:11px}.bp-secondary{background:#faf8f5;color:#385244;border:1px solid #e7e1d9;width:100%;margin-top:18px}.bp-more,.bp-guarantee{border:1px solid #e7e1d9;border-radius:13px;padding:15px;margin-top:14px;font-size:12px}.bp-more summary,.bp-guarantee summary{cursor:pointer;font-weight:800}.bp-dock{display:grid;gap:20px;align-content:start}.bp-dock ol{padding-left:19px;margin:20px 0 0;font-size:12px}.bp-dock li{margin:15px 0}.bp-dock p{font-size:11px}.bp-wallet{padding:16px;border:1px solid #ffd1c2;border-radius:12px;background:#fff8f4;margin:18px 0;color:#c45439;font-size:12px}.bp-wallet a{font-size:11px;color:#c45439;font-weight:800;text-decoration:none}.bp-assets{border:1px solid #e7e1d9;border-radius:12px;padding:16px;background:#faf8f5;font-size:12px}.bp-assets ul{padding-left:15px;font-size:11px;color:#718077;line-height:1.7}.bp-page :is(a,summary):focus-visible{outline:3px solid #80b7dc;outline-offset:3px}@media(max-width:900px){.bp-layout{grid-template-columns:1fr}.bp-dock{grid-template-columns:1fr 1fr}}@media(max-width:700px){.peach-business-workspace .peach-workspace-content{padding:20px 15px 90px}.bp-dock{grid-template-columns:1fr}.bp-heading{align-items:flex-start;flex-direction:column}.bp-page h1{font-size:23px}.bp-panel{padding:18px}}`}</style></PeachAppShell>
+import { ProjectRefresh } from "@/app/components/project-refresh";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { PeachAppShell } from "../../components/peach-app-shell";
+import { AcceptedProject } from "../../components/accepted-project";
+import { ProjectViewManager, ProjectItem } from "./project-view-manager";
+import { FolderArchive, Plus, ShieldCheck, Wallet, Sparkles, Layers } from "lucide-react";
+
+export const dynamic = "force-dynamic";
+
+interface BusinessProjectsPageProps {
+  searchParams?: Promise<{
+    view?: string;
+    search?: string;
+  }>;
+}
+
+export default async function BusinessProjectsPage({ searchParams }: BusinessProjectsPageProps) {
+  const params = searchParams ? await searchParams : {};
+  const requestedView = params.view || "active";
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/auth?role=business&mode=signin");
+
+  const admin = createAdminClient();
+  const [{ data: profile }, { data: business }] = await Promise.all([
+    admin.from("profiles").select("full_name,role").eq("id", user.id).maybeSingle(),
+    admin.from("businesses").select("id,name,logo_url").eq("owner_user_id", user.id).maybeSingle(),
+  ]);
+
+  if (profile?.role === "creative") redirect("/creative");
+  if (!business) redirect("/business");
+
+  const [{ data: wallet }, { data: projects, error }, { data: assets }] = await Promise.all([
+    admin.from("coin_wallets").select("available_coins,held_coins").eq("business_id", business.id).maybeSingle(),
+    admin
+      .from("projects")
+      .select("id,title,description,category,status,coin_amount,due_at,created_at,assigned_creative_id,revision_rounds")
+      .eq("business_id", business.id)
+      .order("created_at", { ascending: false }),
+    admin.from("business_brand_assets").select("id,label,original_name").eq("business_id", business.id),
+  ]);
+
+  const rawList = (projects ?? []) as ProjectItem[];
+  const activeList = rawList.filter((p) => !["completed", "cancelled"].includes(p.status));
+  const archivedList = rawList.filter((p) => ["completed", "cancelled"].includes(p.status));
+  const acceptedProject = activeList.find((p) => p.status === "accepted");
+
+  // Fetch creative names for all assigned creatives
+  const creativeIds = [...new Set(rawList.map((p) => p.assigned_creative_id).filter(Boolean))];
+  const { data: creatives } = creativeIds.length
+    ? await admin.from("creatives").select("id,user_id").in("id", creativeIds)
+    : { data: [] };
+
+  const userIds = ((creatives ?? []) as any[]).map((c: any) => c.user_id);
+  const { data: people } = userIds.length
+    ? await admin.from("profiles").select("id,full_name").in("id", userIds)
+    : { data: [] };
+
+  const namesMap: Record<string, string> = {};
+  ((creatives ?? []) as any[]).forEach((c: any) => {
+    const person = ((people ?? []) as any[]).find((p: any) => p.id === c.user_id);
+    if (person?.full_name) {
+      namesMap[c.id] = person.full_name;
+    }
+  });
+
+  return (
+    <PeachAppShell
+      role="business"
+      active="projects"
+      name={profile?.full_name}
+      businessName={business.name}
+      logoUrl={business.logo_url}
+      coinCount={wallet?.available_coins ?? 0}
+    >
+      <ProjectRefresh />
+      <div className="max-w-[1650px] mx-auto px-4 sm:px-7 py-6 sm:py-8 space-y-6">
+        {/* Top Header */}
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#EB6244] mb-1">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Project Collaboration Workspace</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">
+              {business.name} Projects
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              <span className="font-bold text-slate-900">{activeList.length}</span> active collaboration{activeList.length === 1 ? "" : "s"} &bull;{" "}
+              <span className="font-bold text-slate-900">{archivedList.length}</span> in completed archive
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <Link
+              href="/business/new-project"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#EB6244] hover:bg-[#d85538] text-white text-xs font-bold rounded-xl shadow-xs hover:shadow transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Start a Project</span>
+            </Link>
+          </div>
+        </header>
+
+        {/* Accepted Kickoff Project Announcement (if any) */}
+        {acceptedProject && (
+          <AcceptedProject
+            project={acceptedProject}
+            creativeName={namesMap[acceptedProject.assigned_creative_id || ""]}
+            assetCount={assets?.length ?? 0}
+          />
+        )}
+
+        {/* Main Two-Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Main Column: Project View Manager (Active vs Archived Tabs) */}
+          <main className="lg:col-span-8 space-y-6">
+            {error ? (
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-red-800 text-sm">
+                Projects could not be loaded at this time. Please refresh the page to retry.
+              </div>
+            ) : (
+              <ProjectViewManager
+                initialProjects={rawList}
+                creativeNames={namesMap}
+                initialView={requestedView}
+                businessName={business.name}
+                assetCount={assets?.length ?? 0}
+              />
+            )}
+
+            {/* Peach Guarantee Card */}
+            <details className="border border-[#e7e1d9] bg-white rounded-2xl p-4 sm:p-5 text-xs text-slate-600 group cursor-pointer shadow-2xs">
+              <summary className="font-extrabold text-slate-900 flex items-center justify-between list-none">
+                <span className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <span>Peach Project &amp; Escrow Guarantee</span>
+                </span>
+                <span className="text-slate-400 group-open:rotate-180 transition-transform">⌄</span>
+              </summary>
+              <p className="mt-3 text-xs leading-relaxed text-slate-600 border-t border-slate-100 pt-3">
+                All Peach Network collaborations follow clear milestone scope, agreed revision rounds, and
+                proof reviews inside your dedicated Project Room. Peach Coins remain protected in escrow until you approve
+                the final work. Completed deliverables remain accessible in your archive and sync to your Brand Vault.
+              </p>
+            </details>
+          </main>
+
+          {/* Side Dock: Room Guide & Wallet/Brand Vault Summary */}
+          <aside className="lg:col-span-4 space-y-5">
+            {/* Quick Archive Summary Card */}
+            <section className="bg-white border border-[#e7e1d9] rounded-2xl p-5 shadow-2xs">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                  <FolderArchive className="w-4 h-4 text-[#167b5c]" />
+                  <span>Archive &amp; Vault Access</span>
+                </h2>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                  Permanent
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed mb-3.5">
+                Completed work stays in your archive forever. Final vector files and color systems flow directly
+                into your Brand Vault for reuse across future design requests.
+              </p>
+
+              <div className="bg-[#FAF8F5] border border-slate-200 rounded-xl p-3.5 space-y-2 mb-3.5 text-xs">
+                <div className="flex items-center justify-between font-medium text-slate-700">
+                  <span>Archived Deliverables:</span>
+                  <strong className="text-slate-900">{archivedList.length} projects</strong>
+                </div>
+                <div className="flex items-center justify-between font-medium text-slate-700">
+                  <span>Brand Vault Assets:</span>
+                  <strong className="text-slate-900">{assets?.length ?? 0} saved</strong>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Link
+                  href="/business/projects?view=archived"
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                >
+                  <FolderArchive className="w-3.5 h-3.5 text-[#167b5c]" />
+                  <span>Switch to Archive View</span>
+                </Link>
+                <Link
+                  href="/business/vault"
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold text-[#EB6244] hover:text-[#d85538] hover:bg-orange-50 rounded-xl transition-colors"
+                >
+                  <span>Open Brand Vault →</span>
+                </Link>
+              </div>
+            </section>
+
+            {/* Wallet Overview Card */}
+            <section className="bg-white border border-[#e7e1d9] rounded-2xl p-5 shadow-2xs">
+              <h2 className="text-sm font-extrabold text-slate-900 flex items-center gap-2 mb-3">
+                <Wallet className="w-4 h-4 text-[#EB6244]" />
+                <span>Wallet Summary</span>
+              </h2>
+
+              <div className="bg-[#fff8f4] border border-[#ffd1c2] rounded-xl p-4 text-[#c45439] mb-3.5">
+                <div className="text-2xl font-extrabold text-slate-900">
+                  {wallet?.available_coins ?? 0}{" "}
+                  <span className="text-sm font-bold text-slate-600">Peach Coins available</span>
+                </div>
+                <p className="text-xs text-slate-600 mt-1">
+                  {wallet?.held_coins ?? 0} Coins committed in escrow across active collaborations.
+                </p>
+              </div>
+
+              <Link
+                href="/business/wallet"
+                className="w-full inline-flex items-center justify-center py-2 px-3 text-xs font-bold text-white bg-[#0B2D22] hover:bg-[#164e3c] rounded-xl transition-colors"
+              >
+                Manage Wallet &amp; Buy Coins →
+              </Link>
+            </section>
+
+            {/* Project Room Checklist */}
+            <section className="bg-white border border-[#e7e1d9] rounded-2xl p-5 shadow-2xs">
+              <h2 className="text-sm font-extrabold text-slate-900 mb-2">
+                What to Expect Inside Each Room
+              </h2>
+              <p className="text-xs text-slate-500 mb-3 leading-relaxed">
+                Every Peach Network request gets a dedicated workspace:
+              </p>
+              <ol className="space-y-2.5 text-xs text-slate-700">
+                <li className="flex items-start gap-2">
+                  <span className="w-4 h-4 rounded-full bg-slate-100 text-slate-700 font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
+                  <span><strong>Direct Creative Messaging</strong> — Chat with your designer in one thread.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="w-4 h-4 rounded-full bg-slate-100 text-slate-700 font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
+                  <span><strong>Vault Integration</strong> — Logos, fonts and color codes load automatically.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="w-4 h-4 rounded-full bg-slate-100 text-slate-700 font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
+                  <span><strong>Proof Review &amp; Revisions</strong> — Request tweaks or approve with confidence.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="w-4 h-4 rounded-full bg-slate-100 text-slate-700 font-extrabold text-[10px] flex items-center justify-center shrink-0 mt-0.5">4</span>
+                  <span><strong>Final Hand-off &amp; Archive</strong> — Delivery triggers payout and permanent archive.</span>
+                </li>
+              </ol>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </PeachAppShell>
+  );
 }
