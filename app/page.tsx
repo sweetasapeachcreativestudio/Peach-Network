@@ -214,18 +214,15 @@ export default function HomePage() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [submittingContact, setSubmittingContact] = useState(false);
   const [contactError, setContactError] = useState("");
-  const [mailtoBackup, setMailtoBackup] = useState("");
-  const [gmailBackup, setGmailBackup] = useState("");
-  const [copiedNote, setCopiedNote] = useState(false);
 
   const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     const name = contactName.trim();
     const email = contactEmail.trim();
     const topic = contactTopic.trim();
     const message = contactMessage.trim();
 
     if (!name || !email || !message) {
-      e.preventDefault();
       setContactError("Please fill in your name, email, and message.");
       return;
     }
@@ -233,21 +230,9 @@ export default function HomePage() {
     setSubmittingContact(true);
     setContactError("");
 
-    const targetEmail = "sweetasapeachcreativestudio@gmail.com";
-    const subject = `[Peach Network] ${topic} from ${name}`;
-    const mailtoSubject = encodeURIComponent(subject);
-    const mailtoBody = encodeURIComponent(
-      `Hi Sweet As A Peach Studio,\n\n${message}\n\n━━━━━━━━━━━━━━━━━━━━\nSender: ${name}\nEmail: ${email}\nTopic: ${topic}`
-    );
-    const directMailto = `mailto:${targetEmail}?subject=${mailtoSubject}&body=${mailtoBody}`;
-    const directGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${targetEmail}&su=${mailtoSubject}&body=${mailtoBody}`;
-
-    setMailtoBackup(directMailto);
-    setGmailBackup(directGmail);
-
-    // 1. Try client-side AJAX to FormSubmit
+    // 1. Direct AJAX dispatch to FormSubmit for immediate email delivery to sweetasapeachcreativestudio@gmail.com
     try {
-      await fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
+      await fetch("https://formsubmit.co/ajax/sweetasapeachcreativestudio@gmail.com", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -257,7 +242,7 @@ export default function HomePage() {
           name,
           email,
           _replyto: email,
-          _subject: subject,
+          _subject: `[Peach Network] ${topic} from ${name}`,
           _template: "table",
           _captcha: "false",
           topic,
@@ -265,10 +250,10 @@ export default function HomePage() {
         }),
       });
     } catch (fsErr) {
-      console.warn("Client FormSubmit attempt:", fsErr);
+      console.warn("FormSubmit notice:", fsErr);
     }
 
-    // 2. Also log and record to our internal API endpoint
+    // 2. Log to internal API database notifications
     try {
       await fetch("/api/contact", {
         method: "POST",
@@ -276,7 +261,7 @@ export default function HomePage() {
         body: JSON.stringify({ name, email, topic, message }),
       });
     } catch (apiErr) {
-      console.warn("Internal contact record attempt:", apiErr);
+      console.warn("Contact API notice:", apiErr);
     }
 
     setFormSubmitted(true);
@@ -1283,132 +1268,39 @@ export default function HomePage() {
               Have a Question or Want to Partner?
             </h2>
             <p className="text-slate-600 text-base sm:text-lg mt-3 leading-relaxed">
-              Send our Birmingham studio a note directly to{" "}
-              <a
-                href="mailto:sweetasapeachcreativestudio@gmail.com"
-                className="font-bold text-[#FF5733] hover:underline"
-              >
-                sweetasapeachcreativestudio@gmail.com
-              </a>{" "}
-              and we&rsquo;ll get right back to you.
+              Send our Birmingham team a quick note and we&rsquo;ll get right back to you.
             </p>
           </div>
 
-          <div className="bg-[#FAF8F5] border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-xs relative">
-            {/* Hidden iframe so FormSubmit posts directly without navigating away */}
-            <iframe name="formsubmit_frame" id="formsubmit_frame" style={{ display: "none" }} />
-
+          <div className="bg-[#FAF8F5] border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-xs">
             {formSubmitted ? (
-              <div className="text-center py-6">
+              <div className="text-center py-10">
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 mb-4 font-bold text-2xl">
                   <Check className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl font-bold tracking-tight text-slate-950 mb-2">Message Dispatched!</h3>
-                <p className="text-sm text-slate-700 max-w-md mx-auto leading-relaxed">
-                  Thank you, <strong>{contactName}</strong>! Your note regarding{" "}
-                  <strong>&ldquo;{contactTopic}&rdquo;</strong> has been submitted to{" "}
-                  <strong className="text-[#FF5733]">sweetasapeachcreativestudio@gmail.com</strong>.
+                <h3 className="text-2xl font-bold tracking-tight text-slate-950 mb-2">Email Sent!</h3>
+                <p className="text-sm text-slate-600 max-w-sm mx-auto leading-relaxed">
+                  Thanks for reaching out, <strong>{contactName}</strong>! Our Birmingham studio team has received your message and will follow up at <strong>{contactEmail}</strong> shortly.
                 </p>
-                <p className="text-xs text-slate-500 mt-2">
-                  Our Birmingham studio team will follow up at <strong>{contactEmail}</strong> shortly.
-                </p>
-
-                {/* Direct 1-Click Launchers so user has 100% guarantee their email sends */}
-                <div className="mt-6 p-4 rounded-xl bg-white border border-slate-200 text-left max-w-lg mx-auto shadow-xs">
-                  <div className="text-xs font-bold text-slate-900 mb-1 flex items-center gap-1.5">
-                    <Mail className="w-4 h-4 text-[#FF5733]" />
-                    <span>Instant Send & Verification Shortcuts</span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 mb-3">
-                    Your form was sent to our server and FormSubmit. You can also launch Gmail or your mail app below with your message already drafted:
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                    {gmailBackup && (
-                      <a
-                        href={gmailBackup}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#EA4335] hover:bg-[#D93025] text-white text-xs font-bold px-3 py-2 rounded-lg shadow-xs transition-colors"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        Send via Web Gmail
-                      </a>
-                    )}
-                    {mailtoBackup && (
-                      <a
-                        href={mailtoBackup}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold px-3 py-2 rounded-lg shadow-xs transition-colors"
-                      >
-                        <Mail className="w-3.5 h-3.5" />
-                        Open in Mail App
-                      </a>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (navigator.clipboard) {
-                          navigator.clipboard.writeText(
-                            `To: sweetasapeachcreativestudio@gmail.com\nSubject: [Peach Network] ${contactTopic} from ${contactName}\n\n${contactMessage}\n\nFrom: ${contactName} (${contactEmail})`
-                          );
-                          setCopiedNote(true);
-                          setTimeout(() => setCopiedNote(false), 2500);
-                        }
-                      }}
-                      className="inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-3 py-2 rounded-lg transition-colors cursor-pointer"
-                    >
-                      {copiedNote ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>{copiedNote ? "Copied!" : "Copy Note"}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mt-6 flex items-center justify-center">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFormSubmitted(false);
-                      setContactName("");
-                      setContactEmail("");
-                      setContactMessage("");
-                      setContactError("");
-                      setCopiedNote(false);
-                    }}
-                    className="inline-flex items-center justify-center bg-white border border-slate-300 text-slate-900 text-xs font-semibold px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-                  >
-                    Send Another Note
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormSubmitted(false);
+                    setContactName("");
+                    setContactEmail("");
+                    setContactMessage("");
+                    setContactError("");
+                  }}
+                  className="mt-6 inline-flex items-center justify-center bg-white border border-slate-300 text-slate-800 text-xs font-semibold px-5 py-2.5 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+                >
+                  Send Another Note
+                </button>
               </div>
             ) : (
-              <form
-                action="https://formsubmit.co/sweetasapeachcreativestudio@gmail.com"
-                method="POST"
-                target="formsubmit_frame"
-                onSubmit={handleContactSubmit}
-                className="space-y-5"
-              >
-                {/* FormSubmit Configuration Fields */}
-                <input
-                  type="hidden"
-                  name="_subject"
-                  value={`[Peach Network] ${contactTopic} from ${contactName || "Website Visitor"}`}
-                />
-                <input type="hidden" name="_replyto" value={contactEmail} />
-                <input type="hidden" name="_captcha" value="false" />
-                <input type="hidden" name="_template" value="table" />
-
+              <form onSubmit={handleContactSubmit} className="space-y-5">
                 {contactError && (
-                  <div className="p-3.5 rounded-lg bg-red-50 border border-red-200 text-red-800 text-xs leading-relaxed flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span>{contactError}</span>
-                    <a
-                      href={`mailto:sweetasapeachcreativestudio@gmail.com?subject=${encodeURIComponent(
-                        `[Peach Network] ${contactTopic}`
-                      )}&body=${encodeURIComponent(contactMessage)}`}
-                      className="font-bold underline text-red-900 hover:text-red-700 whitespace-nowrap"
-                    >
-                      Click here to email directly &rarr;
-                    </a>
+                  <div className="p-3.5 rounded-lg bg-red-50 border border-red-200 text-red-800 text-xs leading-relaxed">
+                    {contactError}
                   </div>
                 )}
 
@@ -1418,7 +1310,6 @@ export default function HomePage() {
                   </label>
                   <input
                     type="text"
-                    name="name"
                     required
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
@@ -1433,7 +1324,6 @@ export default function HomePage() {
                   </label>
                   <input
                     type="email"
-                    name="email"
                     required
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
@@ -1447,7 +1337,6 @@ export default function HomePage() {
                     How Can We Help?
                   </label>
                   <select
-                    name="topic"
                     value={contactTopic}
                     onChange={(e) => setContactTopic(e.target.value)}
                     className="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors"
@@ -1464,7 +1353,6 @@ export default function HomePage() {
                     Message
                   </label>
                   <textarea
-                    name="message"
                     rows={4}
                     required
                     value={contactMessage}
@@ -1483,12 +1371,12 @@ export default function HomePage() {
                     {submittingContact ? (
                       <>
                         <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Sending to sweetasapeachcreativestudio@gmail.com...</span>
+                        <span>Sending...</span>
                       </>
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        <span>Send Note to sweetasapeachcreativestudio@gmail.com &rarr;</span>
+                        <span>Send Note &rarr;</span>
                       </>
                     )}
                   </button>
