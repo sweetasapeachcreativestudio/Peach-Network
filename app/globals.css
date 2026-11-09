@@ -385,6 +385,23 @@ body{background:var(--pn-bg);color:var(--pn-ink)}
   animation-play-state: paused;
 }
 
+@keyframes trustSlide {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+.animate-trust-slide {
+  display: flex;
+  width: max-content;
+  animation: trustSlide 28s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.animate-trust-slide:hover {
+  animation-play-state: paused;
+}
+
 @keyframes smoothFloat {
   0%, 100% { transform: translate3d(0, 0, 0); }
   50% { transform: translate3d(0, -8px, 0); }
@@ -395,3 +412,4 @@ body{background:var(--pn-bg);color:var(--pn-ink)}
   will-change: transform;
   backface-visibility: hidden;
 }
+

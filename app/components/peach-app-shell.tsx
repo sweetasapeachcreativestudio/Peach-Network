@@ -15,6 +15,7 @@ const businessNav = [
 
 const creativeNav = [
   ["home", "/creative", "Peach Hub"],
+  ["studio_ai", "/creative/studio-ai", "Creative Director AI"],
   ["opportunities", "/creative/offers", "Opportunities"],
   ["projects", "/creative/projects", "Projects"],
   ["messages", "/creative/messages", "Messages"],

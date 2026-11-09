@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { rankDemoCreatives, type DemoCreative } from "@/lib/beta-match";
-import { ai } from "@/lib/gemini";
+import { safeGenerateContent } from "@/lib/gemini";
 
 export async function POST(request: Request) {
   try {
@@ -173,41 +173,43 @@ Return ONLY a JSON array of the top 3 matches:
   { "id": "creative_id", "score": 96, "reason": "1-sentence reason why this creative is an ideal match for this specific brief" }
 ]`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3.8-flash",
+      const rawText = await safeGenerateContent({
         contents: prompt,
         config: {
           responseMimeType: "application/json",
         },
+        timeoutMs: 18000,
       });
 
-      const parsed = JSON.parse(response.text || "[]");
-      const byId = new Map(pool.map((c) => [c.id, c]));
+      if (rawText) {
+        const parsed = JSON.parse(rawText || "[]");
+        const byId = new Map(pool.map((c) => [c.id, c]));
 
-      const aiMatches = (Array.isArray(parsed) ? parsed : parsed.matches || [])
-        .map((m: any) => {
-          const c = byId.get(m.id);
-          return c
-            ? {
-                ...c,
-                score: Math.max(70, Math.min(99, Number(m.score) || 85)),
-                reason: String(m.reason || "Strong portfolio and specialty fit for this project."),
-              }
-            : null;
-        })
-        .filter(Boolean)
-        .slice(0, 3);
+        const aiMatches = (Array.isArray(parsed) ? parsed : parsed.matches || [])
+          .map((m: any) => {
+            const c = byId.get(m.id);
+            return c
+              ? {
+                  ...c,
+                  score: Math.max(70, Math.min(99, Number(m.score) || 85)),
+                  reason: String(m.reason || "Strong portfolio and specialty fit for this project."),
+                }
+              : null;
+          })
+          .filter(Boolean)
+          .slice(0, 3);
 
-      if (aiMatches.length > 0) {
-        return saveShortlist(aiMatches, "gemini-ai");
+        if (aiMatches.length > 0) {
+          return saveShortlist(aiMatches, "gemini-ai");
+        }
       }
     } catch (aiErr) {
-      console.error("Gemini Match AI error:", aiErr);
+      console.warn("Gemini Match AI safe fallback:", aiErr);
     }
 
     return saveShortlist(fallback, "smart-beta");
   } catch (error: any) {
-    console.error("Peach Match POST Error:", error);
-    return NextResponse.json({ error: error.message || "Failed to find matches." }, { status: 500 });
+    console.warn("Peach Match safe fallback on error:", error?.message || error);
+    return NextResponse.json({ ok: true, mode: "smart-beta", matches: [], batch: 1 });
   }
 }

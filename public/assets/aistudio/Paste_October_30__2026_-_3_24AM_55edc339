@@ -1,0 +1,830 @@
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+
+interface ProjectItem {
+  id: string;
+  title: string;
+  category: string;
+  coins: number;
+  status: "review" | "wip" | "matching" | "completed";
+  statusLabel: string;
+  creativeName: string;
+  creativeRole: string;
+  timeline: string;
+  updatedAt: string;
+  stageNumber: number;
+}
+
+const INITIAL_PROJECTS: ProjectItem[] = [
+  {
+    id: "proj-1",
+    title: "Grand Opening Launch Kit & Print Bleeds",
+    category: "Print & Social Launch",
+    coins: 2,
+    status: "review",
+    statusLabel: "Proof Ready for Review",
+    creativeName: "Jose Garcia",
+    creativeRole: "Commercial Illustrator & Video Editor",
+    timeline: "Est. 2–3 Days",
+    updatedAt: "Today at 10:30 AM",
+    stageNumber: 3,
+  },
+  {
+    id: "proj-2",
+    title: "Empower Her Heart Mobile Health UI",
+    category: "Website & UI/UX Design",
+    coins: 8,
+    status: "wip",
+    statusLabel: "Work in Progress (Day 3 of 5)",
+    creativeName: "Stephanie Stewart",
+    creativeRole: "UI/UX Designer & Art Director",
+    timeline: "Est. 5–7 Days",
+    updatedAt: "Yesterday at 4:15 PM",
+    stageNumber: 2,
+  },
+  {
+    id: "proj-3",
+    title: "Civic Chamber Logo & Vector Identity",
+    category: "Branding Design",
+    coins: 6,
+    status: "matching",
+    statusLabel: "3 Creative Matches Found",
+    creativeName: "Donovan",
+    creativeRole: "Graphic & Brand Designer (SCAD)",
+    timeline: "Est. 4–5 Days",
+    updatedAt: "2 days ago",
+    stageNumber: 1,
+  },
+];
+
+const NEWS_BULLETINS = [
+  {
+    tag: "BETA RELEASE",
+    headline: "Welcome to Peach Network App Beta!",
+    detail: "Open November – January 1. Try the app and share your thoughts in the form sent to your email.",
+    actionText: "Check Email Form",
+    actionLink: "#contact",
+  },
+  {
+    tag: "LAUNCH PARTY",
+    headline: "Version 1 & Launch Party Coming Soon",
+    detail: "Official dates and RSVP details will be sent in our newsletter. Visit www.sweetasapeachcreativeca.com for details.",
+    actionText: "Visit Studio Website",
+    actionLink: "https://www.sweetasapeachcreativeca.com",
+  },
+  {
+    tag: "COMMUNITY MIXER",
+    headline: "Birmingham Commercial Design Mixer & Pitch Night",
+    detail: "Join local business owners, art directors, and commercial photographers at The Battery in Birmingham.",
+    actionText: "Reserve Free Pass",
+    actionLink: "#events",
+  },
+  {
+    tag: "NEW ON ROSTER",
+    headline: "3 New Commercial Photographers & Brand Designers Added",
+    detail: "Expanded local Birmingham talent pool for restaurant culinary shoots and retail packaging.",
+    actionText: "View Creative Roster",
+    actionLink: "#creatives",
+  },
+];
+
+export default function BusinessDashboardPage() {
+  const [activeNav, setActiveNav] = useState<"dashboard" | "start" | "projects" | "messages" | "vault" | "wallet" | "settings">("dashboard");
+  const [projectFilter, setProjectFilter] = useState<"all" | "review" | "wip" | "completed">("all");
+  const [newsIndex, setNewsIndex] = useState(0);
+
+  // Scoping AI Form
+  const [promptText, setPromptText] = useState("");
+  const [selectedFastTrack, setSelectedFastTrack] = useState<string | null>(null);
+  const [isScoping, setIsScoping] = useState(false);
+  const [scopedResult, setScopedResult] = useState<{
+    title: string;
+    coins: number;
+    timeline: string;
+    discipline: string;
+    deliverables: string[];
+  } | null>(null);
+
+  // Wallet State
+  const [coinsAvailable, setCoinsAvailable] = useState(4);
+  const [coinsInEscrow, setCoinsInEscrow] = useState(8);
+
+  const handleFastTrack = (discipline: string, defaultPrompt: string, estimatedCoins: number, timeline: string) => {
+    setSelectedFastTrack(discipline);
+    setPromptText(defaultPrompt);
+    setScopedResult({
+      title: discipline,
+      coins: estimatedCoins,
+      timeline,
+      discipline,
+      deliverables: [
+        "100% Scalable Vector / Figma Deliverables",
+        "Commercial 300 DPI Pre-Flight / Developer Handoff",
+        "Assigned to Verified Birmingham Creative",
+        "Permanent Brand Asset Vault Archival",
+      ],
+    });
+  };
+
+  const handleAnalyzeScope = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promptText.trim()) return;
+
+    setIsScoping(true);
+    setTimeout(() => {
+      const lower = promptText.toLowerCase();
+      let coins = 6;
+      let timeline = "Est. 4–5 Days";
+      let discipline = "Graphic Designer";
+      let title = "Custom Commercial Collateral";
+
+      if (lower.includes("website") || lower.includes("web") || lower.includes("store") || lower.includes("page")) {
+        if (lower.includes("shoe") || lower.includes("retail") || lower.includes("ecommerce") || lower.includes("e-commerce")) {
+          coins = 24;
+          timeline = "Est. 10–14 Days";
+          discipline = "Website Designer (E-Commerce)";
+          title = "Retail E-Commerce Website & Product Catalog";
+        } else if (lower.includes("restaurant") || lower.includes("menu") || lower.includes("bar")) {
+          coins = 20;
+          timeline = "Est. 10–14 Days";
+          discipline = "Website Designer (Hospitality)";
+          title = "Restaurant Website & Menu Architecture";
+        } else {
+          coins = 10;
+          timeline = "Est. 5–7 Days";
+          discipline = "Website Designer";
+          title = "Custom Homepage & UI/UX Prototype";
+        }
+      } else if (lower.includes("logo") || lower.includes("brand") || lower.includes("identity")) {
+        coins = lower.includes("full") ? 12 : 6;
+        timeline = lower.includes("full") ? "Est. 7–10 Days" : "Est. 4–5 Days";
+        discipline = "Branding Designer";
+        title = lower.includes("full") ? "Full Commercial Brand Identity Suite" : "Brand Identity Starter System";
+      } else if (lower.includes("photo") || lower.includes("shoot") || lower.includes("headshot")) {
+        coins = lower.includes("food") ? 12 : 10;
+        timeline = "Est. 5–7 Days";
+        discipline = "Commercial Photographer";
+        title = lower.includes("food") ? "On-Location Culinary & Restaurant Shoot" : "Product Tabletop Photography";
+      } else if (lower.includes("social") || lower.includes("instagram") || lower.includes("post")) {
+        coins = 4;
+        timeline = "Est. 3–4 Days";
+        discipline = "Social Media Designer";
+        title = "Social Campaign Suite & Multi-Slide Drop";
+      } else if (lower.includes("flyer") || lower.includes("event") || lower.includes("banner")) {
+        coins = 2;
+        timeline = "Est. 2–3 Days";
+        discipline = "Graphic Designer";
+        title = "Commercial Event / Promo Launch Kit";
+      }
+
+      setScopedResult({
+        title,
+        coins,
+        timeline,
+        discipline,
+        deliverables: [
+          "Pre-flight checked for commercial press & screen standards",
+          "Includes 2 structured revision rounds",
+          "Dedicated Birmingham Art Director oversight",
+          "Funds held safely in escrow until final proof sign-off",
+        ],
+      });
+      setIsScoping(false);
+    }, 600);
+  };
+
+  const filteredProjects = INITIAL_PROJECTS.filter((p) => {
+    if (projectFilter === "review") return p.status === "review";
+    if (projectFilter === "wip") return p.status === "wip" || p.status === "matching";
+    if (projectFilter === "completed") return p.status === "completed";
+    return true;
+  });
+
+  const currentBulletin = NEWS_BULLETINS[newsIndex];
+
+  return (
+    <div className="min-h-screen bg-[#FAF8F5] text-slate-900 font-sans antialiased flex flex-col lg:flex-row">
+      {/* 1. LEFT SIDEBAR */}
+      <aside className="w-full lg:w-64 bg-[#FFF5EE] border-r border-[#F0D5C7] flex flex-col justify-between shrink-0 p-5 lg:min-h-screen">
+        <div>
+          {/* Logo Brand Header */}
+          <Link href="/" className="flex items-center gap-3 px-2 py-3 mb-6">
+            <div className="w-10 h-10 rounded-2xl bg-[#FF5733] flex items-center justify-center text-white text-xl font-bold shadow-xs">
+              🍑
+            </div>
+            <div>
+              <span className="text-xl font-black tracking-tight text-slate-950 block leading-tight">
+                Peach Network
+              </span>
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#0B2D22]">
+                Business Portal
+              </span>
+            </div>
+          </Link>
+
+          {/* Navigation Links — Renamed to "Your Dashboard" */}
+          <nav className="space-y-1.5">
+            <button
+              type="button"
+              onClick={() => setActiveNav("dashboard")}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                activeNav === "dashboard"
+                  ? "bg-[#0B2D22] text-[#FFD8C2] shadow-xs"
+                  : "text-slate-700 hover:bg-[#FCEAE0] hover:text-slate-950"
+              }`}
+            >
+              <span>Your Dashboard</span>
+              {activeNav === "dashboard" && (
+                <span className="w-2 h-2 rounded-full bg-[#FF5733]" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveNav("start")}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                activeNav === "start"
+                  ? "bg-[#0B2D22] text-[#FFD8C2] shadow-xs"
+                  : "text-slate-700 hover:bg-[#FCEAE0] hover:text-slate-950"
+              }`}
+            >
+              <span>Start a Project</span>
+              <span className="text-[10px] bg-[#FF5733] text-white px-2 py-0.5 rounded-md font-extrabold">
+                Fast
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveNav("projects")}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                activeNav === "projects"
+                  ? "bg-[#0B2D22] text-[#FFD8C2] shadow-xs"
+                  : "text-slate-700 hover:bg-[#FCEAE0] hover:text-slate-950"
+              }`}
+            >
+              <span>Active Projects</span>
+              <span className="text-[11px] font-extrabold text-[#FF5733]">
+                {INITIAL_PROJECTS.length}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveNav("vault")}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                activeNav === "vault"
+                  ? "bg-[#0B2D22] text-[#FFD8C2] shadow-xs"
+                  : "text-slate-700 hover:bg-[#FCEAE0] hover:text-slate-950"
+              }`}
+            >
+              <span>Brand Asset Vault</span>
+              <span className="text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded font-bold">
+                Synced
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveNav("wallet")}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                activeNav === "wallet"
+                  ? "bg-[#0B2D22] text-[#FFD8C2] shadow-xs"
+                  : "text-slate-700 hover:bg-[#FCEAE0] hover:text-slate-950"
+              }`}
+            >
+              <span>Wallet &amp; Coins</span>
+              <span className="text-[11px] font-black text-slate-900">
+                {coinsAvailable} Coins
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveNav("messages")}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                activeNav === "messages"
+                  ? "bg-[#0B2D22] text-[#FFD8C2] shadow-xs"
+                  : "text-slate-700 hover:bg-[#FCEAE0] hover:text-slate-950"
+              }`}
+            >
+              <span>Messages &amp; Proofs</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveNav("settings")}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                activeNav === "settings"
+                  ? "bg-[#0B2D22] text-[#FFD8C2] shadow-xs"
+                  : "text-slate-700 hover:bg-[#FCEAE0] hover:text-slate-950"
+              }`}
+            >
+              <span>Studio Settings</span>
+            </button>
+          </nav>
+        </div>
+
+        {/* User Card */}
+        <div className="pt-6 border-t border-[#F0D5C7] mt-6">
+          <div className="p-3 bg-white border border-[#F0D5C7] rounded-2xl shadow-2xs mb-3">
+            <div className="text-xs font-black text-slate-950 truncate">
+              Stephanie Williams
+            </div>
+            <div className="text-[11px] text-slate-500 font-medium truncate">
+              Peach Agency &bull; Birmingham, AL
+            </div>
+          </div>
+          <Link
+            href="/login"
+            className="block text-center text-xs font-bold text-slate-600 hover:text-[#FF5733] transition-colors py-1.5"
+          >
+            Log Out
+          </Link>
+        </div>
+      </aside>
+
+      {/* 2. MAIN CONTENT AREA */}
+      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        {/* TOP NEWS FEED BANNER */}
+        <div className="bg-gradient-to-r from-[#0B2D22] via-[#133F31] to-[#0B2D22] text-white px-4 sm:px-8 py-3 border-b border-emerald-900/60 sticky top-0 z-30 shadow-xs">
+          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-[#FF5733] text-white shrink-0">
+                {currentBulletin.tag}
+              </span>
+              <div className="text-xs font-medium text-emerald-100 truncate">
+                <strong className="text-white mr-2">{currentBulletin.headline}</strong>
+                <span className="hidden md:inline text-emerald-200/80">{currentBulletin.detail}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+              <a
+                href={currentBulletin.actionLink}
+                target={currentBulletin.actionLink.startsWith("http") ? "_blank" : undefined}
+                rel="noreferrer"
+                className="text-xs font-bold text-[#FFD8C2] hover:text-white underline transition-colors"
+              >
+                {currentBulletin.actionText} &rarr;
+              </a>
+              <div className="flex items-center gap-1 ml-3 border-l border-emerald-800/80 pl-3">
+                <button
+                  type="button"
+                  onClick={() => setNewsIndex((prev) => (prev === 0 ? NEWS_BULLETINS.length - 1 : prev - 1))}
+                  className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold bg-emerald-900/80 text-emerald-200 hover:bg-emerald-800 transition-colors cursor-pointer"
+                  title="Previous announcement"
+                >
+                  &larr;
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewsIndex((prev) => (prev === NEWS_BULLETINS.length - 1 ? 0 : prev + 1))}
+                  className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold bg-emerald-900/80 text-emerald-200 hover:bg-emerald-800 transition-colors cursor-pointer"
+                  title="Next announcement"
+                >
+                  &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* DASHBOARD BODY */}
+        <div className="p-4 sm:p-8 lg:p-10 max-w-6xl w-full mx-auto space-y-8">
+          
+          {/* HEADER: GREETING & STATUS OVERVIEW */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-[#F0D5C7]">
+            <div>
+              <div className="text-xs font-extrabold uppercase tracking-wider text-[#FF5733] mb-1">
+                ✦ SWEET AS A PEACH CREATIVE NETWORK &bull; BIRMINGHAM
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight">
+                Welcome back, Stephanie
+              </h1>
+              <p className="text-sm text-slate-600 mt-1">
+                Your creative studio is active. Start a new build or review deliverables below.
+              </p>
+            </div>
+
+            {/* Quick Stat Badges */}
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <div className="px-3.5 py-2 rounded-xl bg-white border border-[#F0D5C7] shadow-2xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                  Available Wallet
+                </span>
+                <span className="text-sm font-black text-[#FF5733]">
+                  {coinsAvailable} Coins (${coinsAvailable * 50})
+                </span>
+              </div>
+
+              <div className="px-3.5 py-2 rounded-xl bg-white border border-[#F0D5C7] shadow-2xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                  Active in Escrow
+                </span>
+                <span className="text-sm font-black text-[#0B2D22]">
+                  {coinsInEscrow} Coins (${coinsInEscrow * 50})
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setCoinsAvailable((prev) => prev + 10)}
+                className="px-4 py-2.5 rounded-xl bg-[#FF5733] hover:bg-[#E04826] text-white text-xs font-extrabold transition-all shadow-xs cursor-pointer"
+              >
+                + Buy Coins
+              </button>
+            </div>
+          </div>
+
+          {/* 3. SIMPLIFIED 3-MINUTE SCOPING & MATCHING ENGINE */}
+          <section className="bg-white rounded-3xl border border-[#F0D5C7] shadow-md p-6 sm:p-8 relative overflow-hidden">
+            <div className="pointer-events-none absolute -right-16 -top-16 w-64 h-64 rounded-full bg-[#FF5733]/10 blur-3xl" />
+
+            <div className="relative z-10">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                <div className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-[#FF5733]">
+                  ⚡ 3-MINUTE SCOPING &amp; CREATIVE MATCHING
+                </div>
+                <span className="text-xs text-slate-500 font-semibold">
+                  1 Peach Coin = $50 USD &bull; Fixed Scope Guarantee
+                </span>
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">
+                What would you like to create for Peach Agency?
+              </h2>
+              <p className="text-sm text-slate-600 mt-1 max-w-2xl">
+                Describe your project in plain English or select a fast track below. Peach AI calculates realistic coin pricing and pairs 3 vetted Birmingham commercial artists in seconds.
+              </p>
+
+              {/* 5 Fast-Track Category Chips — Pure Color, No Icons */}
+              <div className="mt-5 flex items-center gap-2.5 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleFastTrack(
+                      "Retail E-Commerce Website",
+                      "I need a custom e-commerce website for my footwear company with product catalog grids, size selectors, and mobile cart.",
+                      24,
+                      "Est. 10–14 Days"
+                    )
+                  }
+                  className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                    selectedFastTrack === "Retail E-Commerce Website"
+                      ? "bg-[#0B2D22] text-[#FFD8C2] border-[#0B2D22] shadow-xs"
+                      : "bg-[#FFF5EE] text-[#0B2D22] border-[#F0D5C7] hover:border-[#FF5733]"
+                  }`}
+                >
+                  Website &amp; E-Commerce (8–24 Coins)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleFastTrack(
+                      "Brand Identity & Logo",
+                      "I need a complete commercial brand overhaul with primary logo, vector mark, typography hierarchy, and brand guide.",
+                      6,
+                      "Est. 4–5 Days"
+                    )
+                  }
+                  className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                    selectedFastTrack === "Brand Identity & Logo"
+                      ? "bg-[#0B2D22] text-[#FFD8C2] border-[#0B2D22] shadow-xs"
+                      : "bg-[#FFF5EE] text-[#0B2D22] border-[#F0D5C7] hover:border-[#FF5733]"
+                  }`}
+                >
+                  Brand Identity &amp; Logo (4–12 Coins)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleFastTrack(
+                      "Restaurant & Hospitality Website",
+                      "I need a restaurant website with interactive food & drink menus, table reservations, and catering inquiry forms.",
+                      20,
+                      "Est. 10–14 Days"
+                    )
+                  }
+                  className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                    selectedFastTrack === "Restaurant & Hospitality Website"
+                      ? "bg-[#0B2D22] text-[#FFD8C2] border-[#0B2D22] shadow-xs"
+                      : "bg-[#FFF5EE] text-[#0B2D22] border-[#F0D5C7] hover:border-[#FF5733]"
+                  }`}
+                >
+                  Restaurant &amp; Menus (20 Coins)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleFastTrack(
+                      "Commercial Photography Shoot",
+                      "I need an on-location Birmingham commercial photography shoot for 10 signature plated dishes and restaurant ambiance.",
+                      12,
+                      "Est. 5–7 Days"
+                    )
+                  }
+                  className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                    selectedFastTrack === "Commercial Photography Shoot"
+                      ? "bg-[#0B2D22] text-[#FFD8C2] border-[#0B2D22] shadow-xs"
+                      : "bg-[#FFF5EE] text-[#0B2D22] border-[#F0D5C7] hover:border-[#FF5733]"
+                  }`}
+                >
+                  Commercial Photography (6–12 Coins)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleFastTrack(
+                      "Print & Social Promo Kit",
+                      "I need a commercial print flyer with 300 DPI press bleeds plus matching Instagram square and vertical story.",
+                      2,
+                      "Est. 2–3 Days"
+                    )
+                  }
+                  className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                    selectedFastTrack === "Print & Social Promo Kit"
+                      ? "bg-[#0B2D22] text-[#FFD8C2] border-[#0B2D22] shadow-xs"
+                      : "bg-[#FFF5EE] text-[#0B2D22] border-[#F0D5C7] hover:border-[#FF5733]"
+                  }`}
+                >
+                  Print &amp; Packaging (2–6 Coins)
+                </button>
+              </div>
+
+              {/* Scoping Form */}
+              <form onSubmit={handleAnalyzeScope} className="mt-4 space-y-4">
+                <textarea
+                  rows={3}
+                  value={promptText}
+                  onChange={(e) => setPromptText(e.target.value)}
+                  placeholder="Describe your design request in plain English... e.g. 'I need a 4-page menu redesign and matching social promo graphics for our spring cocktail launch next month.'"
+                  className="w-full bg-[#FAF8F5] border border-[#F0D5C7] focus:border-[#FF5733] focus:bg-white rounded-2xl p-4 text-sm text-slate-900 transition-colors focus:outline-hidden resize-none leading-relaxed"
+                />
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                  <div className="text-xs text-slate-500 font-medium">
+                    Protected Escrow &bull; No hourly bloat &bull; Hand-screened talent
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isScoping || !promptText.trim()}
+                    className="inline-flex items-center justify-center gap-2 bg-[#FF5733] hover:bg-[#E04826] text-white text-sm font-extrabold px-6 py-3 rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {isScoping ? "Analyzing Scope..." : "Analyze Scope & Match Creatives →"}
+                  </button>
+                </div>
+              </form>
+
+              {/* Scoped Result Card */}
+              {scopedResult && (
+                <div className="mt-6 p-5 sm:p-6 bg-[#FFF5EE] border border-[#F0D5C7] rounded-2xl animate-fadeIn">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#F0D5C7]">
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
+                        ✓ SCOPE LOCKED
+                      </span>
+                      <h3 className="text-lg font-extrabold text-slate-950 mt-1">
+                        {scopedResult.title}
+                      </h3>
+                      <div className="text-xs text-slate-600 font-semibold mt-0.5">
+                        Assigned Discipline: <strong className="text-slate-900">{scopedResult.discipline}</strong> &bull; {scopedResult.timeline}
+                      </div>
+                    </div>
+
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-black text-[#FF5733]">
+                        {scopedResult.coins} Coins
+                      </span>
+                      <span className="text-xs text-slate-500 font-bold">
+                        (${scopedResult.coins * 50} USD)
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+                    {scopedResult.deliverables.map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <span className="text-emerald-700 font-black">✓</span>
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-5 pt-4 border-t border-[#F0D5C7] flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <span className="text-xs text-slate-600">
+                      3 Birmingham verified creatives are ready to accept this brief.
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => alert(`Starting project: ${scopedResult.title}! Escrow locked at ${scopedResult.coins} Coins.`)}
+                      className="w-full sm:w-auto inline-flex items-center justify-center bg-[#0B2D22] hover:bg-[#133F31] text-white text-xs font-extrabold px-5 py-2.5 rounded-xl shadow-xs transition-colors cursor-pointer"
+                    >
+                      Confirm Brief &amp; Lock 3 Creatives &rarr;
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* 4. ACTIVE PROJECTS HUB */}
+          <section className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-xl font-black text-slate-950 tracking-tight">
+                  Active Projects &amp; Deliverables
+                </h3>
+                <p className="text-xs text-slate-600">
+                  Track proof reviews, milestone releases, and direct collaboration.
+                </p>
+              </div>
+
+              {/* Filter Tabs */}
+              <div className="inline-flex p-1 bg-white border border-[#F0D5C7] rounded-xl shadow-2xs text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setProjectFilter("all")}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    projectFilter === "all" ? "bg-[#0B2D22] text-white shadow-2xs" : "text-slate-600"
+                  }`}
+                >
+                  All ({INITIAL_PROJECTS.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProjectFilter("review")}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    projectFilter === "review" ? "bg-[#0B2D22] text-white shadow-2xs" : "text-slate-600"
+                  }`}
+                >
+                  Proof Ready (1)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setProjectFilter("wip")}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    projectFilter === "wip" ? "bg-[#0B2D22] text-white shadow-2xs" : "text-slate-600"
+                  }`}
+                >
+                  In Progress (2)
+                </button>
+              </div>
+            </div>
+
+            {/* Project Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {filteredProjects.map((p) => {
+                const isReview = p.status === "review";
+                const isWip = p.status === "wip";
+
+                return (
+                  <div
+                    key={p.id}
+                    className={`bg-white rounded-2xl border p-5 flex flex-col justify-between transition-all shadow-xs hover:shadow-sm ${
+                      isReview ? "border-amber-400/80 bg-amber-50/20" : "border-[#F0D5C7]"
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2.5">
+                        <span
+                          className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded ${
+                            isReview
+                              ? "bg-amber-100 text-amber-900 border border-amber-300"
+                              : isWip
+                              ? "bg-emerald-100 text-emerald-900 border border-emerald-300"
+                              : "bg-blue-100 text-blue-900 border border-blue-300"
+                          }`}
+                        >
+                          {p.statusLabel}
+                        </span>
+
+                        <span className="text-xs font-black text-[#FF5733]">
+                          {p.coins} Coins (${p.coins * 50})
+                        </span>
+                      </div>
+
+                      <h4 className="text-base font-extrabold text-slate-950 tracking-tight leading-snug">
+                        {p.title}
+                      </h4>
+                      <div className="text-[11px] text-slate-500 font-semibold mt-1">
+                        {p.category}
+                      </div>
+
+                      <div className="mt-4 p-3 rounded-xl bg-[#FAF8F5] border border-[#F0D5C7]">
+                        <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                          Assigned Creative
+                        </div>
+                        <div className="text-xs font-bold text-slate-950 mt-0.5">
+                          {p.creativeName}
+                        </div>
+                        <div className="text-[11px] text-[#0B2D22] font-semibold truncate">
+                          {p.creativeRole}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                      <span className="text-[11px] text-slate-500 font-medium">
+                        {p.updatedAt}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => alert(`Opening Project Room for ${p.title}`)}
+                        className={`font-extrabold px-3.5 py-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
+                          isReview
+                            ? "bg-[#FF5733] hover:bg-[#E04826] text-white shadow-2xs"
+                            : "bg-[#0B2D22] hover:bg-[#133F31] text-white"
+                        }`}
+                      >
+                        {isReview ? "Review Proof →" : "View Room →"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* 5. BRAND VAULT & ART DIRECTOR SUPPORT */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            <div className="bg-white rounded-2xl border border-[#F0D5C7] p-6 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800 bg-emerald-50 inline-block px-2 py-0.5 rounded border border-emerald-200 mb-2">
+                  PERMANENT ARCHIVAL
+                </div>
+                <h3 className="text-lg font-black text-slate-950">
+                  Your Brand Asset Vault
+                </h3>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Your master vector logos, typography specifications, color tokens, and previous project handoffs are stored securely for any assigned creative to reference automatically.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-slate-700">
+                  <span className="px-2.5 py-1 bg-[#FAF8F5] border border-slate-200 rounded-md">
+                    Woodlawn_Logo_Master.svg
+                  </span>
+                  <span className="px-2.5 py-1 bg-[#FAF8F5] border border-slate-200 rounded-md">
+                    Autumn_Palette_2026.ase
+                  </span>
+                  <span className="px-2.5 py-1 bg-[#FAF8F5] border border-slate-200 rounded-md">
+                    300 DPI Food Photos (15)
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-xs text-slate-500 font-semibold">
+                  12 Assets Stored
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveNav("vault")}
+                  className="text-xs font-extrabold text-[#FF5733] hover:underline cursor-pointer"
+                >
+                  Manage Brand Vault &rarr;
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-[#FFF5EE] to-[#FAF8F5] rounded-2xl border border-[#F0D5C7] p-6 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="text-[10px] font-extrabold uppercase tracking-wider text-[#FF5733] bg-orange-100/60 inline-block px-2 py-0.5 rounded mb-2">
+                  BIRMINGHAM ART DIRECTION
+                </div>
+                <h3 className="text-lg font-black text-slate-950">
+                  Need Custom Scope or a Pod?
+                </h3>
+                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                  Every project on Peach Network is supervised by our senior commercial art directors. If you have a complex multi-discipline launch, request a custom creative consultation.
+                </p>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-[#F0D5C7] flex items-center justify-between">
+                <span className="text-xs text-[#0B2D22] font-bold">
+                  Sweet As A Peach Creative Agency
+                </span>
+                <a
+                  href="mailto:sweetasapeachcreativestudio@gmail.com"
+                  className="inline-flex items-center gap-1.5 text-xs font-extrabold bg-[#0B2D22] hover:bg-[#133F31] text-white px-3.5 py-2 rounded-xl transition-colors"
+                >
+                  Contact Art Director &rarr;
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  );
+}

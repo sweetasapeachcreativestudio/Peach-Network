@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { AppHeader, BottomNav } from "../components/app-nav";
 import { ProjectProgress } from "../components/project-progress";
+import { PeachStudioAIBox } from "./components/peach-studio-ai-box";
+import { Sparkles, ArrowRight } from "lucide-react";
 
 function prettyLevel(level?: string | null) {
   if (!level) return "Peach Creative";
@@ -100,6 +102,10 @@ export default async function CreativeDashboard() {
   <section className="pn-project-card-list">{(offers??[]).slice(0,2).map((o:any)=><article className="pn-project-card-new" key={o.id}><div className="pn-card-person pn-card-mark">✦</div><div className="pn-card-project-main"><div className="pn-project-topline"><div><small>PRIVATE MATCH</small><h3>{o.projects?.title??"Creative Opportunity"}</h3></div><strong>${(o.payout_cents/100).toFixed(0)}</strong></div><p>{o.projects?.category??"Creative"}{o.projects?.due_at?` · Due ${new Date(o.projects.due_at).toLocaleDateString()}`:""}</p><div className="pn-card-project-bottom"><span>Scope + payout visible before you accept.</span><Link href="/creative/offers" className="btn btn-primary btn-small">Review Match</Link></div></div></article>)}{(!offers||offers.length===0)&&<div className="pn-friendly-empty"><span>🍑</span><div><h3>Nothing ripe yet.</h3><p>Peach is looking. Your next private match will appear here when the fit is right.</p></div></div>}</section>
   <div className="section-row pn-section-row"><div><span className="eyebrow">ACTIVE WORK</span><h2>Keep it moving.</h2></div><Link href="/creative/projects" className="text-link">View projects</Link></div>
   <section className="pn-project-card-list">{active.slice(0,2).map((p:any)=><article className="pn-project-card-new" key={p.id}><div className="pn-card-person pn-card-mark">▣</div><div className="pn-card-project-main"><div className="pn-project-topline"><div><small>{p.category}</small><h3>{p.title}</h3></div><span className={`status-label ${p.status}`}>{p.status.replaceAll("_"," ")}</span></div><p>{p.due_at?`Due ${new Date(p.due_at).toLocaleDateString()}`:"Flexible deadline"}</p><ProjectProgress status={p.status} compact/><div className="pn-card-project-bottom"><span>Chat, proofs and check-ins live together.</span><Link href={`/projects/${p.id}`} className="btn btn-primary btn-small">Open Workspace</Link></div></div></article>)}</section>
+  <div className="section-row pn-section-row" style={{marginTop:"32px"}}><div><span className="eyebrow">CREATIVE DIRECTOR</span><h2>Studio Design Advisor &amp; Software Tips.</h2></div><Link href="/creative/studio-ai" className="text-link">Full Studio Workspace →</Link></div>
+  <section style={{marginBottom:"32px"}}>
+    <PeachStudioAIBox />
+  </section>
   <BottomNav role="creative" active="home"/>
  </main>
 }

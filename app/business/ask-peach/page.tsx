@@ -1,7 +1,63 @@
-"use client";
-import { useMemo, useState } from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { PeachAppShell } from "@/app/components/peach-app-shell";
+import { PeachMatchAIBox } from "@/app/business/components/peach-match-ai-box";
+import { ArrowLeft, Sparkles } from "lucide-react";
 
-function estimateProject(text:string){const q=text.toLowerCase();let min=0,max=0;const items:string[]=[];const add=(a:number,b:number,label:string)=>{min+=a;max+=b;items.push(`${label} · ${a===b?a:`${a}–${b}`} coin${b===1?'':'s'}`)};if(q.includes('flyer'))add(1,1,'Flyer / event graphic');if(q.includes('reel')||q.includes('video'))add(2,4,'Video / reel');if(q.includes('website')||q.includes('web'))add(2,5,'Website work');if(q.includes('logo'))add(3,4,'Logo work');if(q.includes('photo'))add(5,7,'Photography');if(q.includes('social')&&!q.includes('reel'))add(1,2,'Social content');if(!items.length){min=1;max=3;items.push('Starting creative estimate · 1–3 coins')}return{min,max,items}}
+export const dynamic = "force-dynamic";
 
-export default function AskPeachPage(){const[input,setInput]=useState("");const[answer,setAnswer]=useState<null|ReturnType<typeof estimateProject>>(null);const prompt=useMemo(()=>input.trim(),[input]);return <main className="pn-ask-page"><header><Link href="/business" className="text-link">← Back</Link><div className="pn-ask-title"><span>🍑</span><div><strong>Ask Peach AI</strong><small>Your creative assistant · Beta</small></div></div></header><section className="pn-ask-thread"><div className="pn-bubble peach"><span>🍑</span><div><strong>Hi! I’m Peach.</strong><p>Tell me what you’re trying to create. I’ll help you think through the project and give you a planning estimate before you submit it.</p></div></div>{answer&&<><div className="pn-bubble user"><p>{prompt}</p></div><div className="pn-bubble peach"><span>🍑</span><div><strong>Here’s a quick project estimate:</strong><ul>{answer.items.map(i=><li key={i}>{i}</li>)}</ul><p><b>Total: about {answer.min}–{answer.max} coins.</b> We’ll confirm the exact amount before work begins.</p>{answer.max<=5?<p>The Essentials plan may fit if this is your main project. If you expect more work this month, Growth gives you more flexibility.</p>:<p>A 10-coin pack or Growth plan may be a better fit depending on what else you need this month.</p>}<Link className="btn btn-primary btn-small" href={`/business/new-project?brief=${encodeURIComponent(prompt)}`}>Turn this into a project</Link></div></div></>}</section><form className="pn-ask-compose" onSubmit={e=>{e.preventDefault();if(prompt)setAnswer(estimateProject(prompt))}}><input value={input} onChange={e=>setInput(e.target.value)} placeholder="Ask me anything about your project…"/><button aria-label="Send">➜</button></form></main>}
+export default async function AskPeachPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/auth?role=business&mode=signin");
+
+  const admin = createAdminClient();
+  const [{ data: profile }, { data: business }] = await Promise.all([
+    admin.from("profiles").select("full_name,role").eq("id", user.id).maybeSingle(),
+    admin.from("businesses").select("id,name,logo_url").eq("owner_user_id", user.id).maybeSingle(),
+  ]);
+
+  const bizName = business?.name || "My Business";
+  const { data: wallet } = business?.id
+    ? await admin.from("coin_wallets").select("available_coins").eq("business_id", business.id).maybeSingle()
+    : { data: null };
+
+  const coins = wallet?.available_coins ?? 14;
+
+  return (
+    <PeachAppShell
+      role="business"
+      active="home"
+      name={profile?.full_name}
+      businessName={bizName}
+      logoUrl={business?.logo_url}
+      coinCount={coins}
+    >
+      <div className="space-y-6 max-w-5xl mx-auto">
+        <header className="flex items-center justify-between pb-3 border-b border-stone-200">
+          <Link
+            href="/business"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-stone-600 hover:text-stone-950 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Dashboard</span>
+          </Link>
+
+          <div className="inline-flex items-center gap-1 text-xs font-bold text-[#EB6244]">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Interactive Creative Advisory</span>
+          </div>
+        </header>
+
+        <PeachMatchAIBox
+          initialAvailableCoins={coins}
+          businessName={bizName}
+        />
+      </div>
+    </PeachAppShell>
+  );
+}

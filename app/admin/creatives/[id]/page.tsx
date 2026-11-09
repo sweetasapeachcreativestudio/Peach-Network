@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import CreativeReviewActions from "./review-actions";
+import { CreativeStatusBadge } from "../../components/creative-status-badge";
 
 export default async function CreativeReviewDetail({
   params
@@ -59,7 +60,7 @@ export default async function CreativeReviewDetail({
               {[creative.city, creative.state].filter(Boolean).join(", ") || "Location not set"}
             </p>
           </div>
-          <span className="pill">{creative.application_status}</span>
+          <CreativeStatusBadge status={creative.application_status} size="md" />
         </div>
 
         <hr style={{border:0,borderTop:"1px solid var(--peach-border)",margin:"20px 0"}} />

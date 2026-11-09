@@ -9,6 +9,7 @@ import BusinessProjectRoom from "./business-project-room";
 import { PeachAppShell } from "../../components/peach-app-shell";
 import MatchShortlist from "./match-shortlist";
 import { ProofFilePreviewer } from "./proof-file-previewer";
+import { DoorDashDispatchTracker } from "./door-dash-dispatch-tracker";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,7 @@ export default async function ProjectWorkspace({ params, searchParams }: { param
   if (!project) notFound();
 
   const { data: business } = await admin.from("businesses").select("owner_user_id,name,logo_url").eq("id", project.business_id).single();
-  const { data: assignedCreative } = project.assigned_creative_id ? await admin.from("creatives").select("id,user_id,primary_specialty,peach_level").eq("id", project.assigned_creative_id).single() : { data: null } as any;
+  const { data: assignedCreative } = project.assigned_creative_id ? await admin.from("creatives").select("id,user_id,primary_specialty,peach_level,city").eq("id", project.assigned_creative_id).single() : { data: null } as any;
   const isBusiness = business?.owner_user_id === user.id;
   const isCreative = assignedCreative?.user_id === user.id;
   const isAdmin = profile.role === "admin";
@@ -89,16 +90,60 @@ export default async function ProjectWorkspace({ params, searchParams }: { param
   const latestImageProof = ((files ?? []) as any[]).find((f: any) => f.file_kind === "proof" && ["image/png", "image/jpeg", "image/webp"].includes(f.mime_type ?? ""));
   const proofThumbnailUrl = latestImageProof ? previewUrls[latestImageProof.id] ?? null : null;
 
+  const creativeCity = assignedCreative?.city?.toLowerCase() ?? "";
+  const creativeHub = creativeCity.includes("atlanta")
+    ? "Atlanta Hub"
+    : creativeCity.includes("huntsville")
+    ? "Huntsville Hub"
+    : creativeCity.includes("montgomery")
+    ? "Montgomery Hub"
+    : "Birmingham Hub";
+
   const days = project.due_at ? Math.ceil((new Date(project.due_at).getTime()-Date.now())/86400000) : null;
   const appRole = role === "creative" ? "creative" : "business";
   const headerName = profile.full_name;
 
-  if(isBusiness) return <PeachAppShell role="business" active="projects" name={profile.full_name} businessName={business?.name} logoUrl={business?.logo_url} coinCount={wallet?.available_coins??0}>
-    {created === "1" && <p className="auth-message">Project created. Your brief is ready while matching begins.</p>}
-    {!project.assigned_creative_id && ["matching","offer_sent","draft"].includes(project.status) && <MatchShortlist projectId={id}/>}
-    <BusinessProjectRoom proofThumbnail={proofThumbnailUrl} previewUrls={previewUrls} project={project} businessName={business?.name??"Your business"} creative={assignedCreative?{name:creativeProfile?.full_name??"Your creative",avatar:creativeProfile?.avatar_url??null,specialty:assignedCreative.primary_specialty}:null} files={files??[]} assets={brandAssets??[]} requests={requests??[]} initialBrief={view==="brief"} messages={((messages??[]) as any[]).map((m: any)=>({...m,sender:m.sender_user_id===user.id?"You":senderMap.get(m.sender_user_id)??"Project member"}))}/>
-    <style>{`.peach-business-workspace .peach-workspace-content{max-width:1750px;padding:22px 26px 40px}.peach-business-workspace .peach-workspace-topbar{height:52px}@media(max-width:700px){.peach-business-workspace .peach-workspace-content{padding:18px 14px 90px}}`}</style>
-  </PeachAppShell>;
+  if (isBusiness) {
+    const isMatchingOrOffered = ["matching", "offer_sent"].includes(project.status);
+
+    return (
+      <PeachAppShell role="business" active="projects" name={profile.full_name} businessName={business?.name} logoUrl={business?.logo_url} coinCount={wallet?.available_coins??0}>
+        {created === "1" && <p className="auth-message">Project created. Your brief is ready while matching begins.</p>}
+
+        {/* DoorDash-Style Dispatch Tracker */}
+        {isMatchingOrOffered && (
+          <DoorDashDispatchTracker
+            projectId={id}
+            projectTitle={project.title}
+            category={project.category}
+            coins={project.coin_amount}
+            creativeName={creativeProfile?.full_name ?? "Jordan Ellis"}
+            creativeAvatar={creativeProfile?.avatar_url ?? "/Creative1.JPG"}
+            creativeSpecialty={assignedCreative?.primary_specialty ?? "Commercial Graphics"}
+            creativeHub={creativeHub}
+            status={project.status}
+          />
+        )}
+
+        {!project.assigned_creative_id && ["matching","offer_sent","draft"].includes(project.status) && <MatchShortlist projectId={id}/>}
+
+        {/* Full Active Project Room */}
+        <BusinessProjectRoom
+          proofThumbnail={proofThumbnailUrl}
+          previewUrls={previewUrls}
+          project={project}
+          businessName={business?.name??"Your business"}
+          creative={assignedCreative?{name:creativeProfile?.full_name??"Your creative",avatar:creativeProfile?.avatar_url??null,specialty:assignedCreative.primary_specialty,hub:creativeHub}:null}
+          files={files??[]}
+          assets={brandAssets??[]}
+          requests={requests??[]}
+          initialBrief={view==="brief"}
+          messages={((messages??[]) as any[]).map((m: any)=>({...m,sender:m.sender_user_id===user.id?"You":senderMap.get(m.sender_user_id)??"Project member"}))}
+        />
+        <style>{`.peach-business-workspace .peach-workspace-content{max-width:1750px;padding:22px 26px 40px}.peach-business-workspace .peach-workspace-topbar{height:52px}@media(max-width:700px){.peach-business-workspace .peach-workspace-content{padding:18px 14px 90px}}`}</style>
+      </PeachAppShell>
+    );
+  }
 
   return <main className="app-shell">
     <AppHeader name={headerName} role={appRole} coinCount={isBusiness ? (wallet as any)?.available_coins ?? 0 : undefined}/>

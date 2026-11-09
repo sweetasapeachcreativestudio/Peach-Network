@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { SERVICE_GUIDE } from "@/lib/project-pricing";
-import { ai } from "@/lib/gemini";
+import { safeGenerateContent } from "@/lib/gemini";
 import { Type } from "@google/genai";
 
 const guideRules = Object.entries(SERVICE_GUIDE).map(([key, v]) => ({
@@ -23,7 +23,7 @@ function getCategoryForService(key: string): string {
 }
 
 function fallbackScope(text: string) {
-  const q = text.toLowerCase();
+  const q = (text || "").toLowerCase();
   let key: keyof typeof SERVICE_GUIDE = "social_graphic";
 
   if (/website|web site|landing|web page|homepage|shopify|squarespace|wordpress/.test(q)) {
@@ -65,13 +65,12 @@ function fallbackScope(text: string) {
 }
 
 export async function POST(req: Request) {
+  let text = "Design request";
   try {
-    const { idea, details } = await req.json();
-    const text = [idea, details].filter(Boolean).join("\n").trim();
-
-    if (!text) {
-      return NextResponse.json({ error: "Tell Peach what you need created." }, { status: 400 });
-    }
+    const body = await req.json().catch(() => ({}));
+    const idea = body?.idea;
+    const details = body?.details;
+    text = [idea, details].filter(Boolean).join("\n").trim() || "Design request";
 
     if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(fallbackScope(text));
@@ -102,8 +101,7 @@ ${JSON.stringify(guideRules, null, 2)}
 
 Analyze this project request and return the JSON evaluation.`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
+    const rawResponse = await safeGenerateContent({
       contents: prompt,
       config: {
         systemInstruction,
@@ -158,7 +156,17 @@ Analyze this project request and return the JSON evaluation.`;
       },
     });
 
-    const parsed = JSON.parse(response.text || "{}");
+    if (!rawResponse) {
+      return NextResponse.json(fallbackScope(text));
+    }
+
+    let parsed: any = {};
+    try {
+      parsed = JSON.parse(rawResponse);
+    } catch {
+      return NextResponse.json(fallbackScope(text));
+    }
+
     const coins = Math.max(1, Number(parsed.coins) || 1);
 
     return NextResponse.json({
@@ -177,12 +185,7 @@ Analyze this project request and return the JSON evaluation.`;
       followUp: parsed.followUp || null,
     });
   } catch (err: any) {
-    console.error("Peach Match AI Scope Error:", err);
-    try {
-      const { idea, details } = await req.json().catch(() => ({}));
-      return NextResponse.json(fallbackScope([idea, details].filter(Boolean).join("\n")));
-    } catch {
-      return NextResponse.json(fallbackScope("Design request"));
-    }
+    console.warn("Peach Match AI Scope Safe Fallback:", err?.message || err);
+    return NextResponse.json(fallbackScope(text));
   }
 }

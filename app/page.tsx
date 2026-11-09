@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import PhoneHeroMockup from "@/components/PhoneHeroMockup";
-import { X, Check } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { X, Check, ChevronLeft, ChevronRight, ArrowRight, Eye, Star, Play, Pause, Search, Mail, Send } from "lucide-react";
 
 interface ProjectItem {
   id: number;
   title: string;
   client: string;
   category: string;
+  categoryKey: string;
   coins: number;
   timeline: string;
   image: string;
@@ -17,122 +18,193 @@ interface ProjectItem {
   specs: string[];
   designer?: string;
   designerRole?: string;
+  designerAvatar?: string;
+  hub?: string;
 }
 
 const PROJECTS: ProjectItem[] = [
   {
     id: 1,
-    title: "Runa Logo & Vector Kit",
-    client: "Runa",
-    category: "Logo & Vector Kit",
-    coins: 4,
-    timeline: "Est. 3–4 Days",
-    image: "/project 7.jpg",
-    designer: "Jose Garcia",
-    designerRole: "Illustrator & Video Editor • ADDY Award Winner (Troy University)",
+    title: "Social Media Marketing Posts",
+    client: "Lawson State Community College",
+    category: "Social Media Marketing",
+    categoryKey: "social",
+    coins: 2,
+    timeline: "Est. 2–3 Days",
+    image: "/Project 1.png",
+    designer: "Jeremiah",
+    designerRole: "Graphic Designer & Content Creator",
+    designerAvatar: "/Creative1.JPG",
+    hub: "Birmingham Hub",
     description:
-      "High-precision vector logo and identity kit created by Jose Garcia, ADDY Award-winning illustrator and video editor at Troy University.",
+      "Campaign announcement graphics and promotional social media marketing posts designed for Lawson State Community College in Birmingham.",
     specs: [
-      "Primary Logo & Moon Icon",
-      "Apparel Vector Artwork",
-      "100% Scalable Vector SVGs",
-      "Print & Screen Pre-Flight Passed",
+      "1:1 Feed Square & 9:16 Vertical Story Formats",
+      "Branded College Typography & Official Colors",
+      "300 DPI Pre-Flight Approved Digital Master Assets",
+      "Multi-Post Campaign Template Handoff",
     ],
   },
   {
     id: 2,
-    title: "Empower Her Heart",
-    client: "Lillian Hewitt, Black Women's Heart Health, LLC",
-    category: "UI/UX & Art Direction",
-    coins: 8,
-    timeline: "Est. 5–7 Days",
-    image: "/lillian-project.jpg",
-    designer: "Stephanie Stewart",
-    designerRole: "UI/UX Designer & Art Director (Troy University)",
+    title: "Logo & Brand Identity Suite",
+    client: "Bessemer Area Chamber of Commerce",
+    category: "Logo & Branding",
+    categoryKey: "brand",
+    coins: 6,
+    timeline: "Est. 4–5 Days",
+    image: "/Project 3.png",
+    designer: "Donovon",
+    designerRole: "Graphic Designer (SCAD)",
+    designerAvatar: "/Creative2.jpg",
+    hub: "Savannah Georgia Hub",
     description:
-      "Designed by Stephanie Stewart, UI/UX Designer & Art Director at Troy University for Lillian Hewitt's Empower Her Heart initiative.",
+      "Official civic chamber logo, primary seal lockup, signage vectors, and comprehensive brand guidelines designed by Donovon from the Savannah Georgia Hub.",
     specs: [
-      "Responsive Web Experience",
-      "Mobile Health UI Prototype",
-      "Figma Design System Tokens",
-      "Art Direction & Brand Collateral",
+      "Primary Civic Seal & Horizontal Lockup",
+      "100% Scalable Vector Handoff (.AI, .SVG, .EPS)",
+      "Signage, Embroidery & Apparel Print Vector Specs",
+      "Commercial Brand Guidelines & Color Tokens",
     ],
   },
   {
     id: 3,
-    title: "Bessemer Chamber Logo & Brand Kit",
-    client: "Bessemer Area Chamber of Commerce",
-    category: "Logo & Brand Kit",
-    coins: 6,
-    timeline: "Est. 4–5 Days",
-    image: "/Project 3.png",
-    designer: "Donovan",
-    designerRole: "Graphic Designer (Studying at SCAD)",
+    title: "Community Program Booklet",
+    client: "New Joy Fellowship Baptist Church",
+    category: "Booklets & Editorial",
+    categoryKey: "booklet",
+    coins: 4,
+    timeline: "Est. 3–4 Days",
+    image: "/Project 4.png",
+    designer: "Stephanie Stewart",
+    designerRole: "Art Director & Editorial Designer",
+    designerAvatar: "/Creative4.jpg",
+    hub: "Birmingham Hub",
     description:
-      "Official civic chamber logo and brand kit designed by Donovan, graphic designer studying at SCAD (Savannah College of Art and Design).",
+      "Multi-page community program booklet and commemorative publication layout designed for New Joy Fellowship Baptist Church in Birmingham.",
     specs: [
-      "Primary Civic Identity Seal",
-      "Signage & Apparel Vector Art",
-      "300 DPI CMYK Pre-Flight",
-      "Brand Guidelines & Color Specs",
+      "Multi-Page Saddle-Stitch Publication Layout",
+      "Commercial 300 DPI CMYK Print Bleeds & Crop Marks",
+      "Accessible Editorial Typography & Spread Balancing",
+      "Print-Ready Commercial Proof PDF",
     ],
   },
   {
     id: 4,
-    title: "Student Campaign & Announcement Suite",
-    client: "Lawson State Community College",
-    category: "Social Media Campaign",
-    coins: 3,
+    title: "Anniversary Celebration Menu",
+    client: "New Joy Fellowship Baptist Church",
+    category: "Menus & Event Print",
+    categoryKey: "menu",
+    coins: 2,
     timeline: "Est. 2–3 Days",
-    image: "/Project 1.png",
+    image: "/Project 2.png",
+    designer: "Stephanie Stewart",
+    designerRole: "Art Director & Graphic Designer",
+    designerAvatar: "/Creative4.jpg",
+    hub: "Birmingham Hub",
     description:
-      "A cohesive social campaign highlighting student achievement and program opportunities across Birmingham.",
+      "Custom printed celebration banquet menu and event program designed for New Joy Fellowship Baptist Church in Birmingham.",
     specs: [
-      "4 social media designs",
-      "Feed & story formats",
-      "Brand guidelines styling",
-      "Editable source files",
+      "Double-Sided Banquet Menu Layout & Typography",
+      "300 DPI CMYK Commercial Print Bleeds",
+      "Elegant Ceremonial Gold & Charcoal Styling",
+      "Press-Ready Master PDF with Trim Specifications",
     ],
   },
   {
     id: 5,
-    title: "Church Program & Civic Event Suite",
-    client: "New Joy Fellowship Baptist Church",
-    category: "Editorial & Print Design",
+    title: "Custom Vector Character Illustration",
+    client: "Runa Creative & Apparel",
+    category: "Custom Illustration",
+    categoryKey: "illustration",
     coins: 4,
     timeline: "Est. 3–4 Days",
-    image: "/Project 4.png",
+    image: "/project 7.jpg",
+    designer: "Jose Garcia",
+    designerRole: "Illustrator & ADDY Winner",
+    designerAvatar: "/jose-creative.jpg",
+    hub: "Troy Alabama Hub",
     description:
-      "A coordinated print and digital event suite for a historic Birmingham community congregation.",
+      "Bespoke stylized vector illustration and character artwork created by ADDY Award-winner Jose Garcia from the Troy Alabama Hub.",
     specs: [
-      "Print-ready program (300 DPI)",
-      "Digital mobile version",
-      "Social announcement graphics",
-      "Archive vector files",
-    ],
-  },
-  {
-    id: 6,
-    title: "Custom Event Flyer Kit",
-    client: "Local Culinary & Artisan Market",
-    category: "Print & Social Launch Kit",
-    coins: 2,
-    timeline: "Est. 2–3 Days",
-    image: "/Project 2.png",
-    description:
-      "Pre-scoped event kit: 1 high-res print flyer with 300 DPI press bleeds + matching Instagram square and story.",
-    specs: [
-      "1 Commercial Print Flyer (CMYK)",
-      "1 Instagram Square (1080x1080)",
-      "1 Instagram Story (1080x1920)",
-      "Stored in Brand Vault",
+      "100% Scalable Vector Illustration (.AI, .SVG)",
+      "Custom Character & Dynamic Scenic Composition",
+      "Full Commercial Artwork Copyright Release",
+      "High-Resolution Transparent PNG & Screen Previews",
     ],
   },
 ];
 
+const POPULAR_CATEGORIES = [
+  { id: "social", label: "Social Media", index: 0 },
+  { id: "brand", label: "Logo & Brand", index: 1 },
+  { id: "booklet", label: "Booklets", index: 2 },
+  { id: "menu", label: "Menus", index: 3 },
+  { id: "illustration", label: "Illustration", index: 4 },
+] as const;
+
+interface TrustedClientLogo {
+  id: string;
+  name: string;
+  logo: string;
+  fallbackLogo?: string;
+  projectIndex: number;
+}
+
+const TRUSTED_CLIENT_LOGOS: TrustedClientLogo[] = [
+  {
+    id: "lawson",
+    name: "Lawson State Community College",
+    logo: "/assets/aistudio/Lawson-logo_a521bfc8.png",
+    projectIndex: 0,
+  },
+  {
+    id: "bessemer",
+    name: "Bessemer Area Chamber of Commerce",
+    logo: "/assets/aistudio/bessemer-chamber-logo-transparent.png",
+    fallbackLogo: "/assets/aistudio/Heading__Instagram_Post__45___-_4_b6a2c37c.PNG",
+    projectIndex: 1,
+  },
+  {
+    id: "newjoy",
+    name: "New Joy Fellowship Baptist Church",
+    logo: "/assets/aistudio/new-joy-seal-transparent.png",
+    fallbackLogo: "/assets/aistudio/Gemini_Generated_Image_ub3xaoub3xaoub3x_caae32e1.jpg",
+    projectIndex: 2,
+  },
+];
+
 export default function HomePage() {
+  const router = useRouter();
   const [selected, setSelected] = useState<ProjectItem | null>(null);
   const [pricingTab, setPricingTab] = useState<"project" | "membership">("project");
+
+  // Peach Match AI Hero Search / Prompt
+  const [heroPrompt, setHeroPrompt] = useState("");
+
+  const handlePeachMatchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = heroPrompt.trim() ? `?prompt=${encodeURIComponent(heroPrompt.trim())}` : "";
+    router.push(`/login${query}`);
+  };
+
+  // Hero Project Showcase State with Auto-Movement
+  const [featuredIndex, setFeaturedIndex] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+
+  // Automatically advance project showcase every 4.5 seconds
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      setFeaturedIndex((prev) => (prev + 1) % PROJECTS.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [isPaused]);
+
+  const activeProject = PROJECTS[featuredIndex % PROJECTS.length] || PROJECTS[0];
+
+  // Client Trust Ribbon Slide State
+  const [isTrustPaused, setIsTrustPaused] = useState<boolean>(false);
 
   // Basic Contact / Partner / Question Form
   const [contactName, setContactName] = useState("");
@@ -140,11 +212,47 @@ export default function HomePage() {
   const [contactTopic, setContactTopic] = useState("Question About the App");
   const [contactMessage, setContactMessage] = useState("");
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [submittingContact, setSubmittingContact] = useState(false);
+  const [contactError, setContactError] = useState("");
+  const [mailtoBackup, setMailtoBackup] = useState("");
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!contactName.trim() || !contactEmail.trim() || !contactMessage.trim()) return;
-    setFormSubmitted(true);
+    const name = contactName.trim();
+    const email = contactEmail.trim();
+    const topic = contactTopic.trim();
+    const message = contactMessage.trim();
+
+    if (!name || !email || !message) {
+      setContactError("Please fill in your name, email, and message.");
+      return;
+    }
+
+    setSubmittingContact(true);
+    setContactError("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, topic, message }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to send message. Please retry.");
+      }
+      setMailtoBackup(data.mailto || "");
+      setFormSubmitted(true);
+    } catch (err: any) {
+      console.warn("Contact form submission error:", err);
+      const mailtoSubject = encodeURIComponent(`[Peach Network] ${topic} from ${name}`);
+      const mailtoBody = encodeURIComponent(`Hi Sweet As A Peach Team,\n\n${message}\n\nFrom: ${name} (${email})\nTopic: ${topic}`);
+      const fallbackMailto = `mailto:sweetasapeachcreativestudio@gmail.com?subject=${mailtoSubject}&body=${mailtoBody}`;
+      setMailtoBackup(fallbackMailto);
+      setContactError(err.message || "Failed to submit note. You can also click below to email us directly.");
+    } finally {
+      setSubmittingContact(false);
+    }
   };
 
   return (
@@ -182,8 +290,8 @@ export default function HomePage() {
 
           {/* Menu Links */}
           <nav className="flex items-center gap-5 sm:gap-8 lg:gap-10 text-xs sm:text-sm font-semibold text-slate-800 whitespace-nowrap overflow-x-auto py-1">
-            <a href="#about" className="hover:text-[#FF5733] transition-colors">
-              About Us
+            <a href="#highlights" className="hover:text-[#FF5733] transition-colors">
+              Explore Work
             </a>
             <a href="#how-it-works" className="hover:text-[#FF5733] transition-colors">
               How It Works
@@ -191,89 +299,199 @@ export default function HomePage() {
             <a href="#pricing" className="hover:text-[#FF5733] transition-colors">
               Pricing
             </a>
-            <a href="#why-choose-us" className="hover:text-[#FF5733] transition-colors">
-              Why Choose Us
+            <a href="#about" className="hover:text-[#FF5733] transition-colors">
+              About Us
             </a>
             <a href="#contact" className="hover:text-[#FF5733] transition-colors">
               Contact
             </a>
           </nav>
 
-          {/* Header Right: Sign In + High-converting Coral Start a Project CTA (No coin badge clutter) */}
-          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+          {/* Header Right: Bright Green Sign In Button */}
+          <div className="flex items-center shrink-0">
             <Link
               href="/login"
-              className="text-xs sm:text-sm font-semibold text-slate-800 hover:text-[#FF5733] transition-colors px-2 py-1"
+              className="inline-flex items-center justify-center bg-[#22C55E] hover:bg-[#16A34A] text-white text-xs sm:text-sm font-bold px-4 sm:px-5 py-2 rounded-xl shadow-xs hover:shadow transition-all"
             >
               Sign In
-            </Link>
-
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-1.5 bg-[#FF5733] hover:bg-[#E04826] text-white text-xs sm:text-sm font-semibold px-4 sm:px-5 py-2.5 rounded-lg shadow-xs hover:shadow transition-all"
-            >
-              Start a Project &rarr;
             </Link>
           </div>
         </div>
       </header>
 
-      {/* 2. HERO SECTION */}
-      <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-24 border-b border-[#F0D5C7] bg-gradient-to-b from-[#FDF2EC] via-[#FCEAE0]/70 to-[#FAF8F5]">
+      {/* 2. 99DESIGNS-STYLE CLEAN HERO SECTION */}
+      <section className="relative overflow-hidden pt-8 pb-14 lg:pt-14 lg:pb-16 border-b border-[#F0D5C7] bg-gradient-to-b from-[#FFF5EE] via-[#FDECE2]/60 to-[#FAF8F5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
-            {/* HERO LEFT COLUMN */}
-            <div className="lg:col-span-6 flex flex-col items-start text-left z-10">
-              <p className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#1E3A8A] mb-4">
-                ✦ THE ON-DEMAND CREATIVE PLATFORM
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            
+            {/* HERO LEFT COLUMN: UNBOXED FLOATING SHOWCASE (Inspired by 99designs) */}
+            <div className="lg:col-span-6 w-full flex flex-col items-center justify-center order-2 lg:order-1 relative">
+              {/* Soft ambient gradient glow for depth and fun peach/blue/green accent */}
+              <div className="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tr from-[#FF5733]/20 via-[#2563EB]/15 to-[#22C55E]/20 blur-3xl pointer-events-none -z-0" />
+
+              {/* Main Artwork Showcase - 100% UNBOXED, NO CARD BORDER, NO BACKGROUND BOX */}
+              <div
+                className="relative w-full max-w-md sm:max-w-lg aspect-[4/3] flex items-center justify-center cursor-pointer group z-10 p-2"
+                onClick={() => setSelected(activeProject)}
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+              >
+                <img
+                  src={activeProject.image}
+                  alt={activeProject.title}
+                  className="max-h-full max-w-full object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-103"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.opacity = "0";
+                  }}
+                />
+
+                {/* Floating Attribution Speech-Bubble Pill (99designs style: vibrant blue with pointer) */}
+                <div className="absolute bottom-2 sm:bottom-4 left-3 sm:left-6 flex items-center gap-2 z-20 transition-transform duration-300 group-hover:-translate-y-1">
+                  <div className="relative flex items-center gap-2 bg-[#2563EB] text-white text-xs font-bold px-3.5 py-1.5 rounded-full shadow-lg">
+                    {/* Speech bubble pointer triangle pointing up/left to design */}
+                    <div className="absolute -top-1 left-4 w-2.5 h-2.5 bg-[#2563EB] rotate-45" />
+
+                    {activeProject.designerAvatar ? (
+                      <img
+                        src={activeProject.designerAvatar}
+                        alt={activeProject.designer || "Creative"}
+                        className="w-5 h-5 rounded-full object-cover border border-white/80 shrink-0"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-white text-[#2563EB] text-[10px] font-black flex items-center justify-center shrink-0">
+                        {activeProject.designer?.[0] || "P"}
+                      </div>
+                    )}
+                    <span className="truncate max-w-[170px] sm:max-w-[220px]">
+                      {activeProject.category} by {activeProject.designer}
+                    </span>
+                  </div>
+
+                  {/* Bright Green Coin Value Pill */}
+                  <span className="bg-[#22C55E] text-slate-950 text-xs font-black px-2.5 py-1 rounded-full shadow-md">
+                    {activeProject.coins} {activeProject.coins === 1 ? "Coin" : "Coins"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Client & Hub Attribution: Italic Serif text (99designs style) */}
+              <p className="mt-3 text-xs sm:text-sm text-slate-600 italic font-serif text-center z-10">
+                Created for {activeProject.client} &bull;{" "}
+                <span className="font-sans not-italic font-bold text-[#FF5733]">
+                  {activeProject.hub}
+                </span>
               </p>
 
-              {/* H1 Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-extrabold tracking-tight text-slate-950 leading-[1.1] text-balance">
-                Vetted Creatives at the{" "}
-                <span className="text-[#FF5733] italic font-extrabold">
-                  Touch of a Button.
+              {/* Pagination Dots & Pause/Resume Control */}
+              <div className="mt-4 flex items-center justify-center gap-3 z-10">
+                <div className="flex items-center gap-2">
+                  {PROJECTS.map((item, idx) => {
+                    const isActive = idx === featuredIndex;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setFeaturedIndex(idx)}
+                        className={`transition-all rounded-full cursor-pointer ${
+                          isActive
+                            ? "w-7 h-2.5 bg-slate-900"
+                            : "w-2.5 h-2.5 bg-slate-300 hover:bg-slate-400"
+                        }`}
+                        aria-label={`Show ${item.title}`}
+                      />
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsPaused((prev) => !prev)}
+                  className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors px-2 py-1 rounded-md hover:bg-white/80 flex items-center gap-1.5 cursor-pointer ml-1"
+                  title={isPaused ? "Resume auto-movement" : "Pause auto-movement"}
+                >
+                  {isPaused ? (
+                    <>
+                      <Play className="w-3 h-3 fill-current text-slate-700" />
+                      <span className="text-[11px]">Resume</span>
+                    </>
+                  ) : (
+                    <>
+                      <Pause className="w-3 h-3 fill-current text-slate-700" />
+                      <span className="text-[11px]">Pause</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* HERO RIGHT COLUMN: HEADLINE, SUBHEAD, SEARCH & POPULAR CHIPS */}
+            <div className="lg:col-span-6 flex flex-col items-start text-left z-10 order-1 lg:order-2">
+              <div className="text-xs font-black uppercase tracking-wider text-[#FF5733] mb-2.5 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#22C55E]" />
+                <span>Birmingham&rsquo;s Creative Marketplace</span>
+              </div>
+
+              {/* Exact Requested Headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-[52px] font-black tracking-tight text-slate-950 leading-[1.08] text-balance">
+                Commercial design for your business.{" "}
+                <span className="text-[#2563EB] block sm:inline">
+                  Done right, without the runaround.
                 </span>
               </h1>
 
-              {/* Subhead with comfortable breathing room */}
-              <p className="mt-6 text-base sm:text-lg text-slate-700 leading-relaxed max-w-xl">
-                Describe what you need in plain English. Get matched with top commercial designers at transparent coin pricing&mdash;with zero bidding wars, no hourly bloat, and no low-quality AI shortcuts.
+              {/* Exact Requested Subhead */}
+              <p className="mt-5 text-base sm:text-lg text-slate-700 leading-relaxed max-w-xl">
+                Skip the 40-proposal bidding wars. Peach Network pairs you directly with vetted Birmingham commercial artists at transparent coin rates—with clear milestones, prompt delivery, and full asset ownership.
               </p>
 
-              {/* ACTION Buttons */}
-              <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
-                <Link
-                  href="/login"
-                  className="inline-flex items-center justify-center gap-2 bg-[#FF5733] hover:bg-[#E04826] text-white text-base font-semibold px-8 py-3.5 rounded-lg shadow-sm hover:shadow transition-colors text-center"
-                >
-                  Start a Project &rarr;
-                </Link>
+              {/* 99designs-Style Search / Project Launch Bar */}
+              <form onSubmit={handlePeachMatchSubmit} className="mt-7 w-full max-w-xl">
+                <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center bg-white border-2 border-[#F0D5C7] focus-within:border-[#2563EB] rounded-2xl sm:rounded-full p-1.5 shadow-sm transition-all gap-2">
+                  <div className="flex items-center gap-2.5 px-3.5 py-2 flex-1 min-w-0">
+                    <Search className="w-5 h-5 text-slate-400 shrink-0" />
+                    <input
+                      type="text"
+                      value={heroPrompt}
+                      onChange={(e) => setHeroPrompt(e.target.value)}
+                      placeholder="What do you need designed?"
+                      className="w-full bg-transparent text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:outline-none"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="shrink-0 bg-[#FF5733] hover:bg-[#E04826] text-white text-sm font-bold px-6 py-3 rounded-xl sm:rounded-full transition-all cursor-pointer whitespace-nowrap shadow-md hover:shadow-lg active:scale-98"
+                  >
+                    Hire A Creative
+                  </button>
+                </div>
+              </form>
 
-                <Link
-                  href="/apply"
-                  className="inline-flex items-center justify-center bg-white hover:bg-slate-50 text-slate-900 border border-slate-300 text-base font-semibold px-8 py-3.5 rounded-lg transition-colors text-center shadow-2xs"
-                >
-                  Apply as a Creative
-                </Link>
-              </div>
-
-              {/* 4 Clean Proof Anchors */}
-              <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-slate-700">
-                <span>Real Human Craft</span>
-                <span className="text-slate-400">&bull;</span>
-                <span>Zero Bidding Wars</span>
-                <span className="text-slate-400">&bull;</span>
-                <span>Stackable Coin Banking</span>
-                <span className="text-slate-400">&bull;</span>
-                <span>Protected Milestone Release</span>
+              {/* Popular Categories: Clean 99designs-Style Rounded Chips */}
+              <div className="mt-5 flex flex-wrap items-center gap-2 text-xs">
+                <span className="font-bold text-slate-700 mr-1">Popular:</span>
+                {POPULAR_CATEGORIES.map((cat) => {
+                  const isSelected = featuredIndex === cat.index;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setFeaturedIndex(cat.index)}
+                      className={`px-3.5 py-1.5 rounded-lg font-semibold text-xs transition-all cursor-pointer ${
+                        isSelected
+                          ? "bg-[#FF5733] text-white shadow-xs"
+                          : "bg-slate-200/70 hover:bg-slate-300 text-slate-800"
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* HERO RIGHT COLUMN (3D Smartphone Mockup — Intact & Untouched) */}
-            <div className="lg:col-span-6 w-full flex items-center justify-center lg:justify-end">
-              <PhoneHeroMockup />
-            </div>
           </div>
         </div>
 
@@ -305,6 +523,104 @@ export default function HomePage() {
                 <span className="text-slate-600">&bull;</span>
                 <span className="text-cyan-300 font-semibold">Sweet As A Peach Creative Agency</span>
                 <span className="text-slate-600">&bull;</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 2.5 CLIENT LOGOS SHOWCASE (Logos Only Scrolling By) */}
+      <section className="bg-gradient-to-b from-[#FFF5EE]/90 via-white to-[#FAF8F5] border-b border-[#F0D5C7] py-10 sm:py-12 relative overflow-hidden">
+        {/* Soft Multi-Color Ambient Glow: Peach (#FF5733), Bright Blue (#2563EB), Bright Green (#22C55E) */}
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-72 h-72 rounded-full bg-[#FF5733]/12 blur-3xl pointer-events-none -z-0" />
+        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-72 h-72 rounded-full bg-[#2563EB]/10 blur-3xl pointer-events-none -z-0" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-80 h-36 rounded-full bg-[#22C55E]/12 blur-3xl pointer-events-none -z-0" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center mb-8">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#FF5733]/10 text-[#FF5733] border border-[#FF5733]/20 mb-3 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse" />
+            <span>Client Showcase</span>
+          </div>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-slate-950 uppercase font-sans">
+            TRUSTED BY BUSINESSES, CIVIC LEADERS &amp;{" "}
+            <span className="text-[#2563EB]">GROWING BRANDS.</span>
+          </h2>
+        </div>
+
+        {/* Continuous Smooth Horizontal Sliding Logo Ribbon (Logos Only) */}
+        <div 
+          className="relative w-full overflow-hidden py-4 select-none"
+          onMouseEnter={() => setIsTrustPaused(true)}
+          onMouseLeave={() => setIsTrustPaused(false)}
+        >
+          {/* Subtle edge fade overlays for infinite slider depth */}
+          <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-r from-[#FFF5EE] to-transparent z-20 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-28 bg-gradient-to-l from-[#FAF8F5] to-transparent z-20 pointer-events-none" />
+
+          <div 
+            className="animate-trust-slide flex items-center gap-14 sm:gap-20 md:gap-28 px-4"
+            style={{ animationPlayState: isTrustPaused ? "paused" : "running" }}
+          >
+            {/* Repeat the 3 logos 6 times for seamless continuous flow */}
+            {[0, 1, 2, 3, 4, 5].map((loopIdx) => (
+              <div key={loopIdx} className="flex items-center gap-14 sm:gap-20 md:gap-28 shrink-0">
+                {/* 1. Lawson State Community College */}
+                <div 
+                  className="flex items-center justify-center h-16 sm:h-20 w-44 sm:w-52 transition-transform duration-300 hover:scale-108 cursor-pointer"
+                  onClick={() => setSelected(PROJECTS[0])}
+                  title="Lawson State Community College"
+                >
+                  <img
+                    src="/assets/aistudio/Lawson-logo_a521bfc8.png"
+                    alt="Lawson State Community College"
+                    className="max-h-14 sm:max-h-16 w-auto object-contain drop-shadow-2xs filter hover:brightness-105"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                </div>
+
+                {/* 2. Bessemer Area Chamber of Commerce */}
+                <div 
+                  className="flex items-center justify-center h-16 sm:h-20 w-44 sm:w-52 transition-transform duration-300 hover:scale-108 cursor-pointer"
+                  onClick={() => setSelected(PROJECTS[1])}
+                  title="Bessemer Area Chamber of Commerce"
+                >
+                  <img
+                    src="/assets/aistudio/bessemer-chamber-logo-transparent.png"
+                    alt="Bessemer Area Chamber of Commerce"
+                    className="max-h-11 sm:max-h-13 w-auto object-contain filter hover:brightness-105"
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      if (!img.src.includes("Heading__Instagram_Post")) {
+                        img.src = "/assets/aistudio/Heading__Instagram_Post__45___-_4_b6a2c37c.PNG";
+                      } else {
+                        img.style.display = "none";
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* 3. New Joy Fellowship Baptist Church */}
+                <div 
+                  className="flex items-center justify-center h-16 sm:h-20 w-36 sm:w-44 transition-transform duration-300 hover:scale-108 cursor-pointer"
+                  onClick={() => setSelected(PROJECTS[2])}
+                  title="New Joy Fellowship Baptist Church"
+                >
+                  <img
+                    src="/assets/aistudio/new-joy-seal-transparent.png"
+                    alt="New Joy Fellowship Baptist Church"
+                    className="max-h-16 sm:max-h-18 w-auto object-contain drop-shadow-xs filter hover:brightness-105"
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      if (!img.src.includes("Gemini_Generated_Image_ub3xaoub3xaoub3x")) {
+                        img.src = "/assets/aistudio/Gemini_Generated_Image_ub3xaoub3xaoub3x_caae32e1.jpg";
+                      } else {
+                        img.style.display = "none";
+                      }
+                    }}
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -800,7 +1116,7 @@ export default function HomePage() {
                   href="/login"
                   className="inline-flex items-center justify-center bg-[#FF5733] hover:bg-[#E04826] text-white font-semibold text-sm px-6 py-3 rounded-lg shadow-xs transition-colors"
                 >
-                  Start a Project &rarr;
+                  Hire a Creative &rarr;
                 </Link>
                 <Link
                   href="#contact"
@@ -818,6 +1134,9 @@ export default function HomePage() {
                   src="/assets/aistudio/Gemini_Generated_Image_h82sf4h82sf4h82s_d6d4759c.jpg"
                   alt="Sweet As A Peach Creative Agency"
                   className="w-full h-auto max-h-[380px] object-contain mx-auto mix-blend-multiply drop-shadow-sm transition-transform"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
                 />
               </div>
             </div>
@@ -826,7 +1145,7 @@ export default function HomePage() {
       </section>
 
       {/* 7. REAL COMMERCIAL DELIVERABLES GALLERY */}
-      <section className="py-24 bg-[#FAF8F5] border-b border-slate-200">
+      <section id="highlights" className="py-24 bg-[#FAF8F5] border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-14">
             <div>
@@ -841,7 +1160,7 @@ export default function HomePage() {
               href="/login"
               className="mt-4 md:mt-0 inline-flex items-center gap-1.5 text-sm font-semibold text-[#FF5733] hover:underline"
             >
-              Start your project today &rarr;
+              Hire a creative today &rarr;
             </Link>
           </div>
 
@@ -853,14 +1172,17 @@ export default function HomePage() {
                 onClick={() => setSelected(p)}
                 className="group text-left bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-slate-300 transition-colors shadow-2xs flex flex-col"
               >
-                <div className="h-56 w-full overflow-hidden bg-slate-100 relative">
+                <div className="h-64 w-full overflow-hidden bg-[#FAF8F5] relative flex items-center justify-center p-4 border-b border-slate-100">
                   <img
                     src={p.image}
                     alt={p.title}
-                    className="w-full h-full object-cover"
+                    className="max-h-full max-w-full object-contain group-hover:scale-102 transition-transform duration-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.opacity = "0";
+                    }}
                   />
                   <div className="absolute top-3 right-3 bg-white/95 px-2.5 py-1 rounded-md text-xs font-bold text-slate-950 border border-slate-200 shadow-2xs">
-                    {p.coins} Coins (${p.coins * 50})
+                    {p.coins} {p.coins === 1 ? "Coin" : "Coins"}
                   </div>
                 </div>
 
@@ -877,15 +1199,33 @@ export default function HomePage() {
                     </p>
 
                     {p.designer && (
-                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-900">
-                        <span className="w-5 h-5 rounded-full bg-slate-900 text-sky-300 text-[10px] font-bold flex items-center justify-center shrink-0">
-                          {p.designer[0]}
-                        </span>
-                        <div className="truncate">
-                          <span className="font-bold">{p.designer}</span>
-                          <span className="text-slate-400 mx-1">&bull;</span>
-                          <span className="text-xs text-[#0284C7] font-semibold">{p.designerRole}</span>
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-xs text-slate-900">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {p.designerAvatar ? (
+                            <img
+                              src={p.designerAvatar}
+                              alt={p.designer}
+                              className="w-6 h-6 rounded-full object-cover border border-slate-200 shrink-0"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = "none";
+                              }}
+                            />
+                          ) : (
+                            <span className="w-6 h-6 rounded-full bg-slate-900 text-sky-300 text-[10px] font-bold flex items-center justify-center shrink-0">
+                              {p.designer[0]}
+                            </span>
+                          )}
+                          <div className="truncate">
+                            <span className="font-bold text-slate-950">{p.designer}</span>
+                            <span className="text-slate-400 mx-1">&bull;</span>
+                            <span className="text-slate-500 font-medium">{p.designerRole}</span>
+                          </div>
                         </div>
+                        {p.hub && (
+                          <span className="text-[10px] font-black uppercase text-[#C84E2D] bg-[#FFF2EB] px-2 py-0.5 rounded shrink-0">
+                            {p.hub}
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
@@ -907,39 +1247,82 @@ export default function HomePage() {
       <section id="contact" className="py-24 bg-white border-b border-slate-200">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FF5733]/10 text-[#FF5733] text-xs font-bold uppercase tracking-wider mb-3">
+              <Mail className="w-3.5 h-3.5" />
+              <span>Get in Touch</span>
+            </div>
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-950">
               Have a Question or Want to Partner?
             </h2>
             <p className="text-slate-600 text-base sm:text-lg mt-3 leading-relaxed">
-              Send our Birmingham team a quick note and we&rsquo;ll get right back to you.
+              Send our Birmingham studio a note directly to{" "}
+              <a
+                href="mailto:sweetasapeachcreativestudio@gmail.com"
+                className="font-bold text-[#FF5733] hover:underline"
+              >
+                sweetasapeachcreativestudio@gmail.com
+              </a>{" "}
+              and we&rsquo;ll get right back to you.
             </p>
           </div>
 
           <div className="bg-[#FAF8F5] border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-xs">
             {formSubmitted ? (
-              <div className="text-center py-8">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 mb-4 font-bold text-xl">
-                  ✓
+              <div className="text-center py-6">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 mb-4 font-bold text-2xl">
+                  <Check className="w-7 h-7" />
                 </div>
-                <h3 className="text-xl font-bold tracking-tight text-slate-950 mb-2">Message Received!</h3>
-                <p className="text-sm text-slate-600 max-w-sm mx-auto leading-relaxed">
-                  Thanks for reaching out, <strong>{contactName}</strong>! Our Birmingham studio team will follow up at <strong>{contactEmail}</strong> shortly.
+                <h3 className="text-2xl font-bold tracking-tight text-slate-950 mb-2">Message Sent!</h3>
+                <p className="text-sm text-slate-700 max-w-md mx-auto leading-relaxed">
+                  Thanks for reaching out, <strong>{contactName}</strong>! Your message regarding{" "}
+                  <strong>&ldquo;{contactTopic}&rdquo;</strong> has been submitted to{" "}
+                  <strong className="text-[#FF5733]">sweetasapeachcreativestudio@gmail.com</strong>.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFormSubmitted(false);
-                    setContactName("");
-                    setContactEmail("");
-                    setContactMessage("");
-                  }}
-                  className="mt-6 inline-flex items-center justify-center bg-white border border-slate-300 text-slate-900 text-xs font-semibold px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors"
-                >
-                  Send Another Note
-                </button>
+                <p className="text-xs text-slate-500 mt-2">
+                  Our Birmingham studio team will follow up at <strong>{contactEmail}</strong> shortly.
+                </p>
+
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                  {mailtoBackup && (
+                    <a
+                      href={mailtoBackup}
+                      className="inline-flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-xs transition-colors"
+                    >
+                      <Mail className="w-4 h-4" />
+                      Open in Email App
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormSubmitted(false);
+                      setContactName("");
+                      setContactEmail("");
+                      setContactMessage("");
+                      setContactError("");
+                    }}
+                    className="inline-flex items-center justify-center bg-white border border-slate-300 text-slate-900 text-xs font-semibold px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-colors"
+                  >
+                    Send Another Note
+                  </button>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleContactSubmit} className="space-y-5">
+                {contactError && (
+                  <div className="p-3.5 rounded-lg bg-red-50 border border-red-200 text-red-800 text-xs leading-relaxed flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <span>{contactError}</span>
+                    <a
+                      href={`mailto:sweetasapeachcreativestudio@gmail.com?subject=${encodeURIComponent(
+                        `[Peach Network] ${contactTopic}`
+                      )}&body=${encodeURIComponent(contactMessage)}`}
+                      className="font-bold underline text-red-900 hover:text-red-700 whitespace-nowrap"
+                    >
+                      Click here to email directly &rarr;
+                    </a>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-xs font-bold text-slate-800 uppercase tracking-wide mb-1.5">
                     Your Name
@@ -993,7 +1376,7 @@ export default function HomePage() {
                     required
                     value={contactMessage}
                     onChange={(e) => setContactMessage(e.target.value)}
-                    placeholder="How can we help you?"
+                    placeholder="Tell us what you're thinking or how we can collaborate..."
                     className="w-full bg-white border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 focus:outline-hidden focus:border-[#FF5733] transition-colors resize-none"
                   />
                 </div>
@@ -1001,10 +1384,33 @@ export default function HomePage() {
                 <div className="pt-2">
                   <button
                     type="submit"
-                    className="w-full inline-flex items-center justify-center bg-[#FF5733] hover:bg-[#E04826] text-white font-bold text-sm py-3 rounded-lg shadow-xs transition-colors"
+                    disabled={submittingContact}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-[#FF5733] hover:bg-[#E04826] disabled:opacity-75 text-white font-bold text-sm py-3.5 rounded-lg shadow-xs transition-colors cursor-pointer"
                   >
-                    Send Note &rarr;
+                    {submittingContact ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Sending to sweetasapeachcreativestudio@gmail.com...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        <span>Send Note to sweetasapeachcreativestudio@gmail.com &rarr;</span>
+                      </>
+                    )}
                   </button>
+                </div>
+
+                <div className="text-center pt-2">
+                  <span className="text-xs text-slate-500">
+                    Prefer direct email? Write to{" "}
+                    <a
+                      href="mailto:sweetasapeachcreativestudio@gmail.com"
+                      className="font-semibold text-slate-800 hover:text-[#FF5733] underline"
+                    >
+                      sweetasapeachcreativestudio@gmail.com
+                    </a>
+                  </span>
                 </div>
               </form>
             )}
@@ -1027,7 +1433,7 @@ export default function HomePage() {
               href="/login"
               className="inline-flex items-center gap-2 bg-[#FF5733] hover:bg-[#E04826] text-white font-semibold text-base px-8 py-3.5 rounded-lg shadow-xs transition-colors"
             >
-              Start a Project &rarr;
+              Hire a Creative &rarr;
             </Link>
             <Link
               href="/apply"
@@ -1057,11 +1463,14 @@ export default function HomePage() {
               <X className="w-5 h-5" />
             </button>
 
-            <div className="h-64 sm:h-72 w-full bg-slate-100 overflow-hidden">
+            <div className="h-72 sm:h-80 w-full bg-[#FAF8F5] overflow-hidden flex items-center justify-center p-6 border-b border-slate-100">
               <img
                 src={selected.image}
                 alt={selected.title}
-                className="w-full h-full object-cover"
+                className="max-h-full max-w-full object-contain drop-shadow-md"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.opacity = "0";
+                }}
               />
             </div>
 
@@ -1077,23 +1486,41 @@ export default function HomePage() {
               </p>
 
               {selected.designer && (
-                <div className="mt-4 p-3.5 rounded-xl bg-[#FAF8F5] border border-slate-200 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-slate-900 text-sky-300 text-xs font-bold flex items-center justify-center shrink-0">
-                      {selected.designer[0]}
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-950">
+                <div className="mt-4 p-3.5 rounded-xl bg-[#FAF8F5] border border-slate-200 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    {selected.designerAvatar ? (
+                      <img
+                        src={selected.designerAvatar}
+                        alt={selected.designer}
+                        className="w-9 h-9 rounded-full object-cover border border-slate-200 shadow-2xs shrink-0"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-slate-900 text-sky-300 text-xs font-bold flex items-center justify-center shrink-0">
+                        {selected.designer[0]}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-slate-950 truncate">
                         Designed by {selected.designer}
                       </div>
-                      <div className="text-[11px] text-[#0284C7] font-semibold">
+                      <div className="text-[11px] text-[#0284C7] font-semibold truncate">
                         {selected.designerRole}
                       </div>
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
-                    Verified Creative
-                  </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {selected.hub && (
+                      <span className="text-[10px] font-black uppercase text-[#C84E2D] bg-[#FFF2EB] border border-[#F2C2B2] px-2 py-0.5 rounded">
+                        {selected.hub}
+                      </span>
+                    )}
+                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      Verified Creative
+                    </span>
+                  </div>
                 </div>
               )}
 
@@ -1118,8 +1545,8 @@ export default function HomePage() {
               <div className="mt-6 pt-5 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-sm">
                   <span className="text-slate-500">Fixed Scope: </span>
-                  <strong className="text-[#FF5733] font-bold">
-                    {selected.coins} Peach Coins (${selected.coins * 50})
+                  <strong className="text-[#C84E2D] font-bold">
+                    {selected.coins} Peach {selected.coins === 1 ? "Coin" : "Coins"}
                   </strong>
                 </div>
 
@@ -1128,7 +1555,7 @@ export default function HomePage() {
                   onClick={() => setSelected(null)}
                   className="w-full sm:w-auto inline-flex items-center justify-center bg-[#FF5733] hover:bg-[#E04826] text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors shadow-xs"
                 >
-                  Start Similar Project &rarr;
+                  Hire a Creative for This &rarr;
                 </Link>
               </div>
             </div>
@@ -1211,7 +1638,7 @@ export default function HomePage() {
                 </li>
                 <li>
                   <Link href="/login" className="hover:text-[#FFD8C2] transition-colors text-white font-semibold">
-                    Start a Project &rarr;
+                    Hire a Creative &rarr;
                   </Link>
                 </li>
                 <li>
