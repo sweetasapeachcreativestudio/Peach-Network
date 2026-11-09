@@ -6,6 +6,7 @@ import {createClient} from '@/lib/supabase/client';
 import {briefSections,roomStage,roomStatus,type RoomFile,type VaultAsset} from '@/lib/project-room';
 import styles from './business-project-room.module.css';
 import { ProofFilePreviewer } from './proof-file-previewer';
+import { ContractSignatureCard } from './contract-signature-card';
 
 type Project={
   id:string;
@@ -287,6 +288,22 @@ export default function BusinessProjectRoom({project:p,creative,businessName,fil
         ))}
       </section>
     )}
+
+    {/* CREATIVE BRIEF SHEET & DUAL DIGITAL SIGNATURE CONSOLE */}
+    <ContractSignatureCard
+      projectId={p.id}
+      projectTitle={p.title}
+      category={p.category}
+      coins={p.coin_amount}
+      dueAt={p.due_at}
+      businessName={businessName}
+      creativeName={creative?.name || "Peach Creative"}
+      creativeHub={creative?.hub || "Birmingham Hub"}
+      creativeSpecialty={creative?.specialty || "Commercial Specialist"}
+      description={p.description}
+      currentStatus={p.status}
+      isClient={true}
+    />
 
     {/* DELIVERABLE CHECKLIST & APPROVAL BARRIER (REQUIREMENT: Business checks off each piece so creative knows to move on) */}
     <div style={{background:'#fff',border:'2px solid #C84E2D',borderRadius:20,padding:'20px 24px',marginBottom:24,boxShadow:'0 2px 8px rgba(200,78,45,0.06)'}}>

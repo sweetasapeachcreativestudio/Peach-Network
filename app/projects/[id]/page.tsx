@@ -122,6 +122,9 @@ export default async function ProjectWorkspace({ params, searchParams }: { param
             creativeSpecialty={assignedCreative?.primary_specialty ?? "Commercial Graphics"}
             creativeHub={creativeHub}
             status={project.status}
+            businessName={business?.name ?? "Your business"}
+            description={project.description}
+            dueAt={project.due_at}
           />
         )}
 

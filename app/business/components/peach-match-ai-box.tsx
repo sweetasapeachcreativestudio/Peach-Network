@@ -8,6 +8,18 @@ interface PeachMatchAIBoxProps {
   businessName: string;
 }
 
+export interface CatalogTierOption {
+  id: "option_a" | "option_b" | "option_c";
+  tierName: string;
+  coins: number;
+  usdEquivalent: number;
+  typicalTurnaround: string;
+  deliverables: string[];
+  scopeSummary: string;
+  requiredFromBusiness: string[];
+  bestFor: string;
+}
+
 interface ScopedProject {
   serviceKey: string;
   title: string;
@@ -15,6 +27,8 @@ interface ScopedProject {
   coins: number;
   usdAmount: number;
   deliverables: string[];
+  requiredFromBusiness?: string[];
+  scopeSummary?: string;
   estimatedTurnaround: string;
   revisionRounds: number;
   reason: string;
@@ -59,6 +73,8 @@ interface ChatMessage {
   content: string;
   companionTip?: string;
   clarification?: ClarificationData | null;
+  catalogTiers?: CatalogTierOption[];
+  isVague?: boolean;
   scope?: ScopedProject | null;
   matchedCreatives?: MatchedCreative[];
   showCreatives?: boolean;
@@ -67,28 +83,28 @@ interface ChatMessage {
 // Strictly NO ICONS in starter prompts as requested
 const starterPrompts = [
   {
-    label: "Restaurant Website",
-    prompt: "I need a website for a restaurant. What kind of website do I need and how much will it cost?",
+    label: "Website Design Scope",
+    prompt: "I need a website designed for my business. What are the 3 tiers and what does each come with?",
   },
   {
-    label: "Event Flyer Scope",
-    prompt: "I need an event flyer designed. How much does it cost and what is the difference between basic and advanced?",
-  },
-  {
-    label: "Logo & Brand Suite",
-    prompt: "I need branding done for my business and a new logo. What should I include?",
-  },
-  {
-    label: "Shoe E-Commerce Store",
+    label: "Shoe E-Commerce Hub",
     prompt: "I need a website for a shoe company with e-commerce store and shoe box packaging dielines.",
   },
   {
-    label: "Food Photography",
-    prompt: "I need an on-location commercial photography shoot for 10 signature dishes at my restaurant.",
+    label: "Restaurant Food & Web",
+    prompt: "I need a website for a restaurant with digital food & drink menus, plus a commercial photography shoot for 10 signature dishes.",
   },
   {
-    label: "Why 3 Logos in a Suite?",
-    prompt: "Why do I need a 3-part logo suite instead of just one logo?",
+    label: "Branding & 3-Tier Suites",
+    prompt: "I need branding done for my business. Explain the 3 tiers and what you require from me as the business owner.",
+  },
+  {
+    label: "Promo Event Flyer Kit",
+    prompt: "I need an event flyer with QR code, headline hierarchy, and social story formats.",
+  },
+  {
+    label: "Monthly Social Media Suite",
+    prompt: "I need monthly social media graphics and video reels. What is the scope and turnaround?",
   },
 ];
 
@@ -118,16 +134,15 @@ export function PeachMatchAIBox({
     industry?: string;
   } | null>(null);
 
-  // Initial welcome message - strictly NO ICONS, NO "Creative Director"
+  // Initial welcome message - strictly NO ICONS
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome-msg",
       role: "assistant",
-      content: `Hey! I am Peach Match AI, your companion on Sweet As A Peach.
-
-Tell me what you are building—whether it is a restaurant website, event flyer, 3-part logo suite, or photo shoot.
-
-I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = $50.00 USD), and help you hire vetted creatives in under 5 minutes.`,
+      content: `Hey friend! I am Peach Match AI, your creative director and scoping partner on Peach Network.
+I scope projects using the 2026 Master Rates Catalog (1 Peach Coin = $50.00 USD).
+Tell me what you are building—website design, brand identity, commercial photography, social media, or flyers.
+If your request is broad, I will lay out the 3 master tiers (Option A, B, and C) with exact deliverables and what we require from you, then match 3 vetted creatives based on their verified design history.`,
     },
   ]);
 
@@ -189,25 +204,16 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
         content: data.answer || "Here is your project scope and pricing.",
         companionTip: data.companionInsight,
         clarification: data.clarification?.needed ? data.clarification : null,
+        catalogTiers: Array.isArray(data.catalogTiers) ? data.catalogTiers : [],
+        isVague: Boolean(data.isVague),
         scope: data.scope || null,
         matchedCreatives: Array.isArray(data.matchedCreatives) ? data.matchedCreatives : [],
-        showCreatives: false, // User must confirm "Would you like to hire creatives to get it done?"
+        showCreatives: !data.isVague, // If specific tier is clear, reveal creatives; if vague, wait for tier choice
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (err: any) {
-      const rawMsg = String(err?.message || "").toLowerCase();
-      const isQuotaOrRate =
-        rawMsg.includes("rate") ||
-        rawMsg.includes("limit") ||
-        rawMsg.includes("429") ||
-        rawMsg.includes("quota") ||
-        rawMsg.includes("exhausted");
-
-      const friendlyNotice = isQuotaOrRate
-        ? "Peach Match AI is currently at high volume. Please tap one of the suggested project scopes below or retry."
-        : (err.message || "Failed to consult Peach Match AI. Please try again.");
-
+      const friendlyNotice = err?.message || "Failed to consult Peach Match AI. Please try again.";
       setErrorMsg(friendlyNotice);
       setMessages((prev) => [
         ...prev,
@@ -221,6 +227,33 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
     } finally {
       setLoading(false);
     }
+  };
+
+  // Switch tier directly from the 3-Tier Scoping Grid
+  const handleSelectTierFromCatalog = (messageId: string, tier: CatalogTierOption, categoryName: string) => {
+    setMessages((prev) =>
+      prev.map((m) => {
+        if (m.id !== messageId) return m;
+        return {
+          ...m,
+          isVague: false,
+          showCreatives: true,
+          scope: {
+            serviceKey: tier.id,
+            title: tier.tierName,
+            category: categoryName || "Design",
+            coins: tier.coins,
+            usdAmount: tier.usdEquivalent,
+            deliverables: tier.deliverables,
+            requiredFromBusiness: tier.requiredFromBusiness,
+            scopeSummary: tier.scopeSummary,
+            estimatedTurnaround: tier.typicalTurnaround,
+            revisionRounds: 3,
+            reason: `Selected ${tier.tierName} (${tier.coins} Coins / $${tier.usdEquivalent} USD). Includes 3 revision rounds and 100% administrative site/asset ownership transfer.`,
+          },
+        };
+      })
+    );
   };
 
   // Instant Top-Up handler
@@ -258,7 +291,7 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
     );
   };
 
-  // Select creative & dispatch offer, then immediately redirect to /projects/[id]
+  // Select creative & dispatch offer, creating Creative Brief Sheet & redirecting to /projects/[id]
   const handleSelectCreative = async (creative: MatchedCreative, currentScope: ScopedProject) => {
     setSubmittingOffer(creative.id);
     setErrorMsg("");
@@ -275,6 +308,8 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
           coins: currentScope.coins,
           usdAmount: currentScope.usdAmount,
           deliverables: currentScope.deliverables,
+          requiredFromBusiness: currentScope.requiredFromBusiness,
+          scopeSummary: currentScope.scopeSummary,
           estimatedTurnaround: currentScope.estimatedTurnaround,
           revisionRounds: 3,
           selectedCreativeId: creative.id,
@@ -286,9 +321,7 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to create project and dispatch offer.");
 
-      setSuccessMsg(`Matched with ${creative.name}! Redirecting to your live project room...`);
-      
-      // Immediately navigate client to project room with DoorDash-style dispatch timeline
+      setSuccessMsg(`Matched with ${creative.name}! Creative Brief Sheet & Contract created. Redirecting to your workspace...`);
       router.push(`/projects/${data.project.id}`);
     } catch (err: any) {
       setErrorMsg(err.message || "Failed to dispatch match invitation.");
@@ -309,9 +342,8 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
   };
 
   return (
-    // DARKER PEACH CONTAINER: Rich terracotta/warm darker peach border and accent header
     <div className="bg-[#FFF9F6] border-2 border-[#C84E2D] rounded-3xl shadow-md overflow-hidden flex flex-col transition-all">
-      {/* 1. TOPBAR: Standout darker peach bar, NO ICONS, strictly "Peach Match AI" */}
+      {/* 1. TOPBAR */}
       <header className="px-5 py-3.5 bg-[#C84E2D] text-white flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
           <div className="min-w-0">
@@ -320,11 +352,11 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
                 Peach Match AI
               </span>
               <span className="text-[10px] font-black tracking-widest text-[#FFF2EB] bg-[#A33B1E] px-2.5 py-0.5 rounded-full uppercase">
-                Active Scope Engine
+                2026 Master Scoping Engine
               </span>
             </div>
             <div className="text-[11px] text-[#FFE8DF] font-medium truncate">
-              1 Peach Coin = $50.00 USD &bull; Get matched in 5 mins &bull; 3 Revisions Included
+              1 Peach Coin = $50.00 USD &bull; 3-Tier Catalog &bull; Dual Digital Sign-off &bull; 3 Revisions Included
             </div>
           </div>
         </div>
@@ -338,10 +370,10 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
 
           <button
             type="button"
-            onClick={() => handleInstantTopUp(6)}
+            onClick={() => handleInstantTopUp(10)}
             disabled={topUpLoading}
             className="hidden md:inline-flex items-center px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#FFEAE2] text-[#C84E2D] text-xs font-bold transition-colors cursor-pointer"
-            title="Buy 6 coins ($300 USD)"
+            title="Buy 10 coins ($500 USD)"
           >
             Buy Coins
           </button>
@@ -376,8 +408,8 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
         </div>
       )}
 
-      {/* 2. CHAT STREAM (LIKE CHATGPT & GEMINI) */}
-      <div className="p-4 sm:p-6 space-y-5 max-h-[520px] overflow-y-auto bg-gradient-to-b from-[#FFF5F0] to-white scrollbar-thin">
+      {/* 2. CHAT STREAM */}
+      <div className="p-4 sm:p-6 space-y-5 max-h-[560px] overflow-y-auto bg-gradient-to-b from-[#FFF5F0] to-white scrollbar-thin">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -385,7 +417,6 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
               msg.role === "user" ? "justify-end" : "justify-start"
             }`}
           >
-            {/* Assistant Label Tag (strictly NO icon) */}
             {msg.role === "assistant" && (
               <div className="w-8 h-8 rounded-xl bg-[#C84E2D] text-white flex items-center justify-center text-[11px] font-black shrink-0 shadow-2xs mt-0.5">
                 PM
@@ -417,34 +448,99 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
                 })}
               </div>
 
-              {/* Companion Tip Pill */}
+              {/* Companion Tip */}
               {msg.companionTip && (
                 <div className="bg-[#FFF2EB] border-l-4 border-[#C84E2D] p-3 rounded-r-xl text-xs text-slate-700 space-y-0.5">
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#C84E2D] block">
-                    Studio Tip:
+                    Creative Director Tip:
                   </span>
                   <p className="leading-snug text-slate-700 italic">"{msg.companionTip}"</p>
                 </div>
               )}
 
-              {/* Interactive Scope Clarification Options */}
-              {msg.clarification && msg.clarification.needed && msg.clarification.options?.length > 0 && (
-                <div className="pt-2 border-t border-slate-100 space-y-2">
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 block">
-                    {msg.clarification.question || "Select an option to clarify your scope:"}
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {msg.clarification.options.map((opt, oi) => (
-                      <button
-                        key={oi}
-                        type="button"
-                        onClick={() => handleSendMessage(opt.value)}
-                        disabled={loading}
-                        className="text-left px-3.5 py-2 rounded-xl text-xs font-bold bg-[#FFF2EB] hover:bg-[#C84E2D] text-[#0B2D22] hover:text-white border border-[#E9A995] hover:border-[#C84E2D] transition-all cursor-pointer shadow-2xs"
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
+              {/* REQUIREMENT: 3-TIER MASTER CATALOG SELECTOR (Option A, Option B, Option C) */}
+              {msg.catalogTiers && msg.catalogTiers.length > 0 && (
+                <div className="pt-2 border-t border-[#F2C2B2] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase tracking-wider text-[#C84E2D]">
+                      Select 1 of the 3 Master Scoping Tiers:
+                    </span>
+                    <span className="text-[11px] text-slate-500 font-semibold">
+                      1 Coin = $50 USD &bull; Full site &amp; asset transfer
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {msg.catalogTiers.map((tier) => {
+                      const isSelected = msg.scope?.title === tier.tierName;
+                      return (
+                        <div
+                          key={tier.id}
+                          className={`rounded-2xl p-4 flex flex-col justify-between border-2 transition-all cursor-pointer ${
+                            isSelected
+                              ? "bg-[#FFF4EE] border-[#C84E2D] shadow-sm ring-2 ring-[#C84E2D]/20"
+                              : "bg-white border-[#E9A995] hover:border-[#C84E2D] shadow-2xs"
+                          }`}
+                          onClick={() => handleSelectTierFromCatalog(msg.id, tier, msg.scope?.category || "Design")}
+                        >
+                          <div>
+                            <div className="flex items-center justify-between gap-1 mb-2">
+                              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#FFF2EB] text-[#C84E2D]">
+                                {tier.id.replace("_", " ").toUpperCase()}
+                              </span>
+                              <span className="text-[10px] text-slate-500 font-bold">
+                                {tier.typicalTurnaround}
+                              </span>
+                            </div>
+
+                            <strong className="text-xs font-black text-slate-950 block leading-tight mb-1">
+                              {tier.tierName.split(":")[1]?.trim() || tier.tierName}
+                            </strong>
+
+                            <div className="flex items-baseline gap-1.5 mb-2.5">
+                              <span className="text-xl font-black text-[#C84E2D]">
+                                {tier.coins} Coins
+                              </span>
+                              <span className="text-xs text-slate-500 font-bold">
+                                (${tier.usdEquivalent} USD)
+                              </span>
+                            </div>
+
+                            <p className="text-[11px] text-slate-600 leading-snug mb-2">
+                              {tier.scopeSummary}
+                            </p>
+
+                            {/* What it requires from business */}
+                            <div className="bg-[#FFF9F6] p-2.5 rounded-xl border border-[#F2C2B2] mb-3 text-[10px] text-slate-700 space-y-1">
+                              <strong className="text-[10px] text-[#A33B1E] uppercase font-black block">
+                                What we require from you:
+                              </strong>
+                              {tier.requiredFromBusiness.slice(0, 2).map((req, ri) => (
+                                <div key={ri} className="flex items-start gap-1">
+                                  <span className="text-[#C84E2D] font-bold">&bull;</span>
+                                  <span>{req}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectTierFromCatalog(msg.id, tier, msg.scope?.category || "Design");
+                            }}
+                            className={`w-full py-2 rounded-xl text-xs font-black transition-colors cursor-pointer text-center ${
+                              isSelected
+                                ? "bg-[#C84E2D] text-white shadow-2xs"
+                                : "bg-[#FFF2EB] text-[#C84E2D] hover:bg-[#C84E2D] hover:text-white border border-[#E9A995]"
+                            }`}
+                          >
+                            {isSelected ? "✓ Selected Tier" : `Choose ${tier.id.toUpperCase().replace("_", " ")}`}
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -455,7 +551,7 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E9A995]">
                     <div>
                       <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded">
-                        Scope &amp; Price Breakdown
+                        Scoped Tier &amp; Contract Base
                       </span>
                       <h3 className="text-base font-black text-slate-950 mt-1">
                         {msg.scope.title}
@@ -475,29 +571,47 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
-                    {msg.scope.deliverables?.map((deliv, di) => (
-                      <div key={di} className="flex items-start gap-2">
-                        <span className="text-emerald-700 font-black shrink-0">&bull;</span>
-                        <span className="leading-snug">{deliv}</span>
-                      </div>
-                    ))}
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-black uppercase text-slate-600 block">Included Deliverables:</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+                      {msg.scope.deliverables?.map((deliv, di) => (
+                        <div key={di} className="flex items-start gap-2">
+                          <span className="text-emerald-700 font-black shrink-0">&bull;</span>
+                          <span className="leading-snug">{deliv}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="pt-2 text-[11px] text-slate-500 font-medium">
-                    All projects come with 3 revisions included. If you run out, extra revisions can be purchased at 1 Peach Coin each.
+                  {/* What is required from business */}
+                  {msg.scope.requiredFromBusiness && msg.scope.requiredFromBusiness.length > 0 && (
+                    <div className="bg-white p-3 rounded-xl border border-[#E9A995] text-xs text-slate-700 space-y-1">
+                      <span className="text-[10px] font-black uppercase text-[#C84E2D] block">
+                        What Peach Requires From Your Business:
+                      </span>
+                      {msg.scope.requiredFromBusiness.map((req, ri) => (
+                        <div key={ri} className="flex items-start gap-1.5 text-[11px]">
+                          <span className="text-[#C84E2D] font-black shrink-0">&rarr;</span>
+                          <span>{req}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="pt-1 text-[11px] text-slate-500 font-medium">
+                    All tiers include 100% administrative site/asset ownership transfer, vector files in Brand Vault, and 3 full revision rounds.
                   </div>
                 </div>
               )}
 
-              {/* REQUIREMENT: "once it figures out how many coins or how much the project should be then it should ask the client if they would like to hire creatives to get it done?" */}
+              {/* HIRE PROMPT */}
               {msg.scope && msg.matchedCreatives && msg.matchedCreatives.length > 0 && !msg.showCreatives && (
                 <div className="p-4 bg-white border-2 border-[#C84E2D] rounded-2xl space-y-3">
                   <div className="text-sm font-black text-slate-950">
-                    Would you like to hire creatives to get it done?
+                    Ready to view the 3 vetted creatives for this project?
                   </div>
                   <p className="text-xs text-slate-600">
-                    We have 3 approved creatives ready in your Hub with matching portfolio work and 95%+ reliability scores.
+                    We matched 3 approved creatives from our app who have a proven history of designing in this category.
                   </p>
                   <div className="flex flex-wrap gap-2.5 pt-1">
                     <button
@@ -505,28 +619,28 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
                       onClick={() => handleConfirmHirePrompt(msg.id)}
                       className="px-4 py-2.5 bg-[#C84E2D] hover:bg-[#A33B1E] text-white rounded-xl text-xs font-black shadow-xs cursor-pointer transition-colors"
                     >
-                      Yes, hire creatives
+                      View 3 Matched Creatives
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleSendMessage("I want to adjust this scope first.")}
+                      onClick={() => handleSendMessage("I want to adjust this tier first.")}
                       className="px-4 py-2.5 bg-[#FFF2EB] hover:bg-[#FFE3D6] text-[#C84E2D] border border-[#E9A995] rounded-xl text-xs font-bold cursor-pointer transition-colors"
                     >
-                      No, adjust scope
+                      Adjust Tier
                     </button>
                   </div>
                 </div>
               )}
 
-              {/* TOP 3 VETTED CREATIVES WITH HUB LABELS (DISPLAYED AFTER CONFIRMATION) */}
+              {/* 3 VETTED CREATIVES WITH DESIGN HISTORY */}
               {msg.scope && msg.matchedCreatives && msg.matchedCreatives.length > 0 && msg.showCreatives && (
                 <div className="pt-2 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black uppercase tracking-wider text-[#0B2D22]">
-                      Choose 1 of 3 Approved Creatives (5-Minute Match):
+                      Choose 1 of 3 Matched Creatives (Based on Design History):
                     </span>
                     <span className="text-[11px] text-slate-500 font-semibold">
-                      Ranked by Hub &amp; portfolio
+                      Ranked by portfolio &amp; niche
                     </span>
                   </div>
 
@@ -534,16 +648,7 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
                     {msg.matchedCreatives.slice(0, 3).map((creative) => {
                       const isSubmitting = submittingOffer === creative.id;
                       const hasSufficientCoins = availableCoins >= (msg.scope?.coins || 0);
-                      // REQUIREMENT: Must say what Hub they are in instead of location (e.g., Atlanta Hub, Birmingham Hub)
-                      const hubName =
-                        creative.hub ||
-                        (creative.city?.toLowerCase().includes("atlanta")
-                          ? "Atlanta Hub"
-                          : creative.city?.toLowerCase().includes("huntsville")
-                          ? "Huntsville Hub"
-                          : creative.city?.toLowerCase().includes("montgomery")
-                          ? "Montgomery Hub"
-                          : "Birmingham Hub");
+                      const hubName = creative.hub || "Birmingham Hub";
 
                       return (
                         <div
@@ -570,19 +675,21 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
                                 <div className="text-[11px] text-slate-500 truncate">
                                   {creative.headline}
                                 </div>
-                                {/* HUB BADGE (Atlanta Hub, Birmingham Hub, etc.) */}
                                 <div className="text-[10px] text-[#A33B1E] font-black uppercase tracking-wider mt-0.5">
                                   {hubName}
                                 </div>
                               </div>
                             </div>
 
-                            {/* Bio / Specialty Snippet */}
-                            <p className="text-[11px] text-slate-600 line-clamp-2 leading-snug mb-3">
-                              {creative.bio}
-                            </p>
+                            {/* Match reason based on history of designing */}
+                            <div className="p-2 bg-[#FFF8F5] border border-[#F2C2B2] rounded-xl text-[10px] text-slate-700 leading-snug mb-2">
+                              <strong className="text-[#C84E2D] block uppercase font-black text-[9px]">
+                                Why Matched:
+                              </strong>
+                              {creative.match_reason}
+                            </div>
 
-                            {/* Portfolio Thumbnail preview */}
+                            {/* Portfolio Thumbnail preview with design history title */}
                             {creative.featured_work && (
                               <div
                                 onClick={() =>
@@ -600,8 +707,9 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
                                   alt={creative.featured_work.title}
                                   className="w-full h-full object-cover transition-transform group-hover:scale-105"
                                 />
-                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] font-bold">
-                                  View Portfolio Work
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-1 text-center text-white">
+                                  <span className="text-[10px] font-bold">Past Work:</span>
+                                  <span className="text-[10px] font-semibold truncate max-w-full">{creative.featured_work.title}</span>
                                 </div>
                               </div>
                             )}
@@ -622,7 +730,7 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
                               className="w-full py-2.5 bg-[#C84E2D] hover:bg-[#A33B1E] text-white rounded-xl text-xs font-black transition-all shadow-xs cursor-pointer disabled:opacity-50 text-center"
                             >
                               {isSubmitting
-                                ? "Dispatching..."
+                                ? "Creating Brief & Contract..."
                                 : !hasSufficientCoins
                                 ? `Top Up & Hire ${creative.name.split(" ")[0]}`
                                 : `Select & Hire (${msg.scope?.coins ?? 0} Coins)`}
@@ -645,7 +753,7 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
               PM
             </div>
             <div className="bg-white border-2 border-[#F2C2B2] rounded-2xl p-4 rounded-tl-none shadow-xs text-xs text-slate-600 font-medium">
-              Peach Match AI is calculating coin pricing and checking Hub creative rosters...
+              Peach Match AI is calibrating the 2026 Master Catalog and matching creative design histories...
             </div>
           </div>
         )}
@@ -653,7 +761,7 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
         <div ref={chatBottomRef} />
       </div>
 
-      {/* 3. PROMPT STARTER CHIPS (strictly NO icons) */}
+      {/* 3. PROMPT STARTER CHIPS */}
       <div className="px-5 py-2.5 bg-[#FFF2EB] border-t border-[#F2C2B2] flex items-center gap-2 overflow-x-auto scrollbar-none">
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#A33B1E] shrink-0">
           Try:
@@ -691,7 +799,7 @@ I will diagnose your exact scope, calculate transparent pricing (1 Peach Coin = 
                 handleSendMessage();
               }
             }}
-            placeholder="Message Peach Match AI... (e.g. 'I need a website for my restaurant' or 'I need an event flyer with 5 photos')"
+            placeholder="Message Peach Match AI... (e.g. 'I need a website for a restaurant' or 'I need a 4-page menu and flyer')"
             className="flex-1 bg-transparent px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden resize-none leading-relaxed min-h-[40px] max-h-[140px]"
           />
 

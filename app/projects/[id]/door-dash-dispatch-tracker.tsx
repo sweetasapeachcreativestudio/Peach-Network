@@ -71,6 +71,8 @@ const HUB_CREATIVES_FALLBACK: CreativeCandidate[] = [
   },
 ];
 
+import { ContractSignatureCard } from "./contract-signature-card";
+
 interface DoorDashDispatchTrackerProps {
   projectId: string;
   projectTitle: string;
@@ -81,6 +83,9 @@ interface DoorDashDispatchTrackerProps {
   creativeSpecialty?: string | null;
   creativeHub?: string | null;
   status: string;
+  businessName?: string;
+  description?: string | null;
+  dueAt?: string | null;
   onAccepted?: () => void;
 }
 
@@ -94,6 +99,9 @@ export function DoorDashDispatchTracker({
   creativeSpecialty = "Commercial Graphics",
   creativeHub = "Birmingham Hub",
   status,
+  businessName = "Your Business",
+  description,
+  dueAt,
   onAccepted,
 }: DoorDashDispatchTrackerProps) {
   const router = useRouter();
@@ -395,6 +403,22 @@ export function DoorDashDispatchTracker({
           </div>
         </div>
       )}
+
+      {/* CREATIVE BRIEF SHEET & DUAL DIGITAL SIGNATURE CONSOLE */}
+      <ContractSignatureCard
+        projectId={projectId}
+        projectTitle={projectTitle}
+        category={category}
+        coins={coins}
+        dueAt={dueAt}
+        businessName={businessName}
+        creativeName={currentCreative.name}
+        creativeHub={currentCreative.hub}
+        creativeSpecialty={currentCreative.specialty}
+        description={description}
+        currentStatus={status}
+        isClient={true}
+      />
     </div>
   );
 }
