@@ -75,8 +75,8 @@ export function EventAnnouncements() {
               onClick={() => setActiveTab(idx)}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === idx
-                  ? "bg-[#173328] text-white shadow-2xs"
-                  : "bg-white/80 hover:bg-white text-stone-700 border border-[#E8DFD3]"
+                  ? "bg-[#173328] !text-white text-white font-extrabold shadow-2xs"
+                  : "bg-white/80 hover:bg-white text-stone-700 border border-[#E8DFD3] font-bold"
               }`}
             >
               <span>{ann.badge}</span>

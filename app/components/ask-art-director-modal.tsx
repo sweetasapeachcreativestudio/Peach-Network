@@ -142,7 +142,7 @@ export function AskArtDirectorButton({ businessName }: AskArtDirectorButtonProps
                         onClick={() => setTopic(t)}
                         className={`px-2.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                           topic === t
-                            ? "bg-[#173328] text-white shadow-2xs"
+                            ? "bg-[#173328] !text-white text-white font-extrabold shadow-2xs"
                             : "bg-stone-100 hover:bg-stone-200 text-stone-700"
                         }`}
                       >

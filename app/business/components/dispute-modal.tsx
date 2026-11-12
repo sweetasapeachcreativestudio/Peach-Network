@@ -130,12 +130,12 @@ export function DisputeModal({
                   onClick={() => setRequestedResolution("full_refund")}
                   className={`p-2.5 rounded-xl border text-left font-medium transition-all cursor-pointer ${
                     requestedResolution === "full_refund"
-                      ? "bg-[#173328] text-white border-[#173328]"
+                      ? "bg-[#173328] !text-white text-white border-[#173328] shadow-2xs"
                       : "bg-[#FAF8F5] text-stone-700 border-stone-200 hover:bg-white"
                   }`}
                 >
                   <strong className="block text-xs font-bold">Full Refund</strong>
-                  <span className="text-[10px] opacity-80">100% coins back to wallet</span>
+                  <span className="text-[10px] opacity-90">100% coins back to wallet</span>
                 </button>
 
                 <button
@@ -143,12 +143,12 @@ export function DisputeModal({
                   onClick={() => setRequestedResolution("half_refund")}
                   className={`p-2.5 rounded-xl border text-left font-medium transition-all cursor-pointer ${
                     requestedResolution === "half_refund"
-                      ? "bg-[#173328] text-white border-[#173328]"
+                      ? "bg-[#173328] !text-white text-white border-[#173328] shadow-2xs"
                       : "bg-[#FAF8F5] text-stone-700 border-stone-200 hover:bg-white"
                   }`}
                 >
                   <strong className="block text-xs font-bold">Half Refund</strong>
-                  <span className="text-[10px] opacity-80">50% to you / 50% creative</span>
+                  <span className="text-[10px] opacity-90">50% to you / 50% creative</span>
                 </button>
 
                 <button
@@ -156,12 +156,12 @@ export function DisputeModal({
                   onClick={() => setRequestedResolution("new_creative")}
                   className={`p-2.5 rounded-xl border text-left font-medium transition-all cursor-pointer ${
                     requestedResolution === "new_creative"
-                      ? "bg-[#173328] text-white border-[#173328]"
+                      ? "bg-[#173328] !text-white text-white border-[#173328] shadow-2xs"
                       : "bg-[#FAF8F5] text-stone-700 border-stone-200 hover:bg-white"
                   }`}
                 >
                   <strong className="block text-xs font-bold">New Creative</strong>
-                  <span className="text-[10px] opacity-80">Reassign from network</span>
+                  <span className="text-[10px] opacity-90">Reassign from network</span>
                 </button>
               </div>
             </div>

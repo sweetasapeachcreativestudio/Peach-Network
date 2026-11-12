@@ -280,10 +280,10 @@ export default async function BusinessDashboard() {
                 <div className="pt-3 flex items-center gap-2.5">
                   <Link
                     href={`/projects/${lead.id}`}
-                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs ${
+                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold transition-all shadow-xs ${
                       attention
-                        ? "bg-[#EB6244] hover:bg-[#d85538] text-white"
-                        : "bg-[#173328] hover:bg-[#234b3c] text-white"
+                        ? "bg-[#EB6244] hover:bg-[#d85538] !text-white text-white"
+                        : "bg-[#173328] hover:bg-[#234b3c] !text-white text-white"
                     }`}
                   >
                     <span>{attention ? "Review Proof" : "Open Project Room"}</span>
@@ -376,10 +376,10 @@ export default async function BusinessDashboard() {
                             </Link>
                             <Link
                               href={`/projects/${p.id}`}
-                              className={`inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs ${
+                              className={`inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all shadow-2xs ${
                                 isReview
-                                  ? "bg-[#EB6244] hover:bg-[#d85538] text-white"
-                                  : "bg-[#173328] hover:bg-[#234b3c] text-white"
+                                  ? "bg-[#EB6244] hover:bg-[#d85538] !text-white text-white"
+                                  : "bg-[#173328] hover:bg-[#234b3c] !text-white text-white"
                               }`}
                             >
                               <span>{isReview ? "Review Proof" : "Open Room"}</span>
@@ -440,7 +440,7 @@ export default async function BusinessDashboard() {
 
               <Link
                 href="/business/wallet"
-                className="w-full inline-flex items-center justify-center py-2 px-3 text-xs font-bold text-white bg-[#0B2D22] hover:bg-[#164e3c] rounded-xl transition-colors shadow-2xs"
+                className="w-full inline-flex items-center justify-center py-2.5 px-3 text-xs font-black !text-white text-white bg-[#0B2D22] hover:bg-[#164e3c] rounded-xl transition-colors shadow-2xs"
               >
                 Manage Wallet &amp; Buy Coins →
               </Link>

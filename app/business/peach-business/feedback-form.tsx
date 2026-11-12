@@ -101,8 +101,8 @@ export function BusinessFeedbackForm({ businessName }: { businessName: string })
               onClick={() => setCategory(c)}
               className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 category === c
-                  ? "bg-[#173328] text-white shadow-2xs"
-                  : "bg-stone-100 hover:bg-stone-200 text-stone-700"
+                  ? "bg-[#173328] !text-white text-white font-extrabold shadow-2xs"
+                  : "bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold"
               }`}
             >
               {c}

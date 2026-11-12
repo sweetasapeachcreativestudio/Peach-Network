@@ -339,17 +339,17 @@ export function ProjectViewManager({
             <button
               type="button"
               onClick={() => handleToggleView("active")}
-              className={`flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex-1 md:flex-initial ${
+              className={`flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap flex-1 md:flex-initial ${
                 viewMode === "active"
-                  ? "bg-[#173328] text-white shadow-xs"
-                  : "text-stone-600 hover:text-stone-950"
+                  ? "bg-[#173328] !text-white text-white shadow-xs"
+                  : "text-stone-600 hover:text-stone-950 font-bold"
               }`}
             >
               <Layers className="w-3.5 h-3.5 shrink-0" />
               <span>Active Collaborations</span>
               <span
                 className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold tabular-nums ${
-                  viewMode === "active" ? "bg-white/20 text-white" : "bg-stone-200 text-stone-700"
+                  viewMode === "active" ? "bg-white/20 !text-white text-white" : "bg-stone-200 text-stone-700"
                 }`}
               >
                 {activeProjects.length}
@@ -363,17 +363,17 @@ export function ProjectViewManager({
             <button
               type="button"
               onClick={() => handleToggleView("archived")}
-              className={`flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex-1 md:flex-initial ${
+              className={`flex items-center justify-center gap-2 px-3.5 py-2 rounded-lg text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap flex-1 md:flex-initial ${
                 viewMode === "archived"
-                  ? "bg-[#173328] text-white shadow-xs"
-                  : "text-stone-600 hover:text-stone-950"
+                  ? "bg-[#173328] !text-white text-white shadow-xs"
+                  : "text-stone-600 hover:text-stone-950 font-bold"
               }`}
             >
               <FolderArchive className="w-3.5 h-3.5 shrink-0" />
               <span>Completed Archive</span>
               <span
                 className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold tabular-nums ${
-                  viewMode === "archived" ? "bg-white/20 text-white" : "bg-stone-200 text-stone-700"
+                  viewMode === "archived" ? "bg-white/20 !text-white text-white" : "bg-stone-200 text-stone-700"
                 }`}
               >
                 {archivedProjects.length}
@@ -384,10 +384,10 @@ export function ProjectViewManager({
             <button
               type="button"
               onClick={() => handleToggleView("all")}
-              className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex-1 md:flex-initial ${
+              className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap flex-1 md:flex-initial ${
                 viewMode === "all"
-                  ? "bg-[#173328] text-white shadow-xs"
-                  : "text-stone-600 hover:text-stone-950"
+                  ? "bg-[#173328] !text-white text-white shadow-xs"
+                  : "text-stone-600 hover:text-stone-950 font-bold"
               }`}
             >
               <span>All ({initialProjects.length})</span>
@@ -506,10 +506,10 @@ export function ProjectViewManager({
                 <button
                   type="button"
                   onClick={() => setArchiveSubFilter("completed")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer ${
                     archiveSubFilter === "completed"
-                      ? "bg-emerald-700 text-white"
-                      : "text-emerald-800 bg-emerald-50 hover:bg-emerald-100/80"
+                      ? "bg-emerald-700 !text-white text-white font-extrabold shadow-2xs"
+                      : "text-emerald-950 font-bold bg-emerald-100 hover:bg-emerald-200"
                   }`}
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
@@ -674,10 +674,10 @@ export function ProjectViewManager({
                           )}
                           <Link
                             href={`/projects/${project.id}`}
-                            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow whitespace-nowrap ${
+                            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold transition-all shadow-xs hover:shadow whitespace-nowrap ${
                               isActionNeeded
-                                ? "bg-[#EB6244] hover:bg-[#d85538] text-white"
-                                : "bg-[#173328] hover:bg-[#234b3c] text-white"
+                                ? "bg-[#EB6244] hover:bg-[#d85538] !text-white text-white"
+                                : "bg-[#173328] hover:bg-[#234b3c] !text-white text-white"
                             }`}
                           >
                             <span>{isActionNeeded ? "Review Proof" : "Open Room"}</span>
@@ -839,7 +839,7 @@ export function ProjectViewManager({
                           </Link>
                           <Link
                             href={`/projects/${project.id}`}
-                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#173328] hover:bg-[#234b3c] text-white rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow whitespace-nowrap"
+                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#173328] hover:bg-[#234b3c] !text-white text-white rounded-xl text-xs font-extrabold transition-all shadow-xs hover:shadow whitespace-nowrap"
                           >
                             <span>Room &amp; Files</span>
                             <ArrowRight className="w-3.5 h-3.5" />

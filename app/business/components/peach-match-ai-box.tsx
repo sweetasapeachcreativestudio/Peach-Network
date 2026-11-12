@@ -97,7 +97,7 @@ export function PeachMatchAIBox({
   businessName,
 }: PeachMatchAIBoxProps) {
   const router = useRouter();
-  const chatBottomRef = useRef<HTMLDivElement>(null);
+  const chatScrollContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [prompt, setPrompt] = useState("");
@@ -129,8 +129,14 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
     },
   ]);
 
+  // Scroll ONLY the internal chat container — NEVER scroll the outer window/screen
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (chatScrollContainerRef.current) {
+      chatScrollContainerRef.current.scrollTo({
+        top: chatScrollContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
   }, [messages, loading]);
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -340,7 +346,7 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
               <span className="text-sm font-extrabold tracking-tight text-white uppercase">
                 Peach Match AI v1.1
               </span>
-              <span className="text-[10px] font-bold tracking-wider text-[#F2A07E] bg-[#244738] px-2 py-0.5 rounded-full uppercase">
+              <span className="text-[10px] font-black tracking-wider !text-white text-white bg-[#244738] border border-white/20 px-2 py-0.5 rounded-full uppercase">
                 Concierge Scoping
               </span>
             </div>
@@ -352,16 +358,16 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
 
         {/* Right Actions: Wallet balance + New Chat */}
         <div className="flex items-center gap-2 shrink-0">
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#244738] text-xs font-black text-white">
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#244738] text-xs font-black !text-white text-white border border-white/20">
             <span>{availableCoins} Coins</span>
-            <span className="text-[10px] text-[#A5C1B5] font-medium">(${availableCoins * 50})</span>
+            <span className="text-[10px] text-white/90 font-bold">(${availableCoins * 50})</span>
           </div>
 
           <button
             type="button"
             onClick={() => handleInstantTopUp(10)}
             disabled={topUpLoading}
-            className="hidden md:inline-flex items-center px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#FFF2EB] text-[#173328] text-xs font-bold transition-colors cursor-pointer"
+            className="hidden md:inline-flex items-center px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#FFF2EB] text-[#173328] text-xs font-black transition-colors cursor-pointer shadow-2xs"
             title="Buy 10 coins ($500 USD)"
           >
             Buy Coins
@@ -370,7 +376,7 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
           <button
             type="button"
             onClick={handleResetChat}
-            className="inline-flex items-center px-3 py-1.5 rounded-xl bg-[#244738] hover:bg-[#325d4b] text-xs font-bold text-white transition-colors cursor-pointer"
+            className="inline-flex items-center px-3 py-1.5 rounded-xl bg-[#204938] hover:bg-[#2c614b] text-xs font-black !text-white text-white border border-white/20 transition-colors cursor-pointer shadow-2xs"
             title="Start a fresh conversation"
           >
             New Chat
@@ -397,8 +403,11 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
         </div>
       )}
 
-      {/* 2. CHAT STREAM - Calm, short, scannable in 5 seconds */}
-      <div className="p-4 sm:p-6 space-y-4 max-h-[540px] overflow-y-auto bg-gradient-to-b from-[#FFFDFB] to-white scrollbar-thin">
+      {/* 2. CHAT STREAM - Calm, short, scannable in 5 seconds. Internal scroll only — does NOT scroll window. */}
+      <div
+        ref={chatScrollContainerRef}
+        className="p-4 sm:p-6 space-y-4 max-h-[540px] overflow-y-auto bg-gradient-to-b from-[#FFFDFB] to-white scrollbar-thin"
+      >
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -415,7 +424,7 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
             <div
               className={`rounded-2xl leading-relaxed text-xs sm:text-sm ${
                 msg.role === "user"
-                  ? "bg-[#173328] text-[#F4F1EA] p-4 max-w-xl font-medium rounded-tr-none shadow-xs"
+                  ? "bg-[#173328] !text-white text-white p-4 max-w-xl font-medium rounded-tr-none shadow-xs"
                   : "bg-white border border-[#EBE4DE] text-slate-850 p-4 sm:p-5 max-w-2xl rounded-tl-none shadow-2xs space-y-3"
               }`}
             >
@@ -426,8 +435,12 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
                 </div>
               )}
 
-              {/* Message text - scannable in 5 seconds */}
-              <div className="whitespace-pre-wrap leading-relaxed text-slate-800 text-xs sm:text-sm">
+              {/* Message text - scannable in 5 seconds. Highly visible pure white font for user input */}
+              <div
+                className={`whitespace-pre-wrap leading-relaxed text-xs sm:text-sm ${
+                  msg.role === "user" ? "!text-white text-white font-semibold" : "text-slate-800"
+                }`}
+              >
                 {msg.content}
               </div>
 
@@ -651,8 +664,7 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
           </div>
         )}
 
-        <div ref={chatBottomRef} />
-      </div>
+        </div>
 
       {/* 3. PROMPT STARTER CHIPS - HIDDEN ONCE CONVERSATION STARTS (messages.length > 1) */}
       {messages.length <= 1 && (
@@ -675,94 +687,94 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
       )}
 
       {/* 4. DOCKED INPUT BAR */}
-      <div className="p-4 sm:p-5 bg-white border-t border-[#E8D8CF]">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSendMessage();
-          }}
-          className="relative flex items-end gap-2 bg-[#FFFDFB] focus-within:bg-white border border-[#E8D8CF] focus-within:border-[#173328] rounded-2xl p-2 transition-all shadow-inner"
-        >
-          <textarea
-            ref={textareaRef}
-            rows={1}
-            value={prompt}
-            onChange={handleTextareaChange}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-              }
+        <div className="p-4 sm:p-5 bg-white border-t border-[#E8D8CF]">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSendMessage();
             }}
-            placeholder="Message Peach Match AI... (e.g. 'I need a website for my restaurant' or 'I need a new logo')"
-            className="flex-1 bg-transparent px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden resize-none leading-relaxed min-h-[38px] max-h-[120px]"
-          />
-
-          <button
-            type="submit"
-            disabled={loading || !prompt.trim()}
-            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider shrink-0 transition-all cursor-pointer ${
-              prompt.trim() && !loading
-                ? "bg-[#173328] text-white shadow-xs hover:bg-[#234b3c]"
-                : "bg-slate-200 text-slate-400 cursor-not-allowed"
-            }`}
-            title="Send message (Enter)"
-            aria-label="Send message to Peach Match AI"
+            className="relative flex items-end gap-2 bg-[#FFFDFB] focus-within:bg-white border border-[#E8D8CF] focus-within:border-[#173328] rounded-2xl p-2 transition-all shadow-inner"
           >
-            {loading ? "..." : "Send"}
-          </button>
-        </form>
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              value={prompt}
+              onChange={handleTextareaChange}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              placeholder="Message Peach Match AI... (e.g. 'I need a website for my restaurant' or 'I need a new logo')"
+              className="flex-1 bg-transparent px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden resize-none leading-relaxed min-h-[38px] max-h-[120px]"
+            />
 
-        <div className="flex items-center justify-between text-[11px] text-slate-500 mt-2 px-1">
-          <span>Press Enter to send, Shift+Enter for line break</span>
-          <span className="font-bold text-[#173328]">1 Peach Coin = $50 USD &bull; Protected Escrow</span>
-        </div>
-      </div>
+            <button
+              type="submit"
+              disabled={loading || !prompt.trim()}
+              className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider shrink-0 transition-all cursor-pointer ${
+                prompt.trim() && !loading
+                  ? "bg-[#173328] hover:bg-[#234b3c] !text-white text-white shadow-xs"
+                  : "bg-slate-200 text-slate-400 cursor-not-allowed"
+              }`}
+              title="Send message (Enter)"
+              aria-label="Send message to Peach Match AI"
+            >
+              {loading ? "..." : "Send"}
+            </button>
+          </form>
 
-      {/* 5. LIGHTBOX MODAL FOR PORTFOLIO SAMPLES */}
-      {previewImage && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={() => setPreviewImage(null)}
-        >
-          <div
-            className="bg-white rounded-3xl overflow-hidden max-w-2xl w-full shadow-2xl relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="relative h-80 bg-stone-900 flex items-center justify-center">
-              <img
-                src={previewImage.url}
-                alt={previewImage.title}
-                className="max-h-full max-w-full object-contain"
-              />
-              <button
-                type="button"
-                onClick={() => setPreviewImage(null)}
-                className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/70 text-white text-xs font-bold hover:bg-black transition-colors cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-            <div className="p-5 flex items-center justify-between">
-              <div>
-                <h4 className="text-base font-black text-slate-950">
-                  {previewImage.title}
-                </h4>
-                <p className="text-xs text-slate-500 font-semibold">
-                  By {previewImage.creativeName} &bull; {previewImage.industry || "Commercial Portfolio"}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setPreviewImage(null)}
-                className="px-4 py-2 bg-[#173328] text-white text-xs font-black rounded-xl"
-              >
-                Done
-              </button>
-            </div>
+          <div className="flex items-center justify-between text-[11px] text-slate-500 mt-2 px-1">
+            <span>Press Enter to send, Shift+Enter for line break</span>
+            <span className="font-bold text-[#173328]">1 Peach Coin = $50 USD &bull; Protected Escrow</span>
           </div>
         </div>
-      )}
+
+        {/* 5. LIGHTBOX MODAL FOR PORTFOLIO SAMPLES */}
+        {previewImage && (
+          <div
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setPreviewImage(null)}
+          >
+            <div
+              className="bg-white rounded-3xl overflow-hidden max-w-2xl w-full shadow-2xl relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative h-80 bg-stone-900 flex items-center justify-center">
+                <img
+                  src={previewImage.url}
+                  alt={previewImage.title}
+                  className="max-h-full max-w-full object-contain"
+                />
+                <button
+                  type="button"
+                  onClick={() => setPreviewImage(null)}
+                  className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-black/70 text-white text-xs font-bold hover:bg-black transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+              <div className="p-5 flex items-center justify-between">
+                <div>
+                  <h4 className="text-base font-black text-slate-950">
+                    {previewImage.title}
+                  </h4>
+                  <p className="text-xs text-slate-500 font-semibold">
+                    By {previewImage.creativeName} &bull; {previewImage.industry || "Commercial Portfolio"}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPreviewImage(null)}
+                  className="px-4 py-2 bg-[#173328] hover:bg-[#234b3c] !text-white text-white text-xs font-black rounded-xl transition-colors cursor-pointer"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 }
