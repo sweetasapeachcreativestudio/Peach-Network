@@ -593,7 +593,7 @@ export async function POST(req: Request) {
     const historyArray: Array<{ role: string; content: string }> = Array.isArray(history) ? history : [];
     const hasPreviousDiagnosticTurn = historyArray.some((h) => h.role === "assistant");
 
-    const compactPool = pool.map((c) => ({
+    const compactPool = pool.slice(0, 6).map((c) => ({
       id: c.id,
       name: c.name,
       headline: c.headline,
@@ -641,13 +641,14 @@ Output strictly valid JSON matching the schema in the system prompt.`;
         },
       });
 
-      // Try preferred model then fallback model
-      const modelsToTry = ["gemini-3.8-flash", "gemini-3.1-flash-lite"];
+      // Prioritize low-latency gemini-3.1-flash-lite, with gemini-3.8-flash as secondary
+      const modelsToTry = ["gemini-3.1-flash-lite", "gemini-3.8-flash"];
 
       for (const model of modelsToTry) {
+        let timer: ReturnType<typeof setTimeout> | undefined;
         try {
           const timeoutPromise = new Promise<never>((_, reject) => {
-            const timer = setTimeout(() => reject(new Error("Timeout after 20s")), 20000);
+            timer = setTimeout(() => reject(new Error("Timeout after 8s")), 8000);
             if (typeof (timer as any)?.unref === "function") (timer as any).unref();
           });
 
@@ -661,6 +662,7 @@ Output strictly valid JSON matching the schema in the system prompt.`;
           });
 
           const response = await Promise.race([geminiCall, timeoutPromise]);
+          if (timer) clearTimeout(timer);
           const responseText = response?.text;
 
           if (responseText && responseText.trim()) {
@@ -668,6 +670,7 @@ Output strictly valid JSON matching the schema in the system prompt.`;
             break;
           }
         } catch (callErr: any) {
+          if (timer) clearTimeout(timer);
           const errMsg = String(callErr?.message || callErr || "").toLowerCase();
           const is429 =
             errMsg.includes("429") ||
@@ -680,8 +683,10 @@ Output strictly valid JSON matching the schema in the system prompt.`;
           if (is429) {
             rateLimitEncountered = true;
             console.warn(`[Peach Match AI] Gemini 429/Quota on ${model}:`, callErr?.message);
+          } else if (errMsg.includes("timeout")) {
+            console.info(`[Peach Match AI] ${model} response timed out after 8s. Falling back smoothly.`);
           } else {
-            console.warn(`[Peach Match AI] Non-quota error on ${model}:`, callErr?.message);
+            console.warn(`[Peach Match AI] Notice on ${model}:`, callErr?.message);
           }
         }
       }
