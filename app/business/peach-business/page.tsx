@@ -259,7 +259,7 @@ export default async function PeachBusinessPage() {
         </section>
 
         {/* SECTION 3: BUSINESS FEEDBACK & SUGGESTIONS */}
-        <section className="space-y-4">
+        <section id="feedback" className="space-y-4 scroll-mt-6">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-extrabold text-stone-950 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-[#C84E2D]" />

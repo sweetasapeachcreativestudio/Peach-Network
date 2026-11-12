@@ -209,6 +209,22 @@ MASTER PRICING LAW:
      (Up to 4-page menu or tri-fold brochure, or custom folding carton box/label dieline with print-ready CMYK specs).
 
 CRITICAL CONVERSATIONAL & SCOPING RULES:
+Rule 0: "STRICT V1 SCOPE GUARDRAIL".
+In Version 1, Peach Network ONLY offers 6 disciplines:
+1. Graphic Design (print flyers, packaging die-lines, brochures, vector graphics)
+2. Branding Design (core logos, vector kits, brand sheets, brand overhauls)
+3. Website Design (responsive UI/UX, landing pages, multi-page business sites, retail/restaurant hubs on Webflow/Squarespace/Shopify)
+4. Social Media Design (campaign launch graphics, multi-slide carousels, monthly post suites + video reels)
+5. Commercial Photography (executive portraits, product tabletop shoots, on-location culinary & venue shoots)
+6. Creative Direction (scoping, art direction, and creative curation)
+
+If a business owner asks for any service outside this V1 catalog (including but not limited to: mobile app development (iOS/Android native apps), custom software coding, backend engineering, full SEO or ad-buying retainers (PPC/Google Ads/Meta Ads), 3D CGI or visual effects, PR / public relations / press releases, copywriting-only or blog writing, video games, etc.):
+- NEVER invent a coin price or pretend we offer it.
+- NEVER return diagnostic questions or package cards for out-of-scope services.
+- Instead, respond warmly with:
+  "We currently do not offer [requested service] in Version 1, but you can submit this to our **Peach Business** feedback tab to let our team know it's something you want to see in the app. Every piece of feedback helps us grow—so you are growing with us!"
+- Set mode to "out_of_scope" and showFeedbackButton to true.
+
 Rule 1: "DIAGNOSE FIRST, PRICE SECOND".
 Never quote a price or return a "scope" card on the very first message when a user makes an open-ended request (e.g. "I need a website for my restaurant", "I need a logo", "I need photos").
 Instead, ask 2 to 3 short diagnostic questions to understand:
@@ -235,7 +251,18 @@ When recommending a scope requiring N coins:
     Remind them about Peach Network monthly subscriptions (recurring coin allowances, rollover protection, and member discounts): "If you don't want to subscribe, that's completely okay—you can just do a quick one-time top up right here!"
 
 OUTPUT FORMAT REQUIREMENTS:
-You MUST respond with strictly valid JSON adhering to one of these two structures:
+You MUST respond with strictly valid JSON adhering to one of these three structures:
+
+If OUT OF SCOPE (services outside V1: mobile apps, backend software, SEO retainers, ad-buying, 3D CGI, PR, copywriting-only, etc.):
+{
+  "mode": "out_of_scope",
+  "headline": "Service Outside Version 1 Catalog",
+  "answer": "We currently do not offer [requested service] in Version 1, but you can submit this to our **Peach Business** feedback tab to let our team know it's something you want to see in the app. Every piece of feedback helps us grow—so you are growing with us!",
+  "showFeedbackButton": true,
+  "diagnosticQuestions": null,
+  "scope": null,
+  "topCreativeIds": []
+}
 
 If DIAGNOSING (initial open-ended inquiry):
 {
@@ -421,6 +448,65 @@ function buildDefaultDiagnostic(queryText: string) {
   };
 }
 
+function checkOutOfScopeService(queryText: string): { isOutOfScope: boolean; serviceName: string } {
+  const q = queryText.toLowerCase().trim();
+
+  // If user explicitly asks for website design, branding, logo, photography, flyer, or social media for their app/business, that is IN SCOPE
+  const isRequestingDesignOrWebsite = /\b(website|landing page|web page|web design|logo|brand identity|branding|photo shoot|photography|flyer|social media|reels|creative director|graphic design)\b/i.test(q);
+
+  // 1. Mobile App Development
+  if (
+    /\b(mobile app development|ios development|android development|app developer|build a mobile app|create a mobile app|make a mobile app|code an app|ios app development|android app development|react native app|flutter app|swift app|kotlin app)\b/i.test(q) ||
+    (/\b(mobile app|ios app|android app|native app)\b/i.test(q) && !isRequestingDesignOrWebsite)
+  ) {
+    return { isOutOfScope: true, serviceName: "mobile app development" };
+  }
+
+  // 2. Custom Software Coding / Backend Engineering
+  if (
+    /\b(custom software|software engineering|backend engineering|backend developer|api development|database engineering|devops|full-stack code|backend code|build software|fullstack engineering)\b/i.test(q)
+  ) {
+    return { isOutOfScope: true, serviceName: "custom software coding & backend engineering" };
+  }
+
+  // 3. Full SEO / Ad-Buying Retainers / PPC
+  if (
+    /\b(ad-buying|ad buying|media buying|ppc campaign|google ads retainer|facebook ads management|meta ads retainer|full seo retainer|monthly seo retainer|link building|ad spend management)\b/i.test(q)
+  ) {
+    return { isOutOfScope: true, serviceName: "full SEO & ad-buying retainers" };
+  }
+
+  // 4. 3D CGI / VFX
+  if (
+    /\b(3d cgi|cgi animation|vfx|visual effects|3d visual effects|special effects|hollywood cgi|cgi render)\b/i.test(q)
+  ) {
+    return { isOutOfScope: true, serviceName: "3D CGI & visual effects" };
+  }
+
+  // 5. PR / Public Relations
+  if (
+    /\b(public relations|pr agency|pr retainer|press release distribution|media outreach|press release writing|crisis pr)\b/i.test(q)
+  ) {
+    return { isOutOfScope: true, serviceName: "public relations & PR retainers" };
+  }
+
+  // 6. Copywriting-only / Blog Writing
+  if (
+    /\b(copywriting-only|copywriting only|blog writing|article writing|ghostwriting|blog posts only|seo articles|write my blog)\b/i.test(q)
+  ) {
+    return { isOutOfScope: true, serviceName: "copywriting-only services" };
+  }
+
+  // 7. Video Games
+  if (
+    /\b(video game|game development|unity game|unreal engine|build a game)\b/i.test(q)
+  ) {
+    return { isOutOfScope: true, serviceName: "video game development" };
+  }
+
+  return { isOutOfScope: false, serviceName: "" };
+}
+
 export async function POST(req: Request) {
   try {
     const { message, history, clientContext } = await req.json();
@@ -434,6 +520,21 @@ export async function POST(req: Request) {
     const subscriptionPlan = clientContext?.subscriptionPlan ? String(clientContext.subscriptionPlan) : null;
 
     const trimmed = message.trim();
+
+    // Strict V1 Scope Guardrail check
+    const outOfScopeCheck = checkOutOfScopeService(trimmed);
+    if (outOfScopeCheck.isOutOfScope) {
+      return NextResponse.json({
+        mode: "out_of_scope",
+        headline: "Service Outside Version 1 Catalog",
+        answer: `We currently do not offer ${outOfScopeCheck.serviceName} in Version 1, but you can submit this to our **Peach Business** feedback tab to let our team know it's something you want to see in the app. Every piece of feedback helps us grow—so you are growing with us!`,
+        showFeedbackButton: true,
+        diagnosticQuestions: null,
+        scope: null,
+        matchedCreatives: [],
+      });
+    }
+
     const admin = createAdminClient();
 
     // Query approved creatives from Supabase
@@ -595,6 +696,21 @@ Output strictly valid JSON matching the schema in the system prompt.`;
         headline: "Peach Match AI v1.1 High Volume",
         answer:
           "Peach Match AI v1.1 is experiencing high volume right now—click **Ask an Art Director** in the top bar and our team will scope your project for free.",
+        diagnosticQuestions: null,
+        scope: null,
+        matchedCreatives: [],
+      });
+    }
+
+    // Check if model returned an out of scope response
+    if (parsed && (parsed.mode === "out_of_scope" || parsed.showFeedbackButton)) {
+      return NextResponse.json({
+        mode: "out_of_scope",
+        headline: parsed.headline || "Service Outside Version 1 Catalog",
+        answer:
+          parsed.answer ||
+          "We currently do not offer this service in Version 1, but you can submit this to our **Peach Business** feedback tab to let our team know it's something you want to see in the app. Every piece of feedback helps us grow—so you are growing with us!",
+        showFeedbackButton: true,
         diagnosticQuestions: null,
         scope: null,
         matchedCreatives: [],

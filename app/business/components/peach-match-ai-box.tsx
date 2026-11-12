@@ -58,8 +58,9 @@ interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   headline?: string;
-  mode?: "diagnostic" | "recommendation" | "fallback";
+  mode?: "diagnostic" | "recommendation" | "fallback" | "out_of_scope";
   isRateLimit?: boolean;
+  showFeedbackButton?: boolean;
   diagnosticQuestions?: DiagnosticQuestion[] | null;
   scope?: ScopedProject | null;
   matchedCreatives?: MatchedCreative[];
@@ -239,6 +240,26 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
         return;
       }
 
+      if (data.mode === "out_of_scope" || data.showFeedbackButton) {
+        const outOfScopeMsg: ChatMessage = {
+          id: `assistant-${Date.now()}`,
+          role: "assistant",
+          content:
+            data.answer ||
+            "We currently do not offer this service in Version 1, but you can submit this to our **Peach Business** feedback tab to let our team know it's something you want to see in the app. Every piece of feedback helps us grow—so you are growing with us!",
+          headline: data.headline || "Service Outside Version 1 Catalog",
+          mode: "out_of_scope",
+          isRateLimit: false,
+          showFeedbackButton: true,
+          diagnosticQuestions: null,
+          scope: null,
+          matchedCreatives: [],
+          showCreatives: false,
+        };
+        setMessages((prev) => [...prev, outOfScopeMsg]);
+        return;
+      }
+
       const assistantMsg: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
@@ -246,6 +267,7 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
         headline: data.headline,
         mode: data.mode || (data.scope ? "recommendation" : "diagnostic"),
         isRateLimit: false,
+        showFeedbackButton: Boolean(data.showFeedbackButton),
         diagnosticQuestions: Array.isArray(data.diagnosticQuestions) ? data.diagnosticQuestions : null,
         scope: data.scope || null,
         matchedCreatives: Array.isArray(data.matchedCreatives) ? data.matchedCreatives : [],
@@ -483,6 +505,23 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
                   <AskArtDirectorButton businessName={businessName} />
                   <span className="text-[11px] text-stone-500 font-medium">
                     Free scoping guidance with a senior creative director
+                  </span>
+                </div>
+              )}
+
+              {/* Quick Button to Peach Business Feedback Tab for Out-of-Scope Requests */}
+              {(msg.mode === "out_of_scope" || msg.showFeedbackButton) && (
+                <div className="pt-2.5 border-t border-amber-200/80 flex items-center gap-3 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => router.push("/business/peach-business#feedback")}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#173328] hover:bg-[#204938] !text-white text-white text-xs font-black uppercase tracking-wider transition-all cursor-pointer shadow-xs hover:shadow-sm"
+                  >
+                    <span>Go to Peach Business Feedback</span>
+                    <span>&rarr;</span>
+                  </button>
+                  <span className="text-[11px] text-stone-600 font-medium">
+                    Tell our team what features or disciplines you want to see in the app
                   </span>
                 </div>
               )}
