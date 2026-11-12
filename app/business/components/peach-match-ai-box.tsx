@@ -7,6 +7,8 @@ import { AskArtDirectorButton } from "@/app/components/ask-art-director-modal";
 interface PeachMatchAIBoxProps {
   initialAvailableCoins: number;
   businessName: string;
+  hasActiveSubscription?: boolean;
+  subscriptionPlan?: string | null;
 }
 
 interface DiagnosticQuestion {
@@ -95,6 +97,8 @@ const starterPrompts = [
 export function PeachMatchAIBox({
   initialAvailableCoins,
   businessName,
+  hasActiveSubscription = false,
+  subscriptionPlan = null,
 }: PeachMatchAIBoxProps) {
   const router = useRouter();
   const chatScrollContainerRef = useRef<HTMLDivElement>(null);
@@ -105,6 +109,9 @@ export function PeachMatchAIBox({
   const [availableCoins, setAvailableCoins] = useState(initialAvailableCoins);
   const [topUpLoading, setTopUpLoading] = useState(false);
   const [submittingOffer, setSubmittingOffer] = useState<string | null>(null);
+
+  // Diagnostic multi-question answer selection: { [questionId]: selectedPillText }
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
 
   // Status notices
   const [errorMsg, setErrorMsg] = useState("");
@@ -138,6 +145,27 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
       });
     }
   }, [messages, loading]);
+
+  const handleTogglePill = (questionId: string, pill: string) => {
+    setSelectedAnswers((prev) => ({
+      ...prev,
+      [questionId]: prev[questionId] === pill ? "" : pill,
+    }));
+  };
+
+  const handleSubmitDiagnosticAnswers = (questions: DiagnosticQuestion[]) => {
+    const answeredItems = questions
+      .map((q) => {
+        const ans = selectedAnswers[q.id];
+        return ans ? `${q.question}\n→ ${ans}` : null;
+      })
+      .filter(Boolean);
+
+    if (answeredItems.length === 0) return;
+
+    const formattedMessage = `Diagnostic Specifications:\n${answeredItems.join("\n\n")}`;
+    handleSendMessage(formattedMessage);
+  };
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value);
@@ -181,6 +209,11 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
         body: JSON.stringify({
           message: text,
           history: historyPayload,
+          clientContext: {
+            availableCoins,
+            hasSubscription: Boolean(hasActiveSubscription),
+            subscriptionPlan: subscriptionPlan ?? null,
+          },
         }),
       });
 
@@ -454,7 +487,7 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
                 </div>
               )}
 
-              {/* DIAGNOSTIC QUESTIONS WITH CLICKABLE PILL BUTTONS */}
+              {/* DIAGNOSTIC QUESTIONS WITH MULTI-SELECTION AND BATCH SUBMISSION */}
               {msg.diagnosticQuestions && msg.diagnosticQuestions.length > 0 && (
                 <div className="pt-2 border-t border-stone-100 space-y-3">
                   {msg.diagnosticQuestions.map((dq) => (
@@ -463,20 +496,49 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
                         {dq.question}
                       </span>
                       <div className="flex flex-wrap gap-1.5">
-                        {dq.pills.map((pill, pi) => (
-                          <button
-                            key={pi}
-                            type="button"
-                            onClick={() => handleSendMessage(pill)}
-                            disabled={loading}
-                            className="text-left px-3 py-1.5 rounded-full text-xs font-semibold bg-[#FFF5F0] hover:bg-[#C84E2D] text-[#8C341B] hover:text-white border border-[#F2C2B2] hover:border-[#C84E2D] transition-all cursor-pointer shadow-2xs"
-                          >
-                            {pill}
-                          </button>
-                        ))}
+                        {dq.pills.map((pill, pi) => {
+                          const isSelected = selectedAnswers[dq.id] === pill;
+                          return (
+                            <button
+                              key={pi}
+                              type="button"
+                              onClick={() => handleTogglePill(dq.id, pill)}
+                              disabled={loading}
+                              className={`text-left px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer shadow-2xs ${
+                                isSelected
+                                  ? "bg-[#173328] hover:bg-[#204938] !text-white text-white font-bold border-2 border-[#173328] scale-[1.02]"
+                                  : "bg-[#FFF5F0] hover:bg-[#FFE3D6] text-[#8C341B] hover:text-[#5c2111] border border-[#F2C2B2] font-semibold"
+                              }`}
+                            >
+                              {isSelected && <span className="text-emerald-300 font-bold mr-1">✓</span>}
+                              <span>{pill}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   ))}
+
+                  {/* Submit Answers & Get Pricing button */}
+                  <div className="pt-3 border-t border-stone-200/90 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div className="text-[11px] text-stone-600 font-semibold flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#173328]" />
+                      <span>
+                        {msg.diagnosticQuestions.filter((q) => selectedAnswers[q.id]).length} of{" "}
+                        {msg.diagnosticQuestions.length} requirements selected
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleSubmitDiagnosticAnswers(msg.diagnosticQuestions!)}
+                      disabled={loading || msg.diagnosticQuestions.filter((q) => selectedAnswers[q.id]).length === 0}
+                      className="px-5 py-2.5 rounded-xl bg-[#173328] hover:bg-[#204938] disabled:bg-stone-200 disabled:text-stone-400 disabled:cursor-not-allowed !text-white text-white text-xs font-black uppercase tracking-wider transition-all shadow-xs cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      <span>Submit Answers &amp; Get Pricing</span>
+                      <span>&rarr;</span>
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -538,6 +600,119 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
                 </div>
               )}
 
+              {/* COIN BALANCE & SUBSCRIPTION AWARENESS STATUS CARD */}
+              {msg.scope && (() => {
+                const requiredCoins = msg.scope.coins;
+                const hasEnoughCoins = availableCoins >= requiredCoins;
+                const deficitCoins = Math.max(0, requiredCoins - availableCoins);
+
+                if (hasEnoughCoins) {
+                  return (
+                    <div className="bg-[#F0FDF4] border-2 border-emerald-400 rounded-2xl p-4 sm:p-5 space-y-2 shadow-2xs mt-2">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-emerald-600 !text-white text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+                            ✓
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-sm font-black text-emerald-950">
+                                Wallet Ready: You Have Enough Peach Coins!
+                              </h4>
+                              <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 rounded-full">
+                                Ready to Begin
+                              </span>
+                            </div>
+                            <p className="text-xs text-emerald-800 font-medium mt-1">
+                              This project requires <strong className="font-black text-emerald-950">{requiredCoins} Coins</strong> (${requiredCoins * 50} USD). You currently have <strong className="font-black text-emerald-950">{availableCoins} Coins</strong> available in your wallet.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-[11px] text-emerald-700 font-semibold pt-1">
+                        Below are 3 vetted creatives from our ecosystem with verified portfolio matches and skill fit for your project. Select one to generate your Creative Brief Sheet and begin!
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="bg-[#FFFDF7] border-2 border-amber-400 rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs mt-2">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-amber-500 !text-white text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+                          🍑
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-black text-stone-950">
+                              Coin Top-Up Needed ({deficitCoins} More Coins to Start)
+                            </h4>
+                            <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full">
+                              Top Up Required
+                            </span>
+                          </div>
+                          <p className="text-xs text-stone-700 font-medium mt-1">
+                            This project scope requires <strong>{requiredCoins} Coins</strong> (${requiredCoins * 50} USD). You currently have <strong>{availableCoins} Coins</strong> available ({deficitCoins} more needed to hire).
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="hidden sm:block text-right shrink-0">
+                        <span className="text-xs font-black text-amber-900 block">Deficit: {deficitCoins} Coins</span>
+                        <span className="text-[11px] text-stone-500 font-medium">(${deficitCoins * 50} USD)</span>
+                      </div>
+                    </div>
+
+                    {/* Subscription Awareness Note */}
+                    {hasActiveSubscription ? (
+                      <div className="p-3 bg-white rounded-xl border border-amber-200 text-xs text-stone-800 space-y-1">
+                        <p className="font-bold text-stone-900">
+                          🌟 You are on an active <strong>{subscriptionPlan || "Peach Network"}</strong> membership!
+                        </p>
+                        <p className="text-stone-600 text-[11px]">
+                          You can top up the remaining {deficitCoins} Coins at your member rate right now, or wait until your next monthly coin drop.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-white rounded-xl border border-amber-200 text-xs text-stone-800 space-y-1">
+                        <p className="font-bold text-stone-900 flex items-center gap-1.5">
+                          <span>✨</span>
+                          <span>Looking for monthly coins and discounts?</span>
+                        </p>
+                        <p className="text-stone-600 text-[11px]">
+                          Our monthly membership plans come with recurring coin allowances, rollover protection, and member discounts.
+                        </p>
+                        <p className="text-[#8C341B] font-bold text-[11px]">
+                          If you don&apos;t want to subscribe, that&apos;s completely okay—you can just do a quick one-time top up right here!
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Action Buttons: Instant Top Up + View Subscriptions */}
+                    <div className="pt-1 flex items-center gap-2.5 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => handleInstantTopUp(deficitCoins)}
+                        disabled={topUpLoading}
+                        className="px-4 py-2.5 bg-[#173328] hover:bg-[#204938] !text-white text-white rounded-xl text-xs font-black transition-all cursor-pointer shadow-xs disabled:opacity-50 flex items-center gap-2"
+                      >
+                        <span>{topUpLoading ? "Processing..." : `Top Up ${deficitCoins} Coins ($${deficitCoins * 50} USD)`}</span>
+                        <span>&rarr;</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => router.push("/business/wallet")}
+                        className="px-3.5 py-2.5 bg-white hover:bg-stone-50 text-stone-800 border border-stone-300 rounded-xl text-xs font-bold transition-all cursor-pointer"
+                      >
+                        {hasActiveSubscription ? "Manage Membership / Wallet" : "View Subscription Plans"}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* 3 SKILL-ACCURATE MATCHED CREATIVES */}
               {msg.scope && msg.matchedCreatives && msg.matchedCreatives.length > 0 && (
                 <div className="pt-2 space-y-3">
@@ -546,7 +721,7 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
                       3 Vetted Creatives Ready for this Exact Scope:
                     </span>
                     <span className="text-[11px] text-slate-500 font-semibold">
-                      Ranked by verified portfolio
+                      Ranked by verified portfolio &amp; skill fit
                     </span>
                   </div>
 
@@ -554,6 +729,7 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
                     {msg.matchedCreatives.slice(0, 3).map((creative) => {
                       const isSubmitting = submittingOffer === creative.id;
                       const hasSufficientCoins = availableCoins >= (msg.scope?.coins || 0);
+                      const deficitCoins = Math.max(0, (msg.scope?.coins || 0) - availableCoins);
                       const hubName = creative.hub || "Birmingham Hub";
 
                       return (
@@ -627,7 +803,7 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
                               type="button"
                               onClick={() => {
                                 if (!hasSufficientCoins) {
-                                  handleInstantTopUp((msg.scope?.coins || 0) - availableCoins);
+                                  handleInstantTopUp(deficitCoins);
                                 } else {
                                   handleSelectCreative(creative, msg.scope!);
                                 }
@@ -638,7 +814,7 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
                               {isSubmitting
                                 ? "Creating Brief..."
                                 : !hasSufficientCoins
-                                ? `Top Up & Hire ${creative.name.split(" ")[0]}`
+                                ? `Top Up ${deficitCoins} Coins & Hire ${creative.name.split(" ")[0]}`
                                 : `Select & Hire (${msg.scope?.coins ?? 0} Coins)`}
                             </button>
                           </div>
@@ -652,14 +828,21 @@ I will ask 2 to 3 quick diagnostic questions to understand your technical requir
           </div>
         ))}
 
-        {/* Loading Indicator */}
+        {/* Loading Indicator with Animated Bubble & Exact Copy */}
         {loading && (
-          <div className="flex items-center gap-3 text-sm">
-            <div className="w-8 h-8 rounded-xl bg-[#173328] text-white flex items-center justify-center text-[11px] font-black shrink-0 shadow-2xs">
+          <div className="flex items-start gap-3 text-sm">
+            <div className="w-8 h-8 rounded-xl bg-[#173328] text-white flex items-center justify-center text-[11px] font-black shrink-0 shadow-2xs mt-0.5">
               PM
             </div>
-            <div className="bg-white border border-[#EBE4DE] rounded-2xl p-4 rounded-tl-none shadow-xs text-xs text-slate-600 font-medium">
-              Diagnosing project requirements and checking vetted creative rosters...
+            <div className="bg-white border-2 border-[#EBE4DE] rounded-2xl p-4 sm:p-5 rounded-tl-none shadow-xs text-xs sm:text-sm text-slate-800 font-bold flex items-center gap-3">
+              <div className="flex items-center gap-1 shrink-0">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#C84E2D] animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#173328] animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#C84E2D] animate-bounce" style={{ animationDelay: "300ms" }} />
+              </div>
+              <span className="text-slate-900 font-extrabold">
+                Hold on—getting your project pricing and matching creatives...
+              </span>
             </div>
           </div>
         )}

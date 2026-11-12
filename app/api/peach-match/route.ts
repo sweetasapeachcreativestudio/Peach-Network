@@ -223,6 +223,17 @@ Only AFTER the user answers the diagnostic questions (or if they give complete t
 Rule 3: "SKILL-ACCURATE CREATIVE MATCHING".
 When returning a recommendation, nominate 3 creative IDs from the available pool whose verified experience and past work match that exact tier.
 
+Rule 4: "CLIENT WALLET & SUBSCRIPTION AWARENESS".
+When recommending a scope requiring N coins:
+- If client has enough coins (availableCoins >= N):
+  In your answer, celebrate: "Great news—you have enough Peach Coins in your wallet to start this project right away!" and introduce the 3 vetted creatives from our ecosystem with verified portfolio matches and skill fit.
+- If client does not have enough coins (availableCoins < N):
+  State the required coins, the current balance, and the exact deficit needed to start.
+  - If the client is an active subscriber:
+    Remind them that as an active member, they can top up extra coins at their member rate right now, or wait until their next monthly coin drop.
+  - If the client does not have a subscription:
+    Remind them about Peach Network monthly subscriptions (recurring coin allowances, rollover protection, and member discounts): "If you don't want to subscribe, that's completely okay—you can just do a quick one-time top up right here!"
+
 OUTPUT FORMAT REQUIREMENTS:
 You MUST respond with strictly valid JSON adhering to one of these two structures:
 
@@ -412,11 +423,15 @@ function buildDefaultDiagnostic(queryText: string) {
 
 export async function POST(req: Request) {
   try {
-    const { message, history } = await req.json();
+    const { message, history, clientContext } = await req.json();
 
     if (!message || typeof message !== "string" || !message.trim()) {
       return NextResponse.json({ error: "Please enter a question or project brief." }, { status: 400 });
     }
+
+    const availableCoins = Math.max(0, Number(clientContext?.availableCoins) || 0);
+    const hasSubscription = Boolean(clientContext?.hasSubscription);
+    const subscriptionPlan = clientContext?.subscriptionPlan ? String(clientContext.subscriptionPlan) : null;
 
     const trimmed = message.trim();
     const admin = createAdminClient();
@@ -498,6 +513,10 @@ LATEST BUSINESS INQUIRY:
 USER: ${trimmed}
 
 IS_FIRST_MESSAGE_IN_CONVERSATION: ${!hasPreviousDiagnosticTurn}
+
+CLIENT WALLET & MEMBERSHIP CONTEXT:
+- Available Coin Balance: ${availableCoins} Peach Coins ($${availableCoins * 50} USD)
+- Active Subscription: ${hasSubscription ? `YES (Plan: ${subscriptionPlan || "Active Member"})` : "NO (Non-subscriber)"}
 
 AVAILABLE CREATIVE CANDIDATES (Choose 3 with skill-proven fit if recommending a package):
 ${JSON.stringify(compactPool, null, 2)}
@@ -649,10 +668,26 @@ Output strictly valid JSON matching the schema in the system prompt.`;
         }
 
         const opt = cat.options[optKey];
+        const requiredCoins = opt.coins;
+        const hasEnough = availableCoins >= requiredCoins;
+        const deficit = Math.max(0, requiredCoins - availableCoins);
+
+        let answerCopy = `Based on your technical requirements, I recommend **${opt.tierName}** (${requiredCoins} Coins = $${requiredCoins * PEACH_COIN_USD_RATE} USD). This provides a complete commercial scope with 100% administrative transfer and 3 included revision rounds.`;
+        if (hasEnough) {
+          answerCopy += ` Great news—you have enough Peach Coins in your wallet to start this project right away (${requiredCoins} Coins needed, you currently have ${availableCoins} Coins available)! Below are 3 vetted specialists with verified portfolio matches ready to begin.`;
+        } else {
+          answerCopy += ` Note: This scope requires ${requiredCoins} Coins ($${requiredCoins * PEACH_COIN_USD_RATE} USD) and you currently have ${availableCoins} Coins in your wallet (${deficit} more Coins needed to hire).`;
+          if (hasSubscription) {
+            answerCopy += ` As an active ${subscriptionPlan || "Peach Network"} member, you can top up the extra ${deficit} Coins at your member rate right now, or wait until your next monthly coin drop.`;
+          } else {
+            answerCopy += ` Did you know? Peach Network monthly memberships give you recurring coin allowances, rollover protection, and member discounts. If you don't want to subscribe, that's completely okay—you can just do a quick one-time top up right here!`;
+          }
+        }
+
         parsed = {
           mode: "recommendation",
           headline: "Definitive Agency Recommendation",
-          answer: `Based on your technical requirements, I recommend **${opt.tierName}**. This provides a complete commercial scope with 100% administrative transfer and 3 included revision rounds.`,
+          answer: answerCopy,
           scope: {
             title: opt.tierName,
             category: cat.categoryTag,
@@ -714,10 +749,27 @@ Output strictly valid JSON matching the schema in the system prompt.`;
         }
       }
 
+      const hasEnough = availableCoins >= coins;
+      const deficitCoins = Math.max(0, coins - availableCoins);
+
+      let finalAnswer = parsed.answer || "";
+      // Ensure the wallet status and subscription info are clearly stated in the message text
+      const ansLower = finalAnswer.toLowerCase();
+      if (!hasEnough && !ansLower.includes("deficit") && !ansLower.includes("top up") && !ansLower.includes("more coin")) {
+        finalAnswer += `\n\nNote: This project requires ${coins} Coins ($${coins * PEACH_COIN_USD_RATE} USD). You currently have ${availableCoins} Coins in your wallet (${deficitCoins} more needed).`;
+        if (hasSubscription) {
+          finalAnswer += ` As an active ${subscriptionPlan || "Peach Network"} member, you can top up the extra ${deficitCoins} Coins at your member rate right now or wait for your next monthly coin drop.`;
+        } else {
+          finalAnswer += ` Peach Network monthly subscriptions give you recurring monthly coin allowances and rollover protection. If you don't want to subscribe, that's completely okay—you can just do a quick one-time top up right here!`;
+        }
+      } else if (hasEnough && !ansLower.includes("enough") && !ansLower.includes("great news")) {
+        finalAnswer += `\n\nGreat news—you have enough Peach Coins in your wallet to start this project right away (${coins} Coins needed, you have ${availableCoins} Coins available)!`;
+      }
+
       return NextResponse.json({
         mode: "recommendation",
         headline: parsed.headline || "Definitive Agency Recommendation",
-        answer: parsed.answer,
+        answer: finalAnswer,
         diagnosticQuestions: null,
         scope: {
           title: scopeData.title,
@@ -730,6 +782,14 @@ Output strictly valid JSON matching the schema in the system prompt.`;
           estimatedTurnaround: scopeData.estimatedTurnaround,
           revisionRounds: 3,
           reason: scopeData.reason,
+        },
+        walletStatus: {
+          hasEnough,
+          requiredCoins: coins,
+          availableCoins,
+          deficitCoins,
+          hasSubscription,
+          subscriptionPlan,
         },
         matchedCreatives: matchedCreatives.slice(0, 3),
       });

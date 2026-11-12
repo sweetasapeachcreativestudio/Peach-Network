@@ -135,7 +135,7 @@ export default async function BusinessDashboard() {
     };
   }
 
-  const [{ data: wallet }, { data: projects }, { data: brandAssets }] = await Promise.all([
+  const [{ data: wallet }, { data: projects }, { data: brandAssets }, { data: membership }] = await Promise.all([
     admin.from("coin_wallets").select("available_coins,held_coins").eq("business_id", business.id).maybeSingle(),
     admin
       .from("projects")
@@ -143,6 +143,12 @@ export default async function BusinessDashboard() {
       .eq("business_id", business.id)
       .order("created_at", { ascending: false }),
     admin.from("business_brand_assets").select("id,kind,label,value,original_name").eq("business_id", business.id),
+    admin
+      .from("memberships")
+      .select("id,plan_name,status,monthly_coins,current_period_end")
+      .eq("business_id", business.id)
+      .eq("status", "active")
+      .maybeSingle(),
   ]);
 
   const active = ((projects ?? []) as any[]).filter((p: any) => !["completed", "cancelled"].includes(p.status));
@@ -231,6 +237,8 @@ export default async function BusinessDashboard() {
         <PeachMatchAIBox
           initialAvailableCoins={coins}
           businessName={business.name}
+          hasActiveSubscription={Boolean(membership)}
+          subscriptionPlan={membership?.plan_name || null}
         />
 
         {/* Kickoff Banner if a project was just accepted */}
