@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { AskArtDirectorButton } from "./ask-art-director-modal";
 
 type Role = "business" | "creative";
 
 const businessNav = [
   ["home", "/business", "Peach Home"],
-  ["new", "/business/new-project", "Start a Project"],
+  ["peach_business", "/business/peach-business", "Peach Business"],
   ["projects", "/business/projects", "Projects"],
   ["messages", "/business/messages", "Messages"],
   ["vault", "/business/vault", "Brand Vault"],
@@ -65,6 +66,7 @@ export function PeachAppShell({
       <header className="peach-workspace-topbar">
         <div className="peach-mobile-brand"><img src="/brand/peach-wordmark.png" alt="Peach Network"/></div>
         <div className="peach-topbar-actions">
+          {role === "business" && <AskArtDirectorButton businessName={businessName} />}
           {role === "business" && typeof coinCount === "number" && <Link href="/business/wallet" className="peach-coin-chip"><span/> {coinCount} Coins</Link>}
           <Link href="/notifications" className="peach-topbar-button" aria-label="Notifications">Notifications</Link>
           <Link href="/account?edit=1" className="peach-avatar" aria-label="Account">{first[0]?.toUpperCase()}</Link>
@@ -74,7 +76,7 @@ export function PeachAppShell({
     </div>
 
     <nav className="peach-mobile-nav" aria-label="Mobile navigation">
-      {nav.slice(0,5).map(([key, href, label]) => <Link key={key} href={href} className={active === key ? "active" : ""}><span className="peach-nav-dot"/>{label.replace("Start a Project","Start").replace("Brand Vault","Vault").replace("Profile & Portfolio","Profile")}</Link>)}
+      {nav.slice(0,5).map(([key, href, label]) => <Link key={key} href={href} className={active === key ? "active" : ""}><span className="peach-nav-dot"/>{label.replace("Peach Business","Business").replace("Brand Vault","Vault").replace("Profile & Portfolio","Profile")}</Link>)}
     </nav>
 
     <style>{`

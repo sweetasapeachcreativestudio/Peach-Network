@@ -5,7 +5,6 @@ import {
   MASTER_2026_CATALOG,
   PEACH_COIN_USD_RATE,
   findCategoryByKeywords,
-  type CatalogTierOption,
 } from "@/lib/project-pricing";
 
 interface CreativeCandidate {
@@ -32,6 +31,27 @@ interface CreativeCandidate {
 
 const APPROVED_CREATIVES_FALLBACK: CreativeCandidate[] = [
   {
+    id: "cr_nia",
+    name: "Nia Carter",
+    avatar_url: "/Creative2.jpg",
+    peach_level: "tree",
+    headline: "Web & Digital Experience",
+    city: "Birmingham",
+    state: "AL",
+    hub: "Birmingham Hub",
+    reliability_score: 98,
+    bio: "Digital designer focused on high-converting landing pages, multi-page business websites, and restaurant/retail e-commerce hubs on Shopify and Webflow.",
+    match_score: 98,
+    match_reason: "Specialized in restaurant web architecture, digital menus, table reservation widgets, and Shopify store builds.",
+    specialties: ["Web Design", "Landing Pages", "E-Commerce UI", "Shopify", "Webflow"],
+    featured_work: {
+      title: "Aura Botanical Skincare Storefront & Cart",
+      image_url: "/Project 3.png",
+      industry: "Retail & E-Commerce",
+      tags: ["Web Design", "Shopify", "UI/UX"],
+    },
+  },
+  {
     id: "cr_maya",
     name: "Maya Brooks",
     avatar_url: "/people/maya.jpg",
@@ -42,7 +62,7 @@ const APPROVED_CREATIVES_FALLBACK: CreativeCandidate[] = [
     hub: "Atlanta Hub",
     reliability_score: 99,
     bio: "Commercial brand designer who turns business goals into polished campaign systems, 3-tier brand sheets, launch graphics, and print-ready packaging collateral.",
-    match_score: 98,
+    match_score: 97,
     match_reason: "Master of 3-tier brand identity systems, scalable vector kits, and luxury beverage/retail packaging.",
     specialties: ["Brand Identity", "Package Design", "Print Collateral", "Typography"],
     featured_work: {
@@ -71,27 +91,6 @@ const APPROVED_CREATIVES_FALLBACK: CreativeCandidate[] = [
       image_url: "/Project 2.png",
       industry: "Sports & Entertainment",
       tags: ["Event Promo", "Social Campaign", "Flyer"],
-    },
-  },
-  {
-    id: "cr_nia",
-    name: "Nia Carter",
-    avatar_url: "/Creative2.jpg",
-    peach_level: "tree",
-    headline: "Web & Digital Experience",
-    city: "Birmingham",
-    state: "AL",
-    hub: "Birmingham Hub",
-    reliability_score: 98,
-    bio: "Digital designer focused on high-converting landing pages, multi-page business websites, and restaurant/retail e-commerce hubs on Shopify and Webflow.",
-    match_score: 97,
-    match_reason: "Deep portfolio in restaurant digital menus, Shopify e-commerce architecture, and conversion-focused landing pages.",
-    specialties: ["Web Design", "Landing Pages", "E-Commerce UI", "Shopify"],
-    featured_work: {
-      title: "Aura Botanical Skincare Storefront",
-      image_url: "/Project 3.png",
-      industry: "Retail & E-Commerce",
-      tags: ["Web Design", "Shopify", "UI/UX"],
     },
   },
   {
@@ -159,6 +158,138 @@ const APPROVED_CREATIVES_FALLBACK: CreativeCandidate[] = [
   },
 ];
 
+interface DiagnosticQuestion {
+  id: string;
+  question: string;
+  pills: string[];
+}
+
+function generateDefaultDiagnostic(categoryKey: string, queryText: string) {
+  const q = queryText.toLowerCase();
+
+  if (categoryKey === "website_design") {
+    const isRestaurant = /(restaurant|cafe|bar|food|dining|bakery|bistro)/.test(q);
+    return {
+      headline: isRestaurant ? "Let's scope your restaurant website" : "Let's dial in your website requirements",
+      answer: "Before recommending an exact scope, I need to check 3 quick details so you don't overpay or get under-scoped:",
+      questions: [
+        {
+          id: "q_feature",
+          question: isRestaurant ? "What does the restaurant site need to do?" : "What core function does the website need?",
+          pills: isRestaurant
+            ? ["Simple Menu & Location Hours", "Interactive Menu & Table Reservations", "Full Online Takeout & Catering Hub"]
+            : ["Simple Landing Page / Lead Capture", "Standard Multi-Page Business Site (3–5 Pages)", "Full E-Commerce / Product Catalog"],
+        },
+        {
+          id: "q_assets",
+          question: "Do you already have photos and branding ready?",
+          pills: ["Logos & Photos Ready", "Need Creative to Source Stock Photos", "Need an On-Location Photographer (+12 Coins)"],
+        },
+        {
+          id: "q_timeline",
+          question: "What is your target launch timeline?",
+          pills: ["Urgent (5–7 Days)", "Standard (2–3 Weeks)", "Flexible Launch"],
+        },
+      ],
+    };
+  }
+
+  if (categoryKey === "branding_design") {
+    return {
+      headline: "Let's diagnose your brand identity needs",
+      answer: "Branding ranges from a clean standalone mark to a full corporate system. Tell me what stage you're in:",
+      questions: [
+        {
+          id: "q_scope",
+          question: "What level of brand identity do you need?",
+          pills: ["Core Logo & Vector Kit", "Brand Sheet (Colors & Typography)", "Full Commercial Brand Overhaul (Guidelines)"],
+        },
+        {
+          id: "q_starting_point",
+          question: "What are we starting with?",
+          pills: ["Starting from Scratch", "Have a Sketch / Idea to Vectorize", "Existing Logo Needs a Modern Refresh"],
+        },
+        {
+          id: "q_application",
+          question: "Where will this branding be used first?",
+          pills: ["Storefront & Signage", "Website & Social Media", "Product Packaging & Merch"],
+        },
+      ],
+    };
+  }
+
+  if (categoryKey === "commercial_photography") {
+    return {
+      headline: "Let's plan your photography shoot",
+      answer: "To match the right photographer and equipment, I need to understand your subject and venue:",
+      questions: [
+        {
+          id: "q_type",
+          question: "What kind of session are you looking for?",
+          pills: ["Executive / Team Portraits (1 Hr)", "Studio Tabletop Products / Shoes (Up to 5 Items)", "On-Location Restaurant / Plated Dishes (2 Hrs)"],
+        },
+        {
+          id: "q_volume",
+          question: "How many finished retouched photos do you need?",
+          pills: ["5 Retouched Master Shots", "15 Commercial E-Commerce Images", "20+ Editorial & Venue Shots"],
+        },
+        {
+          id: "q_location",
+          question: "Where will the session take place?",
+          pills: ["On-Location at Venue / Office", "Studio Tabletop (Products Shipped)", "Outdoor / City Location"],
+        },
+      ],
+    };
+  }
+
+  if (categoryKey === "social_media") {
+    return {
+      headline: "Let's scope your social media campaign",
+      answer: "Social design depends on your content volume and whether you need static posts or video motion:",
+      questions: [
+        {
+          id: "q_format",
+          question: "What format do you need created?",
+          pills: ["4-Post Campaign Launch Pack", "High-Converting Carousel Drop (6–8 Slides)", "Monthly 30-Day Suite + 2 Video Reels"],
+        },
+        {
+          id: "q_assets",
+          question: "Do you have raw photo or video assets ready?",
+          pills: ["Raw Photos / Clips Ready", "Need Creative to Provide Stock", "Need Video Motion from Scratch"],
+        },
+        {
+          id: "q_platforms",
+          question: "Primary social channels?",
+          pills: ["Instagram & TikTok", "LinkedIn & Facebook", "All Channels"],
+        },
+      ],
+    };
+  }
+
+  // Graphic Design
+  return {
+    headline: "Let's scope your graphic design deliverable",
+    answer: "To give you the exact coin rate, tell me about your format and print requirements:",
+    questions: [
+      {
+        id: "q_item",
+        question: "What are we designing?",
+        pills: ["Commercial Event Promo Flyer", "Multi-Page Menu / Brochure", "Product Packaging Box / Label Dieline"],
+      },
+      {
+        id: "q_complexity",
+        question: "What photo editing is required?",
+        pills: ["Clean Layout with 1–2 Photos", "Multiple Photo Cutouts & 3D Lighting", "Vector Artwork / Dieline Only"],
+      },
+      {
+        id: "q_output",
+        question: "How will this be used?",
+        pills: ["Digital Social Formats Only", "Commercial Print Ready (300 DPI)", "Both Print & Social Story Formats"],
+      },
+    ],
+  };
+}
+
 export async function POST(req: Request) {
   try {
     const { message, history } = await req.json();
@@ -219,112 +350,115 @@ export async function POST(req: Request) {
           })
         : APPROVED_CREATIVES_FALLBACK;
 
-    // Determine category based on keywords
     const masterCat = findCategoryByKeywords(trimmed);
+    const historyArray: Array<{ role: string; content: string }> = Array.isArray(history) ? history : [];
 
-    const systemInstruction = `You are Peach Match AI, the expert Creative Director, pricing architect, and supportive partner for business owners on Peach Network in Birmingham, AL.
-You speak like a trusted, encouraging friend who explains design clearly, protects business owners from under-scoping, and ensures creatives are paid fairly.
+    // Check if the user is answering a previous diagnosis OR if this is the first open-ended inquiry
+    // If history has at least 1 previous assistant turn, user is answering diagnostic questions.
+    const hasPreviousDiagnosticTurn = historyArray.some((h) => h.role === "assistant");
 
-PEACH RATE LAW:
-1 Peach Coin = $50 USD.
-Every price MUST state both Coins and USD ($50 per coin). All projects include 3 revision rounds and 100% administrative ownership transfer upon completion.
+    // Also check if user message explicitly provides complete specifications upfront:
+    const qLower = trimmed.toLowerCase();
+    const hasExplicitTierSpecified =
+      /(landing page|e-commerce|ecommerce|shopify|webflow|table reservations|menu and hours|brand sheet|logo overhaul|tabletop shoot|culinary shoot|portrait session|carousel drop|monthly social|flyer launch kit|packaging die-line)/.test(
+        qLower
+      );
 
-2026 MASTER 3-TIER SCOPING CATALOG:
+    const isDiagnosisPhase = !hasPreviousDiagnosticTurn && !hasExplicitTierSpecified;
+
+    // ==========================================
+    // PHASE 1: DIAGNOSE FIRST (No pricing on message 1)
+    // ==========================================
+    if (isDiagnosisPhase) {
+      const diag = generateDefaultDiagnostic(masterCat.id, trimmed);
+      return NextResponse.json({
+        mode: "diagnostic",
+        headline: diag.headline,
+        answer: diag.answer,
+        diagnosticQuestions: diag.questions,
+        scope: null,
+        matchedCreatives: [],
+      });
+    }
+
+    // ==========================================
+    // PHASE 2: ONE DEFINITIVE RECOMMENDATION
+    // ==========================================
+    const systemInstruction = `You are Peach Match AI, a Senior Creative Director at Peach Network in Birmingham, AL.
+You speak like a calm, high-end agency concierge. Keep your answers brief, confident, and scannable in 5 seconds.
+
+MASTER PRICING LAW:
+1 Peach Coin = Exactly $50 USD.
+Every project includes 3 revision rounds and 100% administrative site/asset transfer upon completion.
+
+2026 MASTER RATES TIERS:
 1. Website Design:
    • Option A: Landing Page / Conversion Hub — 10 Coins ($500), 5–7 Days.
-     Deliverables: 1 high-converting responsive page, hero section, value pillars, social proof, contact form, Webflow/Squarespace/Framer/Figma, custom domain hookup.
-     Requires from business: Headline, core service list, brand colors/logo, photos or stock imagery.
    • Option B: Standard Multi-Page Business Site (3–5 Pages) — 18 Coins ($900), 8–12 Days.
-     Deliverables: Up to 5 custom responsive pages (Home, About, Services, Gallery, Contact), mobile responsive breakpoints, SEO setup, contact routing, live staging link.
-     Requires from business: Page copy/content, team photos, domain login credentials.
-   • Option C: Advanced Retail E-Commerce or Restaurant Hub — 26 Coins ($1,300), 12–16 Days.
-     Deliverables: Full 5–8 page architecture on Shopify or Webflow; Retail: Product detail pages, variant selectors, zoom gallery, cart drawer; Restaurant: Interactive food/drink menu, table reservation integration, online ordering links; Brand Vault backup.
-     Requires from business: Product catalog with photos & variants OR full food & drink menu with prices, payment gateway setup (Stripe/Square).
-
+   • Option C: Advanced Retail E-Commerce or Restaurant Hub — 26 Coins ($1,300), 12–16 Days (Shopify/Webflow, product variants or digital menus + table reservations/ordering).
+   • Add-On: On-Location Photographer Pairing (+12 Coins / $600 USD).
 2. Branding Design:
-   • Option A: Core Logo & Vector Kit — 4 Coins ($200), 3–4 Days (Primary logo + secondary mark, scalable vectors .AI, .SVG, .EPS, .PNG, commercial rights).
-     Requires from business: Company name, target audience, 2–3 visual reference links.
-   • Option B: Brand Identity Starter & Brand Sheet — 6 Coins ($300), 4–5 Days (Primary, secondary, submarks, 1-Page Master Brand Sheet with colors & typography pairings).
-     Requires from business: Mission statement, tone of voice, competitor examples.
-   • Option C: Full Commercial Brand Identity Overhaul — 12 Coins ($600), 7–10 Days (Full system, 4 variations, stationery suite, social avatar kit, 12-page brand guidelines PDF).
-     Requires from business: Detailed questionnaire, existing assets, participation in 2 review rounds.
-
+   • Option A: Core Logo & Vector Kit — 4 Coins ($200), 3–4 Days.
+   • Option B: Brand Identity Starter & Brand Sheet — 6 Coins ($300), 4–5 Days (Logos + typography + color palette).
+   • Option C: Full Commercial Brand Identity Overhaul — 12 Coins ($600), 7–10 Days (4 logo variations, stationery, 12-page brand guidelines).
 3. Commercial Photography:
-   • Option A: Executive & Creative Portrait Session — 6 Coins ($300), 3–5 Days (1-hr on-location/studio, 5 retouched portraits).
-     Requires from business: Wardrobe selection, location confirmation, arrival on time.
-   • Option B: Product Tabletop Session (Footwear / Retail) — 10 Coins ($500), 5–7 Days (Up to 5 products, 15 retouched images, clean white cutouts).
-     Requires from business: Physical products delivered in pristine condition, shot list/angles.
-   • Option C: On-Location Restaurant, Culinary & Brand Shoot — 12 Coins ($600), 5–7 Days (2 hrs on-location, 10 styled dishes, dining room action, 20 retouched photos).
-     Requires from business: Venue shoot window during prep hours, kitchen staff styling dishes fresh.
-
+   • Option A: Executive & Creative Portrait Session — 6 Coins ($300), 3–5 Days (5 retouched portraits).
+   • Option B: Product Tabletop Session (Footwear / Retail) — 10 Coins ($500), 5–7 Days (Up to 5 products, 15 retouched images).
+   • Option C: On-Location Restaurant, Culinary & Brand Shoot — 12 Coins ($600), 5–7 Days (2 hrs, 10 styled dishes, 20 retouched photos).
 4. Social Media Design:
-   • Option A: Social Campaign Launch Pack (4 Posts) — 3 Coins ($150), 2–3 Days (4 static feed + 9:16 story designs, editable source files).
-     Requires from business: Headlines, dates, promotional offer details, logo files.
-   • Option B: High-Converting Multi-Slide Carousel Drop — 4 Coins ($200), 3–4 Days (6–8 slide seamless carousel, hook slide, CTA slide, caption copy).
-     Requires from business: Topic bullet points, product specs, brand fonts/colors.
-   • Option C: Monthly Social Suite + Video Reels / Motion Teasers — 8 Coins ($400), 5–7 Days (12 branded assets, 2 animated reels 15–30s).
-     Requires from business: Monthly campaign goals, raw video clips/photos, brand kit.
-
+   • Option A: Social Campaign Launch Pack (4 Posts) — 3 Coins ($150), 2–3 Days.
+   • Option B: High-Converting Multi-Slide Carousel Drop — 4 Coins ($200), 3–4 Days.
+   • Option C: Monthly Social Suite + Video Reels / Motion Teasers — 8 Coins ($400), 5–7 Days.
 5. Graphic Design:
-   • Option A: Quick Task / Minor Graphic Revision — 1 Coin ($50), 1–2 Days (Business card layout, social header, text update).
-     Requires from business: Existing vector file or high-res file and exact text changes.
-   • Option B: Commercial Event / Promo Flyer Launch Kit — 2 Coins ($100), 2–3 Days (Single/double-sided flyer, 1:1, 9:16, 300 DPI print PDF with bleeds, QR code).
-     Requires from business: Event date, venue, headliners, ticket link, high-res photos.
-   • Option C: Multi-Page Menu, Brochure or Packaging Die-Line — 6 Coins ($300), 4–6 Days (4-page menu/brochure OR box/label dieline + 3D mockup).
-     Requires from business: Printer template specs, finalized menu/copy text, ingredients/nutrition.
+   • Option A: Quick Task / Minor Graphic Revision — 1 Coin ($50), 1–2 Days.
+   • Option B: Commercial Event / Promo Flyer Launch Kit — 2 Coins ($100), 2–3 Days.
+   • Option C: Multi-Page Menu, Brochure or Packaging Die-Line — 6 Coins ($300), 4–6 Days.
 
-BEHAVIOR RULES:
-1. Determine what the client needs:
-   - If the client's request clearly specifies one of these tiers (e.g. "I need an event flyer with QR code" -> Option B: 2 Coins; or "I need a 4-page restaurant menu" -> Option C: 6 Coins; or "I need an e-commerce website for shoes" -> Option C: 26 Coins), suggest that exact tier with its deliverables, turnaround, and what the business needs to provide.
-   - If the client is vague (e.g. "I need a website" or "I want branding" or "I need photos"), set isVague: true and present all 3 tiers (Option A, Option B, Option C) so the client can select one.
-   - Talk to the business owner like a supportive friend! Explain what each tier comes with and what they require from the business.
-2. Return 3 vetted creatives from our app who can do the project based on their profile, including what they have a history of designing (e.g., Nia Carter for restaurant websites and e-commerce UI; Jordan Ellis for sports/event flyers; Maya Brooks for brand identity and beverage packaging; Elijah Vance for footwear/tabletop photography and culinary shoots).
-
-RESPONSE FORMAT (JSON STRICT):
-{
-  "answer": "Warm, encouraging friend-like advice explaining the options, pricing in coins and USD, and what each tier requires from the business.",
-  "companionInsight": "A supportive 1-2 sentence pro-tip for this business owner.",
-  "isVague": boolean,
-  "categoryId": "website_design" | "branding_design" | "commercial_photography" | "social_media" | "graphic_design",
-  "selectedTier": "option_a" | "option_b" | "option_c",
-  "scope": {
-    "title": "Exact title of recommended tier",
-    "category": "Website" | "Brand & Illustration" | "Photography" | "Design",
-    "serviceKey": "string",
-    "coins": number,
-    "usdAmount": number,
-    "deliverables": ["List of deliverables"],
-    "requiredFromBusiness": ["List of what the business owner must provide"],
-    "estimatedTurnaround": "e.g., 8–12 Business Days",
-    "revisionRounds": 3,
-    "reason": "Clear explanation of how the project is scoped and why this coin investment fits."
-  },
-  "topCreativeIds": [
-    { "id": "creative_id", "score": 98, "reason": "Specific reason citing their past design history and industry fit" }
-  ]
-}`;
+CRITICAL RULES FOR RECOMMENDATION:
+1. Give ONE Definitive Recommendation that precisely fits the user's technical requirements and asset readiness.
+2. State the exact package name, coins, USD, turnaround, and what is required from the business.
+3. Keep the text concise: 2 short paragraphs max. No clutter. No "tips".
+4. Select 3 skill-accurate creatives whose specialties and verified portfolios prove they can execute this exact tier.`;
 
     const compactPool = pool.map((c) => ({
       id: c.id,
       name: c.name,
-      level: c.peach_level,
+      headline: c.headline,
       hub: c.hub,
       specialties: c.specialties,
-      bio: c.bio,
       historyOfDesigning: c.featured_work.title,
       industry: c.featured_work.industry,
     }));
 
-    const prompt = `CLIENT QUERY / PROJECT REQUEST:
+    const prompt = `CLIENT BRIEF & DIAGNOSTIC CONTEXT:
 """${trimmed}"""
 
-RECENT CONVERSATION HISTORY:
-${JSON.stringify(history || [])}
+RECENT CHAT HISTORY:
+${JSON.stringify(historyArray.slice(-4))}
 
-AVAILABLE CREATIVES (WITH DESIGN HISTORY):
+AVAILABLE CREATIVES:
 ${JSON.stringify(compactPool, null, 2)}
 
-Provide your response in strictly valid JSON matching the format described.`;
+Provide your response in strictly valid JSON:
+{
+  "mode": "recommendation",
+  "answer": "Concise 2-sentence explanation of why this specific package is the right commercial recommendation.",
+  "scope": {
+    "title": "Exact title of recommended tier",
+    "category": "Website" | "Brand & Illustration" | "Photography" | "Design",
+    "serviceKey": "website_design" | "branding_design" | "commercial_photography" | "social_media" | "graphic_design",
+    "coins": number,
+    "usdAmount": number,
+    "deliverables": ["3 to 4 concrete deliverables"],
+    "requiredFromBusiness": ["2 to 3 assets required from client"],
+    "estimatedTurnaround": "e.g., 8–12 Business Days",
+    "revisionRounds": 3,
+    "reason": "1-sentence reason why this exact package fits"
+  },
+  "topCreativeIds": [
+    { "id": "creative_id", "score": 98, "reason": "Specific skill fit citing past work" }
+  ]
+}`;
 
     let parsed: any = null;
 
@@ -339,115 +473,68 @@ Provide your response in strictly valid JSON matching the format described.`;
               thinkingLevel: ThinkingLevel.LOW,
             },
           },
-          timeoutMs: 22000,
+          timeoutMs: 20000,
         });
         if (rawText) {
           parsed = JSON.parse(rawText);
         }
       } catch (modelErr) {
-        console.warn("Gemini model temporary error, using 2026 catalog fallback engine:", modelErr);
+        console.warn("Gemini model fallback:", modelErr);
       }
     }
 
-    // Deterministic fallback using 2026 Master Catalog if AI unavailable
+    // Deterministic fallback recommendation engine
     if (!parsed || !parsed.scope) {
-      const q = trimmed.toLowerCase();
       const cat = masterCat;
-      let selectedOptionKey: "option_a" | "option_b" | "option_c" = "option_b";
-      let isVague = false;
-      let answer = "";
-      let companionInsight = "I'm right here with you! Every project on Peach is protected by escrow, includes 3 revision rounds, and guarantees full ownership transfer.";
+      let optKey: "option_a" | "option_b" | "option_c" = "option_b";
 
       if (cat.id === "website_design") {
-        if (/(e-commerce|ecommerce|store|shop|shoe|restaurant|menu|online ordering|reservation)/.test(q)) {
-          selectedOptionKey = "option_c";
-          answer =
-            "For a retail store or restaurant, you need a high-performing architecture that handles menus, ordering, or product variants. Option C: Advanced Retail E-Commerce or Restaurant Hub is 26 Peach Coins ($1,300 USD). It comes with full 5–8 page architecture on Shopify or Webflow, interactive food & drink menus or product variant selectors, and full administrative site transfer.\n\nWhat we require from you: your product catalog/photos or menu items with pricing, and your merchant login (Square/Stripe).";
-          companionInsight =
-            "Diners and shoppers browse heavily on mobile. A tailored Shopify or Webflow hub with instant cart checkout or tap-to-order menus will drastically boost your conversions!";
-        } else if (/(landing|single page|lead capture|one page)/.test(q)) {
-          selectedOptionKey = "option_a";
-          answer =
-            "A fast, high-converting digital presence! Option A: Landing Page / Conversion Hub is 10 Peach Coins ($500 USD). It includes 1 high-converting responsive page with a hero section, value pillars, social proof, and lead capture form.\n\nWhat we require from you: headline, core services list, logo files, and preferred photos.";
-          companionInsight =
-            "A clean landing page is the fastest way to validate an idea or launch a campaign without spending weeks building out subpages.";
+        if (/(e-commerce|ecommerce|store|shop|shoe|restaurant|online ordering|reservation|menu)/.test(qLower)) {
+          optKey = "option_c"; // 26 Coins
+        } else if (/(landing|single page|lead capture|one page)/.test(qLower)) {
+          optKey = "option_a"; // 10 Coins
         } else {
-          isVague = true;
-          selectedOptionKey = "option_b";
-          answer =
-            "Hey friend! For website design, Peach Network offers 3 master tiers calibrated to your business stage. If you're looking for a standard company presence, Option B: Standard Multi-Page Business Site (3–5 Pages) is 18 Coins ($900 USD). If you just need a single conversion page, Option A is 10 Coins ($500 USD). Or if you need e-commerce/restaurant ordering, Option C is 26 Coins ($1,300 USD). You can pick any tier below to see what it includes and what we require from your business!";
-          companionInsight =
-            "Check which tier matches your current goals. You can always start with Option A or B and expand later!";
+          optKey = "option_b"; // 18 Coins
         }
       } else if (cat.id === "branding_design") {
-        if (/(overhaul|full brand|guidelines|stationery|rebrand)/.test(q)) {
-          selectedOptionKey = "option_c";
-          answer =
-            "A complete visual overhaul! Option C: Full Commercial Brand Identity Overhaul is 12 Peach Coins ($600 USD). You get primary, secondary, horizontal, and vertical logo variations, custom color palette, stationery suite, and a 12-page commercial brand guidelines PDF.\n\nWhat we require from you: brand questionnaire response, existing assets, and active feedback across 2 review rounds.";
-        } else if (/(brand sheet|starter|palette|typography)/.test(q)) {
-          selectedOptionKey = "option_b";
-          answer =
-            "The sweet spot for consistency! Option B: Brand Identity Starter & Brand Sheet is 6 Peach Coins ($300 USD). You get your primary logo, secondary marks, and a 1-Page Master Brand Sheet with color palettes (Hex, RGB, CMYK) and font pairings.\n\nWhat we require from you: mission statement, preferred vibe/tone of voice, and competitor examples.";
+        if (/(overhaul|full brand|guidelines|stationery|rebrand)/.test(qLower)) {
+          optKey = "option_c"; // 12 Coins
+        } else if (/(brand sheet|starter|palette|typography)/.test(qLower)) {
+          optKey = "option_b"; // 6 Coins
         } else {
-          isVague = true;
-          selectedOptionKey = "option_a";
-          answer =
-            "Hey! For branding, Peach Network has 3 straightforward options: Option A: Core Logo & Vector Kit (4 Coins / $200 USD) for a clean standalone mark; Option B: Brand Identity Starter & Brand Sheet (6 Coins / $300 USD) for logos plus full typography & color sheet; or Option C: Full Commercial Brand Overhaul (12 Coins / $600 USD) with stationery and 12-page brand guidelines. Take a look at the 3 tiers below to select your best fit!";
-          companionInsight =
-            "Having a master brand sheet (Option B) prevents mismatched colors and fonts across your social media and physical signage!";
+          optKey = "option_a"; // 4 Coins
         }
       } else if (cat.id === "commercial_photography") {
-        if (/(restaurant|food|culinary|chef|dish)/.test(q)) {
-          selectedOptionKey = "option_c";
-          answer =
-            "On-location food & venue photography! Option C: On-Location Restaurant & Brand Shoot is 12 Peach Coins ($600 USD). Includes a 2-hour shoot at your venue, 10 signature plated dishes styled under professional lighting, dining room and bar action shots, and 20 retouched commercial photos.\n\nWhat we require from you: a 2-hour window during prep hours and kitchen staff ready to plate dishes fresh.";
-        } else if (/(tabletop|product|shoe|retail|bottle)/.test(q)) {
-          selectedOptionKey = "option_b";
-          answer =
-            "Clean studio product imagery! Option B: Product Tabletop Session (Footwear / Retail) is 10 Peach Coins ($500 USD). Covers up to 5 physical products, multiple angles, detail closeups, clean white cutouts, and 15 retouched commercial images.\n\nWhat we require from you: physical product samples shipped/delivered clean, and your required angle checklist.";
+        if (/(restaurant|food|culinary|chef|dish)/.test(qLower)) {
+          optKey = "option_c"; // 12 Coins
+        } else if (/(tabletop|product|shoe|retail|bottle)/.test(qLower)) {
+          optKey = "option_b"; // 10 Coins
         } else {
-          selectedOptionKey = "option_a";
-          answer =
-            "Executive portraits and headshots! Option A: Executive & Creative Portrait Session is 6 Peach Coins ($300 USD). 1-hour session on location or studio, mobile lighting, and 5 retouched master portraits.\n\nWhat we require from you: wardrobe selection and on-time arrival.";
+          optKey = "option_a"; // 6 Coins
         }
       } else if (cat.id === "social_media") {
-        if (/(monthly|30 day|calendar|video|reel)/.test(q)) {
-          selectedOptionKey = "option_c";
-          answer =
-            "A full month of branded content! Option C: Monthly Social Suite + Video Reels is 8 Peach Coins ($400 USD). Includes 12 custom branded assets scheduled for a 30-day calendar, plus 2 animated motion video teasers (15–30s).\n\nWhat we require from you: monthly campaign goals and raw photos/video clips.";
-        } else if (/(carousel|slide)/.test(q)) {
-          selectedOptionKey = "option_b";
-          answer =
-            "High-converting carousel storytelling! Option B: Multi-Slide Carousel Drop is 4 Peach Coins ($200 USD). 1 seamless 6–8 slide carousel with custom hook and CTA slide plus caption copy.\n\nWhat we require from you: topic bullet points or outline and product details.";
+        if (/(monthly|30 day|calendar|video|reel)/.test(qLower)) {
+          optKey = "option_c"; // 8 Coins
+        } else if (/(carousel|slide)/.test(qLower)) {
+          optKey = "option_b"; // 4 Coins
         } else {
-          selectedOptionKey = "option_a";
-          answer =
-            "Launch campaign pack! Option A: Social Campaign Launch Pack (4 Posts) is 3 Peach Coins ($150 USD). 4 coordinated feed designs (1:1 Square) + 9:16 Story formats with editable source files.\n\nWhat we require from you: headlines, dates, and promo offer details.";
+          optKey = "option_a"; // 3 Coins
         }
       } else {
         // Graphic Design
-        if (/(menu|packaging|die-line|dieline|box|brochure)/.test(q)) {
-          selectedOptionKey = "option_c";
-          answer =
-            "Multi-page print or packaging! Option C: Multi-Page Menu, Brochure or Packaging Die-Line is 6 Peach Coins ($300 USD). Up to 4-page folded menu or complete box/label die-line with press-ready bleeds and 3D digital mockup.\n\nWhat we require from you: printer template specs and proofread menu/ingredient copy.";
-        } else if (/(flyer|poster|event|promo)/.test(q)) {
-          selectedOptionKey = "option_b";
-          answer =
-            "Commercial event promotion! Option B: Commercial Event / Promo Flyer Launch Kit is 2 Peach Coins ($100 USD). High-impact single or double-sided flyer with 1:1 feed square, 9:16 story format, 300 DPI print-ready PDF with bleeds, and QR code placement.\n\nWhat we require from you: event date, venue, headliners, ticket link, and 1–2 photos.";
+        if (/(menu|packaging|die-line|dieline|box|brochure)/.test(qLower)) {
+          optKey = "option_c"; // 6 Coins
+        } else if (/(flyer|poster|event|promo)/.test(qLower)) {
+          optKey = "option_b"; // 2 Coins
         } else {
-          selectedOptionKey = "option_a";
-          answer =
-            "Quick design revision! Option A: Quick Task / Minor Graphic Revision is 1 Peach Coin ($50 USD). Business card layout, social header, or text/price update on existing artwork with print-ready PDF.\n\nWhat we require from you: existing design file and exact text changes.";
+          optKey = "option_a"; // 1 Coin
         }
       }
 
-      const opt = cat.options[selectedOptionKey];
+      const opt = cat.options[optKey];
       parsed = {
-        answer,
-        companionInsight,
-        isVague,
-        categoryId: cat.id,
-        selectedTier: selectedOptionKey,
+        mode: "recommendation",
+        answer: `Based on your technical requirements, I recommend **${opt.tierName}**. This gives your business a complete commercial setup with 100% ownership transfer and 3 included revision rounds.`,
         scope: {
           title: opt.tierName,
           category: cat.categoryTag,
@@ -458,21 +545,20 @@ Provide your response in strictly valid JSON matching the format described.`;
           requiredFromBusiness: opt.requiredFromBusiness,
           estimatedTurnaround: opt.typicalTurnaround,
           revisionRounds: 3,
-          reason: `Scoped from 2026 Master Catalog (${opt.coins} Coins = $${opt.coins * PEACH_COIN_USD_RATE} USD). Includes 3 revision rounds and 100% administrative transfer.`,
+          reason: `Locked in based on your required features, assets, and timeline (${opt.coins} Coins = $${opt.coins * PEACH_COIN_USD_RATE} USD).`,
         },
         topCreativeIds: [
-          { id: pool[0]?.id || "cr_nia", score: 98, reason: "Specialist with verified design history in this exact category." },
-          { id: pool[1]?.id || "cr_jordan", score: 95, reason: "Strong commercial portfolio and rapid turnaround record." },
-          { id: pool[2]?.id || "cr_maya", score: 94, reason: "Proven track record with local businesses and commercial brand deliverables." },
+          { id: pool[0]?.id || "cr_nia", score: 98, reason: "Verified commercial portfolio executing this exact tier." },
+          { id: pool[1]?.id || "cr_maya", score: 96, reason: "Specialized in commercial branding and print production." },
+          { id: pool[2]?.id || "cr_jordan", score: 94, reason: "Proven track record with high-impact commercial deliverables." },
         ],
       };
     }
 
-    const catObj = MASTER_2026_CATALOG[parsed.categoryId] || masterCat;
-    const scopeData = parsed.scope || {};
-    const coins = Math.max(1, Number(scopeData.coins) || catObj.options.option_a.coins);
+    const scopeData = parsed.scope;
+    const coins = Math.max(1, Number(scopeData.coins) || 10);
 
-    // Filter matched creatives to top 3 based on category / industry history
+    // Skill-accurate creative matching
     const matchedIds: Array<{ id: string; score: number; reason: string }> = Array.isArray(parsed?.topCreativeIds)
       ? parsed.topCreativeIds
       : [];
@@ -491,10 +577,11 @@ Provide your response in strictly valid JSON matching the format described.`;
       }
     }
 
-    // Fill pool to 3 creatives prioritized by relevant industry history
+    // Ensure 3 creatives prioritized by exact skill alignment
+    const targetTag = scopeData.category?.toLowerCase() || "design";
     const sortedPool = [...pool].sort((a, b) => {
-      const aMatches = a.specialties.some((s) => s.toLowerCase().includes(catObj.categoryTag.toLowerCase()));
-      const bMatches = b.specialties.some((s) => s.toLowerCase().includes(catObj.categoryTag.toLowerCase()));
+      const aMatches = a.specialties.some((s) => s.toLowerCase().includes(targetTag));
+      const bMatches = b.specialties.some((s) => s.toLowerCase().includes(targetTag));
       if (aMatches && !bMatches) return -1;
       if (!aMatches && bMatches) return 1;
       return 0;
@@ -507,63 +594,49 @@ Provide your response in strictly valid JSON matching the format described.`;
       }
     }
 
-    // Assemble the 3 catalog tiers (Option A, Option B, Option C)
-    const catalogTiers: CatalogTierOption[] = [
-      catObj.options.option_a,
-      catObj.options.option_b,
-      catObj.options.option_c,
-    ];
-
     return NextResponse.json({
+      mode: "recommendation",
       answer: parsed.answer,
-      companionInsight: parsed.companionInsight || "We are here to support your business every step of the way!",
-      isVague: Boolean(parsed.isVague),
-      categoryId: catObj.id,
-      catalogTiers,
+      diagnosticQuestions: null,
       scope: {
-        title: scopeData.title || catObj.options.option_b.tierName,
-        category: scopeData.category || catObj.categoryTag,
-        serviceKey: scopeData.serviceKey || catObj.id,
+        title: scopeData.title,
+        category: scopeData.category || "Design",
+        serviceKey: scopeData.serviceKey || "website_design",
         coins,
         usdAmount: coins * PEACH_COIN_USD_RATE,
-        deliverables:
-          Array.isArray(scopeData.deliverables) && scopeData.deliverables.length > 0
-            ? scopeData.deliverables
-            : catObj.options.option_b.deliverables,
-        requiredFromBusiness:
-          Array.isArray(scopeData.requiredFromBusiness) && scopeData.requiredFromBusiness.length > 0
-            ? scopeData.requiredFromBusiness
-            : catObj.options.option_b.requiredFromBusiness,
-        estimatedTurnaround: scopeData.estimatedTurnaround || catObj.options.option_b.typicalTurnaround,
+        deliverables: scopeData.deliverables,
+        requiredFromBusiness: scopeData.requiredFromBusiness,
+        estimatedTurnaround: scopeData.estimatedTurnaround,
         revisionRounds: 3,
-        reason: scopeData.reason || `Scoped at ${coins} Peach Coins ($${coins * PEACH_COIN_USD_RATE} USD) from the 2026 Master Catalog.`,
+        reason: scopeData.reason,
       },
       matchedCreatives: matchedCreatives.slice(0, 3),
     });
   } catch (err: any) {
     console.warn("AI Consult safe fallback:", err?.message || err);
-    const cat = MASTER_2026_CATALOG.graphic_design;
-    const opt = cat.options.option_b;
     return NextResponse.json({
-      answer:
-        "Peach Match AI scoped your request using the 2026 Master Catalog! On Peach Network, 1 Peach Coin equals $50.00 USD of vetted studio work, including 3 revision rounds and 100% administrative transfer.",
-      companionInsight: "We are right here with you! Tell us more details anytime to adjust your scope.",
-      isVague: false,
-      categoryId: cat.id,
-      catalogTiers: [cat.options.option_a, cat.options.option_b, cat.options.option_c],
-      scope: {
-        title: opt.tierName,
-        category: cat.categoryTag,
-        serviceKey: cat.id,
-        coins: opt.coins,
-        usdAmount: opt.coins * PEACH_COIN_USD_RATE,
-        deliverables: opt.deliverables,
-        requiredFromBusiness: opt.requiredFromBusiness,
-        estimatedTurnaround: opt.typicalTurnaround,
-        revisionRounds: 3,
-        reason: `Priced at ${opt.coins} Peach Coins ($${opt.coins * PEACH_COIN_USD_RATE} USD) via the 2026 Master Catalog.`,
-      },
-      matchedCreatives: APPROVED_CREATIVES_FALLBACK.slice(0, 3),
+      mode: "diagnostic",
+      headline: "Let's diagnose your project requirements",
+      answer: "Before recommending an exact scope, let me ask 3 quick questions so we don't under-scope or over-quote:",
+      diagnosticQuestions: [
+        {
+          id: "q_scope",
+          question: "What core deliverable do you need?",
+          pills: ["Landing Page / Web Design", "Brand Identity & Logo Suite", "Commercial Photography / Product Shoot", "Event Flyer / Print Promo"],
+        },
+        {
+          id: "q_assets",
+          question: "Do you have brand assets and copy ready?",
+          pills: ["Assets & Copy Ready", "Need Creative to Sourcing/Editing", "Starting from Scratch"],
+        },
+        {
+          id: "q_timeline",
+          question: "What is your target completion timeline?",
+          pills: ["Urgent (Within 1 Week)", "Standard (2–3 Weeks)", "Flexible Timeline"],
+        },
+      ],
+      scope: null,
+      matchedCreatives: [],
     });
   }
 }

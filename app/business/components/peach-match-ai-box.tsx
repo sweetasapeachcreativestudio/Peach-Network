@@ -2,22 +2,17 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { AskArtDirectorButton } from "@/app/components/ask-art-director-modal";
 
 interface PeachMatchAIBoxProps {
   initialAvailableCoins: number;
   businessName: string;
 }
 
-export interface CatalogTierOption {
-  id: "option_a" | "option_b" | "option_c";
-  tierName: string;
-  coins: number;
-  usdEquivalent: number;
-  typicalTurnaround: string;
-  deliverables: string[];
-  scopeSummary: string;
-  requiredFromBusiness: string[];
-  bestFor: string;
+interface DiagnosticQuestion {
+  id: string;
+  question: string;
+  pills: string[];
 }
 
 interface ScopedProject {
@@ -56,55 +51,44 @@ interface MatchedCreative {
   };
 }
 
-interface ClarificationOption {
-  label: string;
-  value: string;
-}
-
-interface ClarificationData {
-  needed: boolean;
-  question: string;
-  options: ClarificationOption[];
-}
-
 interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
-  companionTip?: string;
-  clarification?: ClarificationData | null;
-  catalogTiers?: CatalogTierOption[];
-  isVague?: boolean;
+  headline?: string;
+  mode?: "diagnostic" | "recommendation" | "fallback";
+  isRateLimit?: boolean;
+  diagnosticQuestions?: DiagnosticQuestion[] | null;
   scope?: ScopedProject | null;
   matchedCreatives?: MatchedCreative[];
   showCreatives?: boolean;
 }
 
-// Strictly NO ICONS in starter prompts as requested
+// Initial starter prompts shown ONLY on welcome screen before chat starts
 const starterPrompts = [
   {
-    label: "Website Design Scope",
-    prompt: "I need a website designed for my business. What are the 3 tiers and what does each come with?",
+    label: "Restaurant Website",
+    prompt: "I need a website for my restaurant. What do you need to diagnose my scope?",
   },
   {
-    label: "Shoe E-Commerce Hub",
-    prompt: "I need a website for a shoe company with e-commerce store and shoe box packaging dielines.",
+    label: "Brand Identity Suite",
+    prompt: "I need a brand identity and logo suite designed for my business.",
   },
   {
-    label: "Restaurant Food & Web",
-    prompt: "I need a website for a restaurant with digital food & drink menus, plus a commercial photography shoot for 10 signature dishes.",
+    label: "Shoe E-Commerce Store",
+    prompt: "I need an e-commerce website for a footwear brand with product detail pages and cart.",
   },
   {
-    label: "Branding & 3-Tier Suites",
-    prompt: "I need branding done for my business. Explain the 3 tiers and what you require from me as the business owner.",
+    label: "Food & Dish Photography",
+    prompt: "I need an on-location commercial photography shoot for signature dishes at my venue.",
   },
   {
-    label: "Promo Event Flyer Kit",
-    prompt: "I need an event flyer with QR code, headline hierarchy, and social story formats.",
+    label: "Event Promo Flyer Kit",
+    prompt: "I need a high-impact commercial event flyer with 300 DPI print and social story formats.",
   },
   {
     label: "Monthly Social Media Suite",
-    prompt: "I need monthly social media graphics and video reels. What is the scope and turnaround?",
+    prompt: "I need a monthly social media content package with video reels and static posts.",
   },
 ];
 
@@ -134,15 +118,14 @@ export function PeachMatchAIBox({
     industry?: string;
   } | null>(null);
 
-  // Initial welcome message - strictly NO ICONS
+  // Initial welcome message - calm, high-end design agency concierge
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome-msg",
       role: "assistant",
-      content: `Hey friend! I am Peach Match AI, your creative director and scoping partner on Peach Network.
-I scope projects using the 2026 Master Rates Catalog (1 Peach Coin = $50.00 USD).
-Tell me what you are building—website design, brand identity, commercial photography, social media, or flyers.
-If your request is broad, I will lay out the 3 master tiers (Option A, B, and C) with exact deliverables and what we require from you, then match 3 vetted creatives based on their verified design history.`,
+      content: `Welcome to Peach Match AI v1.1. I act as your agency Creative Director.
+Tell me what you are planning to build—a website, branding suite, commercial photo shoot, or social campaign.
+I will ask 2 to 3 quick diagnostic questions to understand your technical requirements and assets, then lock in one definitive package and pair you with 3 vetted specialists.`,
     },
   ]);
 
@@ -154,7 +137,7 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
     setPrompt(e.target.value);
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 140)}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
   };
 
@@ -186,7 +169,7 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
         content: m.content,
       }));
 
-      const res = await fetch("/api/projects/ai-consult", {
+      const res = await fetch("/api/peach-match", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -198,62 +181,75 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Peach Match AI could not process your message.");
 
+      if (data.rateLimit || data.error === "rate_limit") {
+        const fallbackMsg: ChatMessage = {
+          id: `assistant-${Date.now()}`,
+          role: "assistant",
+          content:
+            data.answer ||
+            "Peach Match AI v1.1 is experiencing high volume right now—click **Ask an Art Director** in the top bar and our team will scope your project for free.",
+          headline: data.headline || "High Volume Notice",
+          mode: "fallback",
+          isRateLimit: true,
+          diagnosticQuestions: null,
+          scope: null,
+          matchedCreatives: [],
+          showCreatives: false,
+        };
+        setMessages((prev) => [...prev, fallbackMsg]);
+        return;
+      }
+
       const assistantMsg: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
-        content: data.answer || "Here is your project scope and pricing.",
-        companionTip: data.companionInsight,
-        clarification: data.clarification?.needed ? data.clarification : null,
-        catalogTiers: Array.isArray(data.catalogTiers) ? data.catalogTiers : [],
-        isVague: Boolean(data.isVague),
+        content: data.answer || "Here is your recommended project scope.",
+        headline: data.headline,
+        mode: data.mode || (data.scope ? "recommendation" : "diagnostic"),
+        isRateLimit: false,
+        diagnosticQuestions: Array.isArray(data.diagnosticQuestions) ? data.diagnosticQuestions : null,
         scope: data.scope || null,
         matchedCreatives: Array.isArray(data.matchedCreatives) ? data.matchedCreatives : [],
-        showCreatives: !data.isVague, // If specific tier is clear, reveal creatives; if vague, wait for tier choice
+        showCreatives: Boolean(data.scope),
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (err: any) {
-      const friendlyNotice = err?.message || "Failed to consult Peach Match AI. Please try again.";
-      setErrorMsg(friendlyNotice);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `err-${Date.now()}`,
-          role: "assistant",
-          content:
-            "Peach Match AI is right here! To keep moving forward, you can select one of the popular project scopes below or describe your deliverables.",
-        },
-      ]);
+      const errMsg = String(err?.message || "").toLowerCase();
+      const isRateLimit =
+        errMsg.includes("429") ||
+        errMsg.includes("quota") ||
+        errMsg.includes("rate") ||
+        errMsg.includes("volume") ||
+        errMsg.includes("exhausted");
+
+      if (isRateLimit) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `err-${Date.now()}`,
+            role: "assistant",
+            isRateLimit: true,
+            headline: "High Volume Notice",
+            content:
+              "Peach Match AI v1.1 is experiencing high volume right now—click **Ask an Art Director** in the top bar and our team will scope your project for free.",
+          },
+        ]);
+      } else {
+        setErrorMsg(err?.message || "Failed to consult Peach Match AI. Please try again.");
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `err-${Date.now()}`,
+            role: "assistant",
+            content:
+              "I'm right here! Tell me a bit about your project goals or tap one of the suggested project options.",
+          },
+        ]);
+      }
     } finally {
       setLoading(false);
     }
-  };
-
-  // Switch tier directly from the 3-Tier Scoping Grid
-  const handleSelectTierFromCatalog = (messageId: string, tier: CatalogTierOption, categoryName: string) => {
-    setMessages((prev) =>
-      prev.map((m) => {
-        if (m.id !== messageId) return m;
-        return {
-          ...m,
-          isVague: false,
-          showCreatives: true,
-          scope: {
-            serviceKey: tier.id,
-            title: tier.tierName,
-            category: categoryName || "Design",
-            coins: tier.coins,
-            usdAmount: tier.usdEquivalent,
-            deliverables: tier.deliverables,
-            requiredFromBusiness: tier.requiredFromBusiness,
-            scopeSummary: tier.scopeSummary,
-            estimatedTurnaround: tier.typicalTurnaround,
-            revisionRounds: 3,
-            reason: `Selected ${tier.tierName} (${tier.coins} Coins / $${tier.usdEquivalent} USD). Includes 3 revision rounds and 100% administrative site/asset ownership transfer.`,
-          },
-        };
-      })
-    );
   };
 
   // Instant Top-Up handler
@@ -282,13 +278,6 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
     } finally {
       setTopUpLoading(false);
     }
-  };
-
-  // User confirmed "Yes, hire creatives" for a specific message
-  const handleConfirmHirePrompt = (messageId: string) => {
-    setMessages((prev) =>
-      prev.map((m) => (m.id === messageId ? { ...m, showCreatives: true } : m))
-    );
   };
 
   // Select creative & dispatch offer, creating Creative Brief Sheet & redirecting to /projects/[id]
@@ -321,7 +310,7 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to create project and dispatch offer.");
 
-      setSuccessMsg(`Matched with ${creative.name}! Creative Brief Sheet & Contract created. Redirecting to your workspace...`);
+      setSuccessMsg(`Matched with ${creative.name}! Creative Brief Sheet & Contract created. Redirecting to workspace...`);
       router.push(`/projects/${data.project.id}`);
     } catch (err: any) {
       setErrorMsg(err.message || "Failed to dispatch match invitation.");
@@ -342,37 +331,37 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
   };
 
   return (
-    <div className="bg-[#FFF9F6] border-2 border-[#C84E2D] rounded-3xl shadow-md overflow-hidden flex flex-col transition-all">
-      {/* 1. TOPBAR */}
-      <header className="px-5 py-3.5 bg-[#C84E2D] text-white flex items-center justify-between gap-4">
+    <div className="bg-[#FFFDFB] border border-[#E8D8CF] rounded-3xl shadow-sm overflow-hidden flex flex-col transition-all">
+      {/* 1. TOPBAR - Clean, High-End Agency Concierge Style */}
+      <header className="px-5 py-3.5 bg-[#173328] text-white flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-base font-black tracking-tight text-white uppercase">
-                Peach Match AI
+              <span className="text-sm font-extrabold tracking-tight text-white uppercase">
+                Peach Match AI v1.1
               </span>
-              <span className="text-[10px] font-black tracking-widest text-[#FFF2EB] bg-[#A33B1E] px-2.5 py-0.5 rounded-full uppercase">
-                2026 Master Scoping Engine
+              <span className="text-[10px] font-bold tracking-wider text-[#F2A07E] bg-[#244738] px-2 py-0.5 rounded-full uppercase">
+                Concierge Scoping
               </span>
             </div>
-            <div className="text-[11px] text-[#FFE8DF] font-medium truncate">
-              1 Peach Coin = $50.00 USD &bull; 3-Tier Catalog &bull; Dual Digital Sign-off &bull; 3 Revisions Included
+            <div className="text-[11px] text-[#DCE7E1] font-medium truncate">
+              Diagnose First &bull; 1 Peach Coin = $50.00 USD &bull; 3 Revisions Included &bull; 100% Transfer
             </div>
           </div>
         </div>
 
         {/* Right Actions: Wallet balance + New Chat */}
         <div className="flex items-center gap-2 shrink-0">
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#A33B1E] text-xs font-black text-white">
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#244738] text-xs font-black text-white">
             <span>{availableCoins} Coins</span>
-            <span className="text-[10px] text-[#FFD4C4] font-medium">(${availableCoins * 50})</span>
+            <span className="text-[10px] text-[#A5C1B5] font-medium">(${availableCoins * 50})</span>
           </div>
 
           <button
             type="button"
             onClick={() => handleInstantTopUp(10)}
             disabled={topUpLoading}
-            className="hidden md:inline-flex items-center px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#FFEAE2] text-[#C84E2D] text-xs font-bold transition-colors cursor-pointer"
+            className="hidden md:inline-flex items-center px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#FFF2EB] text-[#173328] text-xs font-bold transition-colors cursor-pointer"
             title="Buy 10 coins ($500 USD)"
           >
             Buy Coins
@@ -381,7 +370,7 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
           <button
             type="button"
             onClick={handleResetChat}
-            className="inline-flex items-center px-3 py-1.5 rounded-xl bg-[#A33B1E] hover:bg-[#8F3319] text-xs font-bold text-white transition-colors cursor-pointer"
+            className="inline-flex items-center px-3 py-1.5 rounded-xl bg-[#244738] hover:bg-[#325d4b] text-xs font-bold text-white transition-colors cursor-pointer"
             title="Start a fresh conversation"
           >
             New Chat
@@ -408,8 +397,8 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
         </div>
       )}
 
-      {/* 2. CHAT STREAM */}
-      <div className="p-4 sm:p-6 space-y-5 max-h-[560px] overflow-y-auto bg-gradient-to-b from-[#FFF5F0] to-white scrollbar-thin">
+      {/* 2. CHAT STREAM - Calm, short, scannable in 5 seconds */}
+      <div className="p-4 sm:p-6 space-y-4 max-h-[540px] overflow-y-auto bg-gradient-to-b from-[#FFFDFB] to-white scrollbar-thin">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -418,7 +407,7 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
             }`}
           >
             {msg.role === "assistant" && (
-              <div className="w-8 h-8 rounded-xl bg-[#C84E2D] text-white flex items-center justify-center text-[11px] font-black shrink-0 shadow-2xs mt-0.5">
+              <div className="w-8 h-8 rounded-xl bg-[#173328] text-white flex items-center justify-center text-[11px] font-black shrink-0 shadow-2xs mt-0.5">
                 PM
               </div>
             )}
@@ -426,143 +415,76 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
             <div
               className={`rounded-2xl leading-relaxed text-xs sm:text-sm ${
                 msg.role === "user"
-                  ? "bg-[#0B2D22] text-[#FFD8C2] p-4 max-w-xl font-medium rounded-tr-none shadow-xs"
-                  : "bg-white border-2 border-[#F2C2B2] text-slate-850 p-4 sm:p-5 max-w-3xl rounded-tl-none shadow-xs space-y-3.5"
+                  ? "bg-[#173328] text-[#F4F1EA] p-4 max-w-xl font-medium rounded-tr-none shadow-xs"
+                  : "bg-white border border-[#EBE4DE] text-slate-850 p-4 sm:p-5 max-w-2xl rounded-tl-none shadow-2xs space-y-3"
               }`}
             >
-              {/* Message text */}
-              <div className="whitespace-pre-wrap leading-relaxed space-y-2">
-                {msg.content.split("\n\n").map((para, pi) => {
-                  if (para.startsWith("###")) {
-                    return (
-                      <h4 key={pi} className="text-sm sm:text-base font-black text-slate-950 mt-2 mb-1">
-                        {para.replace("###", "").trim()}
-                      </h4>
-                    );
-                  }
-                  return (
-                    <p key={pi} className={msg.role === "user" ? "text-[#FFD8C2]" : "text-slate-800"}>
-                      {para}
-                    </p>
-                  );
-                })}
+              {/* Optional punchy diagnosis headline */}
+              {msg.headline && (
+                <div className="text-[11px] font-black uppercase tracking-wider text-[#C84E2D]">
+                  {msg.headline}
+                </div>
+              )}
+
+              {/* Message text - scannable in 5 seconds */}
+              <div className="whitespace-pre-wrap leading-relaxed text-slate-800 text-xs sm:text-sm">
+                {msg.content}
               </div>
 
-              {/* Companion Tip */}
-              {msg.companionTip && (
-                <div className="bg-[#FFF2EB] border-l-4 border-[#C84E2D] p-3 rounded-r-xl text-xs text-slate-700 space-y-0.5">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[#C84E2D] block">
-                    Creative Director Tip:
+              {/* Inline Art Director Action on Rate Limit / High Volume */}
+              {msg.isRateLimit && (
+                <div className="pt-2 border-t border-amber-200/80 flex items-center gap-3 flex-wrap">
+                  <AskArtDirectorButton businessName={businessName} />
+                  <span className="text-[11px] text-stone-500 font-medium">
+                    Free scoping guidance with a senior creative director
                   </span>
-                  <p className="leading-snug text-slate-700 italic">"{msg.companionTip}"</p>
                 </div>
               )}
 
-              {/* REQUIREMENT: 3-TIER MASTER CATALOG SELECTOR (Option A, Option B, Option C) */}
-              {msg.catalogTiers && msg.catalogTiers.length > 0 && (
-                <div className="pt-2 border-t border-[#F2C2B2] space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black uppercase tracking-wider text-[#C84E2D]">
-                      Select 1 of the 3 Master Scoping Tiers:
-                    </span>
-                    <span className="text-[11px] text-slate-500 font-semibold">
-                      1 Coin = $50 USD &bull; Full site &amp; asset transfer
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    {msg.catalogTiers.map((tier) => {
-                      const isSelected = msg.scope?.title === tier.tierName;
-                      return (
-                        <div
-                          key={tier.id}
-                          className={`rounded-2xl p-4 flex flex-col justify-between border-2 transition-all cursor-pointer ${
-                            isSelected
-                              ? "bg-[#FFF4EE] border-[#C84E2D] shadow-sm ring-2 ring-[#C84E2D]/20"
-                              : "bg-white border-[#E9A995] hover:border-[#C84E2D] shadow-2xs"
-                          }`}
-                          onClick={() => handleSelectTierFromCatalog(msg.id, tier, msg.scope?.category || "Design")}
-                        >
-                          <div>
-                            <div className="flex items-center justify-between gap-1 mb-2">
-                              <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-[#FFF2EB] text-[#C84E2D]">
-                                {tier.id.replace("_", " ").toUpperCase()}
-                              </span>
-                              <span className="text-[10px] text-slate-500 font-bold">
-                                {tier.typicalTurnaround}
-                              </span>
-                            </div>
-
-                            <strong className="text-xs font-black text-slate-950 block leading-tight mb-1">
-                              {tier.tierName.split(":")[1]?.trim() || tier.tierName}
-                            </strong>
-
-                            <div className="flex items-baseline gap-1.5 mb-2.5">
-                              <span className="text-xl font-black text-[#C84E2D]">
-                                {tier.coins} Coins
-                              </span>
-                              <span className="text-xs text-slate-500 font-bold">
-                                (${tier.usdEquivalent} USD)
-                              </span>
-                            </div>
-
-                            <p className="text-[11px] text-slate-600 leading-snug mb-2">
-                              {tier.scopeSummary}
-                            </p>
-
-                            {/* What it requires from business */}
-                            <div className="bg-[#FFF9F6] p-2.5 rounded-xl border border-[#F2C2B2] mb-3 text-[10px] text-slate-700 space-y-1">
-                              <strong className="text-[10px] text-[#A33B1E] uppercase font-black block">
-                                What we require from you:
-                              </strong>
-                              {tier.requiredFromBusiness.slice(0, 2).map((req, ri) => (
-                                <div key={ri} className="flex items-start gap-1">
-                                  <span className="text-[#C84E2D] font-bold">&bull;</span>
-                                  <span>{req}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
+              {/* DIAGNOSTIC QUESTIONS WITH CLICKABLE PILL BUTTONS */}
+              {msg.diagnosticQuestions && msg.diagnosticQuestions.length > 0 && (
+                <div className="pt-2 border-t border-stone-100 space-y-3">
+                  {msg.diagnosticQuestions.map((dq) => (
+                    <div key={dq.id} className="space-y-1.5">
+                      <span className="text-[11px] font-bold text-stone-700 block">
+                        {dq.question}
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {dq.pills.map((pill, pi) => (
                           <button
+                            key={pi}
                             type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSelectTierFromCatalog(msg.id, tier, msg.scope?.category || "Design");
-                            }}
-                            className={`w-full py-2 rounded-xl text-xs font-black transition-colors cursor-pointer text-center ${
-                              isSelected
-                                ? "bg-[#C84E2D] text-white shadow-2xs"
-                                : "bg-[#FFF2EB] text-[#C84E2D] hover:bg-[#C84E2D] hover:text-white border border-[#E9A995]"
-                            }`}
+                            onClick={() => handleSendMessage(pill)}
+                            disabled={loading}
+                            className="text-left px-3 py-1.5 rounded-full text-xs font-semibold bg-[#FFF5F0] hover:bg-[#C84E2D] text-[#8C341B] hover:text-white border border-[#F2C2B2] hover:border-[#C84E2D] transition-all cursor-pointer shadow-2xs"
                           >
-                            {isSelected ? "✓ Selected Tier" : `Choose ${tier.id.toUpperCase().replace("_", " ")}`}
+                            {pill}
                           </button>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
 
-              {/* SCOPE BREAKDOWN CARD */}
+              {/* ONE DEFINITIVE RECOMMENDED PACKAGE CARD */}
               {msg.scope && (
-                <div className="bg-[#FFF4EE] border border-[#E9A995] rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#E9A995]">
+                <div className="bg-[#FFF9F6] border-2 border-[#C84E2D] rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xs mt-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#F2C2B2]">
                     <div>
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded">
-                        Scoped Tier &amp; Contract Base
+                      <span className="text-[10px] font-black uppercase tracking-wider text-white bg-[#C84E2D] px-2 py-0.5 rounded-full">
+                        Definitive Agency Recommendation
                       </span>
                       <h3 className="text-base font-black text-slate-950 mt-1">
                         {msg.scope.title}
                       </h3>
                       <div className="text-xs text-slate-600 font-semibold mt-0.5">
-                        Category: <strong className="text-slate-900">{msg.scope.category}</strong> &bull; Turnaround: {msg.scope.estimatedTurnaround} &bull; 3 Revisions Included
+                        Category: <strong className="text-slate-900">{msg.scope.category}</strong> &bull; Turnaround: {msg.scope.estimatedTurnaround}
                       </div>
                     </div>
 
-                    <div className="flex items-baseline gap-2 bg-white px-3.5 py-2 rounded-xl border border-[#E9A995] self-start sm:self-auto">
-                      <span className="text-2xl font-black text-[#C84E2D] tabular-nums">
+                    <div className="flex items-baseline gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-[#F2C2B2] self-start sm:self-auto">
+                      <span className="text-xl font-black text-[#C84E2D]">
                         {msg.scope.coins} Coins
                       </span>
                       <span className="text-xs text-slate-500 font-bold">
@@ -572,10 +494,10 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
                   </div>
 
                   <div className="space-y-1">
-                    <span className="text-[10px] font-black uppercase text-slate-600 block">Included Deliverables:</span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+                    <span className="text-[10px] font-black uppercase text-stone-600 block">Included Deliverables:</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-slate-700">
                       {msg.scope.deliverables?.map((deliv, di) => (
-                        <div key={di} className="flex items-start gap-2">
+                        <div key={di} className="flex items-start gap-1.5">
                           <span className="text-emerald-700 font-black shrink-0">&bull;</span>
                           <span className="leading-snug">{deliv}</span>
                         </div>
@@ -583,64 +505,35 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
                     </div>
                   </div>
 
-                  {/* What is required from business */}
                   {msg.scope.requiredFromBusiness && msg.scope.requiredFromBusiness.length > 0 && (
-                    <div className="bg-white p-3 rounded-xl border border-[#E9A995] text-xs text-slate-700 space-y-1">
+                    <div className="bg-white p-2.5 rounded-xl border border-[#F2C2B2] text-xs text-slate-700 space-y-1">
                       <span className="text-[10px] font-black uppercase text-[#C84E2D] block">
-                        What Peach Requires From Your Business:
+                        What We Require From You:
                       </span>
                       {msg.scope.requiredFromBusiness.map((req, ri) => (
-                        <div key={ri} className="flex items-start gap-1.5 text-[11px]">
-                          <span className="text-[#C84E2D] font-black shrink-0">&rarr;</span>
+                        <div key={ri} className="flex items-start gap-1 text-[11px]">
+                          <span className="text-[#C84E2D] font-bold">&rarr;</span>
                           <span>{req}</span>
                         </div>
                       ))}
                     </div>
                   )}
 
-                  <div className="pt-1 text-[11px] text-slate-500 font-medium">
-                    All tiers include 100% administrative site/asset ownership transfer, vector files in Brand Vault, and 3 full revision rounds.
+                  <div className="text-[10px] text-slate-500 font-medium pt-1">
+                    Includes 3 revision rounds, protected escrow, and 100% administrative site &amp; asset ownership transfer.
                   </div>
                 </div>
               )}
 
-              {/* HIRE PROMPT */}
-              {msg.scope && msg.matchedCreatives && msg.matchedCreatives.length > 0 && !msg.showCreatives && (
-                <div className="p-4 bg-white border-2 border-[#C84E2D] rounded-2xl space-y-3">
-                  <div className="text-sm font-black text-slate-950">
-                    Ready to view the 3 vetted creatives for this project?
-                  </div>
-                  <p className="text-xs text-slate-600">
-                    We matched 3 approved creatives from our app who have a proven history of designing in this category.
-                  </p>
-                  <div className="flex flex-wrap gap-2.5 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => handleConfirmHirePrompt(msg.id)}
-                      className="px-4 py-2.5 bg-[#C84E2D] hover:bg-[#A33B1E] text-white rounded-xl text-xs font-black shadow-xs cursor-pointer transition-colors"
-                    >
-                      View 3 Matched Creatives
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleSendMessage("I want to adjust this tier first.")}
-                      className="px-4 py-2.5 bg-[#FFF2EB] hover:bg-[#FFE3D6] text-[#C84E2D] border border-[#E9A995] rounded-xl text-xs font-bold cursor-pointer transition-colors"
-                    >
-                      Adjust Tier
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* 3 VETTED CREATIVES WITH DESIGN HISTORY */}
-              {msg.scope && msg.matchedCreatives && msg.matchedCreatives.length > 0 && msg.showCreatives && (
+              {/* 3 SKILL-ACCURATE MATCHED CREATIVES */}
+              {msg.scope && msg.matchedCreatives && msg.matchedCreatives.length > 0 && (
                 <div className="pt-2 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-black uppercase tracking-wider text-[#0B2D22]">
-                      Choose 1 of 3 Matched Creatives (Based on Design History):
+                    <span className="text-xs font-black uppercase tracking-wider text-[#173328]">
+                      3 Vetted Creatives Ready for this Exact Scope:
                     </span>
                     <span className="text-[11px] text-slate-500 font-semibold">
-                      Ranked by portfolio &amp; niche
+                      Ranked by verified portfolio
                     </span>
                   </div>
 
@@ -661,7 +554,7 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
                               <img
                                 src={creative.avatar_url || "/Creative2.jpg"}
                                 alt={creative.name}
-                                className="w-11 h-11 rounded-full object-cover border-2 border-[#F2C2B2] shadow-2xs"
+                                className="w-10 h-10 rounded-full object-cover border-2 border-[#F2C2B2] shadow-2xs"
                               />
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center justify-between">
@@ -681,15 +574,15 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
                               </div>
                             </div>
 
-                            {/* Match reason based on history of designing */}
+                            {/* Match reason based on skill & history */}
                             <div className="p-2 bg-[#FFF8F5] border border-[#F2C2B2] rounded-xl text-[10px] text-slate-700 leading-snug mb-2">
                               <strong className="text-[#C84E2D] block uppercase font-black text-[9px]">
-                                Why Matched:
+                                Verified Skill Fit:
                               </strong>
                               {creative.match_reason}
                             </div>
 
-                            {/* Portfolio Thumbnail preview with design history title */}
+                            {/* Portfolio Thumbnail preview */}
                             {creative.featured_work && (
                               <div
                                 onClick={() =>
@@ -700,7 +593,7 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
                                     industry: creative.featured_work.industry,
                                   })
                                 }
-                                className="relative rounded-xl overflow-hidden h-20 bg-slate-100 border border-slate-200 cursor-pointer group mb-3"
+                                className="relative rounded-xl overflow-hidden h-18 bg-slate-100 border border-slate-200 cursor-pointer group mb-3"
                               >
                                 <img
                                   src={creative.featured_work.image_url}
@@ -727,10 +620,10 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
                                 }
                               }}
                               disabled={isSubmitting}
-                              className="w-full py-2.5 bg-[#C84E2D] hover:bg-[#A33B1E] text-white rounded-xl text-xs font-black transition-all shadow-xs cursor-pointer disabled:opacity-50 text-center"
+                              className="w-full py-2 bg-[#C84E2D] hover:bg-[#A33B1E] text-white rounded-xl text-xs font-black transition-all shadow-xs cursor-pointer disabled:opacity-50 text-center"
                             >
                               {isSubmitting
-                                ? "Creating Brief & Contract..."
+                                ? "Creating Brief..."
                                 : !hasSufficientCoins
                                 ? `Top Up & Hire ${creative.name.split(" ")[0]}`
                                 : `Select & Hire (${msg.scope?.coins ?? 0} Coins)`}
@@ -749,11 +642,11 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
         {/* Loading Indicator */}
         {loading && (
           <div className="flex items-center gap-3 text-sm">
-            <div className="w-8 h-8 rounded-xl bg-[#C84E2D] text-white flex items-center justify-center text-[11px] font-black shrink-0 shadow-2xs">
+            <div className="w-8 h-8 rounded-xl bg-[#173328] text-white flex items-center justify-center text-[11px] font-black shrink-0 shadow-2xs">
               PM
             </div>
-            <div className="bg-white border-2 border-[#F2C2B2] rounded-2xl p-4 rounded-tl-none shadow-xs text-xs text-slate-600 font-medium">
-              Peach Match AI is calibrating the 2026 Master Catalog and matching creative design histories...
+            <div className="bg-white border border-[#EBE4DE] rounded-2xl p-4 rounded-tl-none shadow-xs text-xs text-slate-600 font-medium">
+              Diagnosing project requirements and checking vetted creative rosters...
             </div>
           </div>
         )}
@@ -761,32 +654,34 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
         <div ref={chatBottomRef} />
       </div>
 
-      {/* 3. PROMPT STARTER CHIPS */}
-      <div className="px-5 py-2.5 bg-[#FFF2EB] border-t border-[#F2C2B2] flex items-center gap-2 overflow-x-auto scrollbar-none">
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#A33B1E] shrink-0">
-          Try:
-        </span>
-        {starterPrompts.map((starter, si) => (
-          <button
-            key={si}
-            type="button"
-            onClick={() => handleSendMessage(starter.prompt)}
-            disabled={loading}
-            className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white hover:bg-[#FFE3D6] border border-[#E9A995] text-xs font-bold text-slate-800 hover:text-[#C84E2D] transition-colors cursor-pointer shadow-2xs shrink-0"
-          >
-            {starter.label}
-          </button>
-        ))}
-      </div>
+      {/* 3. PROMPT STARTER CHIPS - HIDDEN ONCE CONVERSATION STARTS (messages.length > 1) */}
+      {messages.length <= 1 && (
+        <div className="px-5 py-2.5 bg-[#FFF9F6] border-t border-[#F2C2B2] flex items-center gap-2 overflow-x-auto scrollbar-none">
+          <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#A33B1E] shrink-0">
+            Try:
+          </span>
+          {starterPrompts.map((starter, si) => (
+            <button
+              key={si}
+              type="button"
+              onClick={() => handleSendMessage(starter.prompt)}
+              disabled={loading}
+              className="whitespace-nowrap px-3 py-1.5 rounded-xl bg-white hover:bg-[#FFE3D6] border border-[#E9A995] text-xs font-bold text-slate-800 hover:text-[#C84E2D] transition-colors cursor-pointer shadow-2xs shrink-0"
+            >
+              {starter.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* 4. DOCKED INPUT BAR */}
-      <div className="p-4 sm:p-5 bg-white border-t border-[#F2C2B2]">
+      <div className="p-4 sm:p-5 bg-white border-t border-[#E8D8CF]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             handleSendMessage();
           }}
-          className="relative flex items-end gap-2 bg-[#FFF8F5] focus-within:bg-white border-2 border-[#F2C2B2] focus-within:border-[#C84E2D] rounded-2xl p-2 transition-all shadow-inner"
+          className="relative flex items-end gap-2 bg-[#FFFDFB] focus-within:bg-white border border-[#E8D8CF] focus-within:border-[#173328] rounded-2xl p-2 transition-all shadow-inner"
         >
           <textarea
             ref={textareaRef}
@@ -799,8 +694,8 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
                 handleSendMessage();
               }
             }}
-            placeholder="Message Peach Match AI... (e.g. 'I need a website for a restaurant' or 'I need a 4-page menu and flyer')"
-            className="flex-1 bg-transparent px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden resize-none leading-relaxed min-h-[40px] max-h-[140px]"
+            placeholder="Message Peach Match AI... (e.g. 'I need a website for my restaurant' or 'I need a new logo')"
+            className="flex-1 bg-transparent px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden resize-none leading-relaxed min-h-[38px] max-h-[120px]"
           />
 
           <button
@@ -808,19 +703,19 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
             disabled={loading || !prompt.trim()}
             className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider shrink-0 transition-all cursor-pointer ${
               prompt.trim() && !loading
-                ? "bg-[#C84E2D] text-white shadow-xs hover:bg-[#A33B1E]"
+                ? "bg-[#173328] text-white shadow-xs hover:bg-[#234b3c]"
                 : "bg-slate-200 text-slate-400 cursor-not-allowed"
             }`}
             title="Send message (Enter)"
             aria-label="Send message to Peach Match AI"
           >
-            {loading ? "Sending..." : "Send"}
+            {loading ? "..." : "Send"}
           </button>
         </form>
 
         <div className="flex items-center justify-between text-[11px] text-slate-500 mt-2 px-1">
           <span>Press Enter to send, Shift+Enter for line break</span>
-          <span className="font-bold text-[#A33B1E]">1 Peach Coin = $50 USD &bull; Protected Escrow</span>
+          <span className="font-bold text-[#173328]">1 Peach Coin = $50 USD &bull; Protected Escrow</span>
         </div>
       </div>
 
@@ -860,7 +755,7 @@ If your request is broad, I will lay out the 3 master tiers (Option A, B, and C)
               <button
                 type="button"
                 onClick={() => setPreviewImage(null)}
-                className="px-4 py-2 bg-[#C84E2D] text-white text-xs font-black rounded-xl"
+                className="px-4 py-2 bg-[#173328] text-white text-xs font-black rounded-xl"
               >
                 Done
               </button>

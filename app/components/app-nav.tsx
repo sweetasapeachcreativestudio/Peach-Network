@@ -2,18 +2,21 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { BellIcon, FolderIcon, HomeIcon, MessageIcon, UserIcon, WalletIcon } from "./icons";
 import { PeachBrand } from "./brand";
+import { AskArtDirectorButton } from "./ask-art-director-modal";
 
 export function AppHeader({ name, role, coinCount }: { name?: string | null; role: "business" | "creative"; coinCount?: number | null }) {
   return (
     <header className="app-header">
       <PeachBrand href={role === "business" ? "/business" : "/creative"} />
       <div className="app-header-actions">
+        {role === "business" && <AskArtDirectorButton businessName={name} />}
         <Link className="pn-network-link" href="/network">Network</Link>
         {role === "business" && typeof coinCount === "number" && (
           <Link className="wallet-chip" href="/business/wallet"><span className="peach-dot" />{coinCount} Coins</Link>
         )}
         <Link className="round-action" href="/notifications" aria-label="Notifications"><BellIcon /></Link>
-        <form action="/auth/signout" method="post" style={{margin:0}}><button type="submit" className="pn-network-link" style={{background:"none",border:0,cursor:"pointer"}}>Log Out</button></form>\n        <Link className="profile-chip" href="/account?edit=1" aria-label="Profile">
+        <form action="/auth/signout" method="post" style={{margin:0}}><button type="submit" className="pn-network-link" style={{background:"none",border:0,cursor:"pointer"}}>Log Out</button></form>
+        <Link className="profile-chip" href="/account?edit=1" aria-label="Profile">
           <span className="profile-avatar">{(name?.trim()?.[0] ?? "P").toUpperCase()}</span>
         </Link>
       </div>

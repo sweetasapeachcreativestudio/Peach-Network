@@ -103,11 +103,11 @@ export default async function BusinessProjectsPage({ searchParams }: BusinessPro
 
           <div className="flex items-center gap-2.5">
             <Link
-              href="/business/new-project"
+              href="/business"
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#EB6244] hover:bg-[#d85538] text-white text-xs font-bold rounded-xl shadow-xs hover:shadow transition-all"
             >
               <Plus className="w-4 h-4" />
-              <span>Start a Project</span>
+              <span>Scope with Peach Match AI</span>
             </Link>
           </div>
         </header>

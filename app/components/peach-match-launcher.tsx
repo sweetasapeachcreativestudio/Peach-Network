@@ -11,7 +11,7 @@ export default function PeachMatchLauncher({ compact = false }: { compact?: bool
   function submit(event: FormEvent) {
     event.preventDefault();
     const value = brief.trim();
-    const url = value ? `/business/new-project?brief=${encodeURIComponent(value)}` : "/business/new-project";
+    const url = "/business";
     router.push(url);
   }
 

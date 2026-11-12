@@ -714,11 +714,11 @@ export function ProjectViewManager({
                   View Completed Archive ({archivedProjects.length})
                 </button>
                 <Link
-                  href="/business/new-project"
+                  href="/business"
                   className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#EB6244] hover:bg-[#d85538] text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Start a Project</span>
+                  <span>Scope with Peach Match AI</span>
                 </Link>
               </div>
             </div>
