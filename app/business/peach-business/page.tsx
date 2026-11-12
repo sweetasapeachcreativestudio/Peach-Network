@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PeachAppShell } from "@/app/components/peach-app-shell";
 import { BusinessFeedbackForm } from "./feedback-form";
+import { BusinessFAQSection } from "./faq-section";
 import {
   Sparkles,
   Calendar,
@@ -17,6 +18,7 @@ import {
   Clock,
   ArrowRight,
   ShieldCheck,
+  HelpCircle,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -63,17 +65,36 @@ export default async function PeachBusinessPage() {
     >
       <div className="space-y-8 max-w-5xl">
         {/* Page Header */}
-        <header className="pb-4 border-b border-stone-200">
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-[#C84E2D] mb-1">
-            <Building2 className="w-3.5 h-3.5" />
-            <span>Peach Network Ecosystem Hub</span>
+        <header className="pb-4 border-b border-stone-200 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-[#C84E2D] mb-1">
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Peach Network Ecosystem Hub</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-stone-950 tracking-tight">
+              Peach Business
+            </h1>
+            <p className="text-xs sm:text-sm text-stone-600 mt-1 max-w-2xl leading-relaxed">
+              Platform announcements, scoping &amp; pricing answers, upcoming partner mixers, and special commercial coin opportunities for growing businesses on Peach.
+            </p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-stone-950 tracking-tight">
-            Peach Business
-          </h1>
-          <p className="text-xs sm:text-sm text-stone-600 mt-1 max-w-2xl leading-relaxed">
-            Platform announcements, upcoming partner mixers, and special commercial coin opportunities for growing businesses on Peach.
-          </p>
+
+          <div className="flex items-center gap-2 flex-wrap shrink-0">
+            <a
+              href="#faq"
+              className="px-3 py-1.5 rounded-xl bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-[#C84E2D]" />
+              <span>Scoping &amp; Pricing FAQ</span>
+            </a>
+            <a
+              href="#feedback"
+              className="px-3 py-1.5 rounded-xl bg-white hover:bg-stone-50 border border-stone-200 text-stone-700 text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5"
+            >
+              <TrendingUp className="w-3.5 h-3.5 text-stone-500" />
+              <span>Feedback</span>
+            </a>
+          </div>
         </header>
 
         {/* SECTION 1: ANNOUNCEMENTS & SPECIALS */}
@@ -258,7 +279,10 @@ export default async function PeachBusinessPage() {
           </div>
         </section>
 
-        {/* SECTION 3: BUSINESS FEEDBACK & SUGGESTIONS */}
+        {/* SECTION 3: FREQUENTLY ASKED QUESTIONS */}
+        <BusinessFAQSection />
+
+        {/* SECTION 4: BUSINESS FEEDBACK & SUGGESTIONS */}
         <section id="feedback" className="space-y-4 scroll-mt-6">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-extrabold text-stone-950 flex items-center gap-2">
