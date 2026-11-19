@@ -25,8 +25,8 @@ const HUB_CREATIVES_FALLBACK: CreativeCandidate[] = [
     match_score: 98,
   },
   {
-    id: "cr_jordan",
-    name: "Jordan Ellis",
+    id: "cr_matched",
+    name: "Local Studio Lead",
     avatar_url: "/Creative1.JPG",
     headline: "Sports & Event Graphics",
     hub: "Birmingham Hub",
@@ -94,7 +94,7 @@ export function DoorDashDispatchTracker({
   projectTitle,
   category,
   coins,
-  creativeName = "Jordan Ellis",
+  creativeName = "Matched Creative",
   creativeAvatar = "/Creative1.JPG",
   creativeSpecialty = "Commercial Graphics",
   creativeHub = "Birmingham Hub",
@@ -109,7 +109,7 @@ export function DoorDashDispatchTracker({
   const [showAlternativeCreatives, setShowAlternativeCreatives] = useState(false);
   const [activeStep, setActiveStep] = useState(2); // Step 3: Creative Reviewing Brief
   const [currentCreative, setCurrentCreative] = useState({
-    name: creativeName || "Jordan Ellis",
+    name: creativeName || "Matched Creative",
     avatar: creativeAvatar || "/Creative1.JPG",
     specialty: creativeSpecialty || "Commercial Graphics",
     hub: creativeHub || "Birmingham Hub",
@@ -120,7 +120,7 @@ export function DoorDashDispatchTracker({
   const steps = [
     {
       title: "Project Dispatched",
-      desc: `${coins} Coins held in escrow`,
+      desc: `${coins} Coins reserved under Peach Project Protection`,
       status: "done",
     },
     {
@@ -234,7 +234,7 @@ export function DoorDashDispatchTracker({
             {projectTitle}
           </h2>
           <div className="text-xs text-slate-600 font-semibold mt-0.5">
-            {category} &bull; <strong className="text-[#C84E2D]">{coins} Peach Coins</strong> (${coins * 50} USD held in escrow) &bull; 3 Revisions Included
+            {category} &bull; <strong className="text-[#C84E2D]">{coins} Peach Coins</strong> (${coins * 50} USD reserved under Peach Project Protection) &bull; 3 Revisions Included
           </div>
         </div>
 
@@ -417,7 +417,8 @@ export function DoorDashDispatchTracker({
         creativeSpecialty={currentCreative.specialty}
         description={description}
         currentStatus={status}
-        isClient={true}
+        userRole="business"
+        briefLocked={status !== "draft"}
       />
     </div>
   );

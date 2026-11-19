@@ -70,7 +70,7 @@ export default function MatchActions({
 
   // Cancel creative search
   async function cancelSearch() {
-    if (!confirm("Are you sure you want to cancel this creative search? Any coins committed in escrow will be returned to your available wallet balance.")) {
+    if (!confirm("Are you sure you want to cancel this creative search? Any reserved Coins will be returned to your available wallet balance.")) {
       return;
     }
 

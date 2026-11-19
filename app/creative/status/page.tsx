@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
@@ -13,9 +14,11 @@ export default async function CreativeStatusPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth?role=creative&mode=signin");
+  const cookieStore = await cookies();
+  const roleCookie = cookieStore.get("peach_role")?.value;
   const admin = createAdminClient();
   const { data: profile } = await admin.from("profiles").select("full_name,role").eq("id", user.id).single();
-  if (profile?.role === "business") redirect("/business");
+  if (profile?.role === "business" && roleCookie !== "creative") redirect("/business");
   const { data: creative } = await admin.from("creatives").select("application_status,peach_level,primary_specialty").eq("user_id", user.id).single();
   if (!creative) redirect("/creative/apply");
   const approved = creative.application_status === "approved";

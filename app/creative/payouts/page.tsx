@@ -1,12 +1,25 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
+import { PeachAppShell } from "@/app/components/peach-app-shell";
 import ConnectButton from "./connect-button";
 import PayoutStatusCard from "./status-card";
 
+export const dynamic = "force-dynamic";
+
 export default async function CreativePayoutsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/auth");
+
+  const admin = createAdminClient();
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("full_name")
+    .eq("id", user.id)
+    .maybeSingle();
 
   const { data: creative } = await supabase
     .from("creatives")
@@ -24,36 +37,48 @@ export default async function CreativePayoutsPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <main className="shell" style={{maxWidth:850}}>
-      <div className="brand">PE<span className="brand-accent">≡</span>CH</div>
-      <p className="muted">CREATIVE PAYOUTS</p>
+    <PeachAppShell role="creative" active="earnings" name={profile?.full_name}>
+      <div className="max-w-3xl space-y-5">
+        <PayoutStatusCard />
 
-      <PayoutStatusCard />
+        <section className="card">
+          <h1>Get paid through Peach.</h1>
+          <p className="muted">
+            Your payout account is handled through Stripe Connect. Peach approves eligible project payouts after completion.
+          </p>
+          <ConnectButton />
+          <p className="muted" style={{ fontSize: 13 }}>
+            {creative.stripe_connect_account_id
+              ? "A Stripe Connect account has been created for this Peach profile."
+              : "Payout setup has not started yet."}
+          </p>
+        </section>
 
-      <section className="card" style={{marginTop:20}}>
-        <h1>Get paid through Peach.</h1>
-        <p className="muted">
-          Your payout account is handled through Stripe Connect. Peach approves eligible project payouts after completion.
-        </p>
-        <ConnectButton />
-        <p className="muted" style={{fontSize:13}}>
-          {creative.stripe_connect_account_id ? "A Stripe Connect account has been created for this Peach profile." : "Payout setup has not started yet."}
-        </p>
-      </section>
-
-      <section className="card" style={{marginTop:18}}>
-        <h2>Payout History</h2>
-        {(payouts ?? []).map((p: any) => (
-          <div key={p.id} style={{display:"flex",justifyContent:"space-between",gap:16,padding:"12px 0",borderBottom:"1px solid var(--peach-border)"}}>
-            <div>
-              <strong>{p.projects?.title ?? "Peach Project"}</strong>
-              <p className="muted" style={{margin:"4px 0 0"}}>{p.status}</p>
+        <section className="card">
+          <h2>Payout History</h2>
+          {(payouts ?? []).map((p: any) => (
+            <div
+              key={p.id}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 16,
+                padding: "12px 0",
+                borderBottom: "1px solid var(--peach-border)",
+              }}
+            >
+              <div>
+                <strong>{p.projects?.title ?? "Peach Project"}</strong>
+                <p className="muted" style={{ margin: "4px 0 0" }}>
+                  {p.status}
+                </p>
+              </div>
+              <strong>${(p.amount_cents / 100).toFixed(2)}</strong>
             </div>
-            <strong>${(p.amount_cents/100).toFixed(2)}</strong>
-          </div>
-        ))}
-        {(!payouts || payouts.length === 0) && <p className="muted">No payouts yet.</p>}
-      </section>
-    </main>
+          ))}
+          {(!payouts || payouts.length === 0) && <p className="muted">No payouts yet.</p>}
+        </section>
+      </div>
+    </PeachAppShell>
   );
 }

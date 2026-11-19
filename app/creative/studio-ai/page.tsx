@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -15,13 +16,16 @@ export default async function CreativeStudioAIPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/auth?role=creative&mode=signin");
 
+  const cookieStore = await cookies();
+  const roleCookie = cookieStore.get("peach_role")?.value;
+
   const admin = createAdminClient();
   const [{ data: profile }, { data: creative }] = await Promise.all([
     admin.from("profiles").select("full_name,role,avatar_url").eq("id", user.id).maybeSingle(),
     admin.from("creatives").select("id,peach_level,primary_specialty").eq("user_id", user.id).maybeSingle(),
   ]);
 
-  if (profile?.role === "business") redirect("/business");
+  if (profile?.role === "business" && roleCookie !== "creative") redirect("/business");
 
   return (
     <PeachAppShell

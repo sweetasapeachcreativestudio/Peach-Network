@@ -21,13 +21,14 @@ export async function POST(req: NextRequest) {
 
     const res = NextResponse.json({ success: true, user, role: assignedRole });
 
-    // Set auth cookie: secure when HTTPS, lax for iframe and top-level navigation
+    // Set auth cookie: SameSite=None; Secure on HTTPS iframes, SameSite=Lax on HTTP localhost
     const isHttps = req.url.startsWith("https://") || req.headers.get("x-forwarded-proto") === "https";
+    const sameSiteValue = isHttps ? "none" : "lax";
     
     res.cookies.set("peach_session", JSON.stringify(user), {
       path: "/",
       httpOnly: false,
-      sameSite: "lax",
+      sameSite: sameSiteValue,
       secure: isHttps,
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
     res.cookies.set("peach_role", assignedRole, {
       path: "/",
       httpOnly: false,
-      sameSite: "lax",
+      sameSite: sameSiteValue,
       secure: isHttps,
       maxAge: 60 * 60 * 24 * 7,
     });

@@ -1,26 +1,26 @@
-import { ProjectRefresh } from "@/app/components/project-refresh";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import {
+  ArrowRight,
+  ChevronDown,
+  FolderKanban,
+  MapPin,
+  ShieldCheck,
+  Wallet,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getActiveDashboardBannerSlides } from "@/lib/business-banners";
+import { formatCityHub } from "@/lib/hubs";
+import { computeBusinessBrandReadiness } from "@/lib/readiness";
+import { ProjectRefresh } from "@/app/components/project-refresh";
 import { PeachAppShell } from "../components/peach-app-shell";
 import { AcceptedProject } from "../components/accepted-project";
-import { ProjectProgress } from "../components/project-progress";
-import { EventAnnouncements } from "./components/event-announcements";
+import { BusinessBannerCarousel } from "./components/business-banner-carousel";
 import { PeachMatchAIBox } from "./components/peach-match-ai-box";
-import {
-  Sparkles,
-  Coins,
-  ArrowRight,
-  ShieldCheck,
-  FolderArchive,
-  Wallet,
-  MessageSquare,
-  Plus,
-  AlertCircle,
-  ExternalLink,
-} from "lucide-react";
-import { cookies } from "next/headers";
+import { BrandReadinessCard } from "./components/brand-readiness-card";
+import { CollapsibleRailCards } from "./components/collapsible-rail-cards";
 
 export const dynamic = "force-dynamic";
 
@@ -44,13 +44,6 @@ function statusLabel(status: string) {
   );
 }
 
-function nextStep(status: string) {
-  if (reviewStatuses.includes(status)) return "Review proof or respond to your creative in the room.";
-  if (status === "matching" || status === "offer_sent") return "Peach is arranging your 3 creative matches.";
-  if (status === "revisions") return "Your creative is implementing agreed revisions.";
-  return "Open the project room for the latest proofs and deliverables.";
-}
-
 function dueText(value: string | null) {
   if (!value) return "Flexible timeline";
   const hours = Math.ceil((new Date(value).getTime() - Date.now()) / 3600000);
@@ -61,7 +54,9 @@ function dueText(value: string | null) {
 
 export default async function BusinessDashboard() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/auth?role=business&mode=signin");
 
   const cookieStore = await cookies();
@@ -86,7 +81,9 @@ export default async function BusinessDashboard() {
         .upsert({
           id: user.id,
           email: user.email,
-          full_name: user.user_metadata?.full_name || (user.email ? user.email.split("@")[0] : "Peach Partner"),
+          full_name:
+            user.user_metadata?.full_name ||
+            (user.email ? user.email.split("@")[0] : "Peach Partner"),
           role: "business",
         })
         .select("full_name,role,avatar_url")
@@ -97,7 +94,7 @@ export default async function BusinessDashboard() {
 
   let { data: business } = await admin
     .from("businesses")
-    .select("id,name,industry,logo_url")
+    .select("id,name,industry,logo_url,description,common_needs,city,state")
     .eq("owner_user_id", user.id)
     .maybeSingle();
 
@@ -113,7 +110,7 @@ export default async function BusinessDashboard() {
           name: bizName,
           industry: "Commercial & Creative",
         })
-        .select("id,name,industry,logo_url")
+        .select("id,name,industry,logo_url,description,common_needs,city,state")
         .maybeSingle();
       business = createdBiz;
       if (business) {
@@ -129,36 +126,60 @@ export default async function BusinessDashboard() {
   if (!business) {
     business = {
       id: `biz_${user.id.slice(0, 8)}`,
-      name: user.user_metadata?.business_name || (profile?.full_name ? `${profile.full_name}'s Business` : "My Business"),
+      name:
+        user.user_metadata?.business_name ||
+        (profile?.full_name ? `${profile.full_name}'s Business` : "My Business"),
       industry: "Commercial & Creative",
-      logo_url: "/brand/peach-app-logo.png",
+      logo_url: null,
+      description: null,
+      common_needs: [],
+      city: null,
+      state: null,
     };
   }
+  const businessHub = formatCityHub(business.city, business.state);
 
-  const [{ data: wallet }, { data: projects }, { data: brandAssets }, { data: membership }] = await Promise.all([
-    admin.from("coin_wallets").select("available_coins,held_coins").eq("business_id", business.id).maybeSingle(),
-    admin
-      .from("projects")
-      .select("id,title,description,category,status,coin_amount,due_at,created_at,assigned_creative_id,revision_rounds")
-      .eq("business_id", business.id)
-      .order("created_at", { ascending: false }),
-    admin.from("business_brand_assets").select("id,kind,label,value,original_name").eq("business_id", business.id),
-    admin
-      .from("memberships")
-      .select("id,plan_name,status,monthly_coins,current_period_end")
-      .eq("business_id", business.id)
-      .eq("status", "active")
-      .maybeSingle(),
-  ]);
+  const [{ data: wallet }, { data: projects }, { data: brandAssets }, { data: membership }, bannerSlides] =
+    await Promise.all([
+      admin
+        .from("coin_wallets")
+        .select("available_coins,held_coins")
+        .eq("business_id", business.id)
+        .maybeSingle(),
+      admin
+        .from("projects")
+        .select("id,title,description,category,status,coin_amount,due_at,created_at,assigned_creative_id,revision_rounds")
+        .eq("business_id", business.id)
+        .order("created_at", { ascending: false }),
+      admin
+        .from("business_brand_assets")
+        .select("id,kind,label,value,original_name,notes")
+        .eq("business_id", business.id),
+      admin
+        .from("memberships")
+        .select("id,plan_name,status,monthly_coins,current_period_end")
+        .eq("business_id", business.id)
+        .eq("status", "active")
+        .maybeSingle(),
+      getActiveDashboardBannerSlides(admin),
+    ]);
 
-  const active = ((projects ?? []) as any[]).filter((p: any) => !["completed", "cancelled"].includes(p.status));
+  const active = ((projects ?? []) as any[]).filter(
+    (p: any) => !["completed", "cancelled"].includes(p.status)
+  );
   const accepted = active.find((p: any) => p.status === "accepted");
-  const attention = active.find((p: any) => reviewStatuses.includes(p.status));
-  const lead = attention ?? active[0];
   const first = profile?.full_name?.trim().split(" ")[0] || business.name;
   const coins = wallet?.available_coins ?? 0;
+  const heldCoins = wallet?.held_coins ?? 0;
 
-  const creativeIds = [...new Set(active.map((p: any) => p.assigned_creative_id).filter(Boolean))];
+  const brandReadiness = computeBusinessBrandReadiness(
+    business,
+    (brandAssets ?? []) as any[]
+  );
+
+  const creativeIds = [
+    ...new Set(active.map((p: any) => p.assigned_creative_id).filter(Boolean)),
+  ];
   const activeIds = active.map((p: any) => p.id);
 
   const [{ data: messages }, { data: creatives }] = await Promise.all([
@@ -170,14 +191,18 @@ export default async function BusinessDashboard() {
           .order("created_at", { ascending: false })
           .limit(4)
       : Promise.resolve({ data: [] }),
-    creativeIds.length ? admin.from("creatives").select("id,user_id").in("id", creativeIds) : Promise.resolve({ data: [] }),
+    creativeIds.length
+      ? admin.from("creatives").select("id,user_id").in("id", creativeIds)
+      : Promise.resolve({ data: [] }),
   ]);
 
   const peopleIds = [
-    ...new Set([
-      ...((creatives ?? []) as any[]).map((c: any) => c.user_id),
-      ...((messages ?? []) as any[]).map((m: any) => m.sender_user_id),
-    ].filter(Boolean)),
+    ...new Set(
+      [
+        ...((creatives ?? []) as any[]).map((c: any) => c.user_id),
+        ...((messages ?? []) as any[]).map((m: any) => m.sender_user_id),
+      ].filter(Boolean)
+    ),
   ];
 
   const { data: people } = peopleIds.length
@@ -185,7 +210,16 @@ export default async function BusinessDashboard() {
     : { data: [] };
 
   const peopleMap = new Map(((people ?? []) as any[]).map((p: any) => [p.id, p]));
-  const creativeMap = new Map(((creatives ?? []) as any[]).map((c: any) => [c.id, peopleMap.get(c.user_id)]));
+  const creativeMap = new Map(
+    ((creatives ?? []) as any[]).map((c: any) => [c.id, peopleMap.get(c.user_id)])
+  );
+
+  const formattedMessages = ((messages ?? []) as any[]).map((m) => ({
+    id: m.id,
+    project_id: m.project_id,
+    message: m.message,
+    senderName: peopleMap.get(m.sender_user_id)?.full_name || "Project Member",
+  }));
 
   return (
     <PeachAppShell
@@ -198,135 +232,90 @@ export default async function BusinessDashboard() {
     >
       <ProjectRefresh />
       <div className="space-y-6">
-        {/* Top Event & Opportunity Announcement Section */}
-        <EventAnnouncements />
-
-        {/* Dashboard Welcome Header */}
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-stone-200/70">
+        {/* Top Greeting Header */}
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
           <div>
-            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#EB6244] mb-1">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Sweet As A Peach Creative Network</span>
+            <div className="text-xs font-extrabold uppercase tracking-wider text-[#FF5E3A]">
+              Peach Studio &middot; {business.name}
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-950 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#231714] tracking-tight mt-0.5">
               Welcome back, {first}
             </h1>
-            <p className="text-xs sm:text-sm text-stone-600 mt-1 flex items-center gap-2 flex-wrap">
+            <p className="text-[15px] text-[#4A3B36] mt-1 flex items-center gap-2 flex-wrap">
               <span>
-                <strong className="text-stone-900 tabular-nums">{active.length}</strong> active collaboration{active.length === 1 ? "" : "s"}
+                <strong className="text-[#231714] tabular-nums">{active.length}</strong> active project
+                {active.length === 1 ? "" : "s"}
               </span>
-              <span className="text-stone-300 font-normal">·</span>
+              <span className="text-[#F7DFD0]">&bull;</span>
               <span>
-                <strong className="text-stone-900 tabular-nums">{coins}</strong> Peach Coins available
+                <strong className="text-[#231714] tabular-nums">{coins}</strong> Peach Coins available
+              </span>
+              <span className="text-[#F7DFD0]">&bull;</span>
+              <span>
+                Brand Readiness{" "}
+                <strong className="text-[#FF5E3A] tabular-nums">{brandReadiness.score}%</strong>
               </span>
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 shrink-0">
             <Link
               href="/business/projects"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-stone-700 hover:text-stone-950 bg-white hover:bg-stone-50 border border-stone-200 rounded-xl transition-all shadow-2xs"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm font-bold text-[#231714] bg-white hover:bg-[#FFD8BE] border border-[#F7DFD0] rounded-2xl transition-colors shadow-[0_6px_18px_rgba(232,93,59,0.06)]"
             >
               <span>View All Projects</span>
-              <ArrowRight className="w-3.5 h-3.5 text-stone-400" />
+              <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
             </Link>
           </div>
         </header>
 
-        {/* 1. PEACH MATCH AI CONTAINER (Direct on Dashboard for immediate access) */}
-        <PeachMatchAIBox
-          initialAvailableCoins={coins}
-          businessName={business.name}
-          hasActiveSubscription={Boolean(membership)}
-          subscriptionPlan={membership?.plan_name || null}
-        />
+        {/* 3-Column Peach Studio Layout (240px Sidebar via Shell + Center Workspace + 300px Right Rail) */}
+        <div className="flex flex-col xl:flex-row gap-6 items-start">
+          {/* CENTER COLUMN */}
+          <main className="flex-1 min-w-0 w-full space-y-6">
+            {/* 1. Top Hero Carousel Banner */}
+            <BusinessBannerCarousel slides={bannerSlides} />
 
-        {/* Kickoff Banner if a project was just accepted */}
-        {accepted && (
-          <AcceptedProject
-            project={accepted}
-            creativeName={creativeMap.get(accepted.assigned_creative_id)?.full_name}
-            assetCount={brandAssets?.length ?? 0}
-          />
-        )}
-
-        {/* Two-Column Layout: Active Projects on Left, Side Dock on Right */}
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 sm:gap-6 items-start">
-          {/* Main Column */}
-          <main className="xl:col-span-8 space-y-5 min-w-0">
-            {/* Attention Banner if an action is needed */}
-            {lead && (
-              <section
-                className={`rounded-2xl border p-5 shadow-xs transition-all ${
-                  attention
-                    ? "bg-[#FFFDF7] border-amber-300/80 ring-1 ring-amber-100"
-                    : "bg-white border-stone-200/90"
-                }`}
-              >
-                <div className="flex items-center justify-between gap-2 mb-2 flex-wrap text-xs">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`font-bold ${
-                        attention ? "text-amber-800" : "text-stone-700"
-                      }`}
-                    >
-                      {attention ? "Action Needed" : "Active Focus"}
-                    </span>
-                    <span className="text-stone-300">·</span>
-                    <span className="font-semibold text-stone-600">{statusLabel(lead.status)}</span>
-                  </div>
-                  <span className="text-stone-500 font-medium">{dueText(lead.due_at)}</span>
-                </div>
-
-                <h2 className="text-lg font-extrabold text-stone-950 tracking-tight leading-snug">
-                  {lead.title}
-                </h2>
-                <p className="text-xs text-stone-600 mt-1 leading-relaxed">
-                  {lead.coin_amount} Peach Coins in escrow · {nextStep(lead.status)}
-                </p>
-
-                <div className="pt-3 flex items-center gap-2.5">
-                  <Link
-                    href={`/projects/${lead.id}`}
-                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-extrabold transition-all shadow-xs ${
-                      attention
-                        ? "bg-[#EB6244] hover:bg-[#d85538] !text-white text-white"
-                        : "bg-[#173328] hover:bg-[#234b3c] !text-white text-white"
-                    }`}
-                  >
-                    <span>{attention ? "Review Proof" : "Open Project Room"}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-
-                  <Link
-                    href={`/projects/${lead.id}#chat`}
-                    className="px-3 py-2 text-stone-600 hover:text-stone-950 text-xs font-bold hover:bg-stone-100 rounded-xl transition-colors"
-                  >
-                    Message Creative
-                  </Link>
-                </div>
-              </section>
+            {/* Kickoff banner if a project was just accepted */}
+            {accepted && (
+              <AcceptedProject
+                project={accepted}
+                creativeName={creativeMap.get(accepted.assigned_creative_id)?.full_name}
+                assetCount={brandAssets?.length ?? 0}
+              />
             )}
 
-            {/* Active Projects List */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-base font-extrabold text-stone-950 flex items-center gap-2">
-                  <span>Current Collaborations</span>
-                  <span className="text-xs font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full tabular-nums">
+            {/* 2. Peachy™ Creative Director AI & Live Project Planner */}
+            <PeachMatchAIBox
+              initialAvailableCoins={coins}
+              businessName={business.name}
+              hasActiveSubscription={Boolean(membership)}
+              subscriptionPlan={membership?.plan_name || null}
+              brandReadinessScore={brandReadiness.score}
+              missingBrandItems={brandReadiness.missingLabels}
+            />
+
+            {/* 3. Your Projects Section (Clean 3-line cards) */}
+            <section className="space-y-3.5">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <FolderKanban className="w-5 h-5 text-[#FF5E3A]" strokeWidth={1.5} />
+                  <h2 className="text-lg font-extrabold text-[#231714]">Your Projects</h2>
+                  <span className="text-xs font-extrabold text-[#231714] bg-[#FFD8BE] px-2.5 py-0.5 rounded-full tabular-nums">
                     {active.length}
                   </span>
-                </h2>
+                </div>
                 <Link
                   href="/business/projects"
-                  className="text-xs font-bold text-[#EB6244] hover:text-[#d85538] hover:underline"
+                  className="text-sm font-bold text-[#FF5E3A] hover:text-[#231714] transition-colors inline-flex items-center gap-1"
                 >
-                  All Projects &amp; Archive →
+                  <span>All Projects</span>
+                  <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
                 </Link>
               </div>
 
               {active.length > 0 ? (
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {active.map((p: any) => {
                     const creative = creativeMap.get(p.assigned_creative_id);
                     const isReview = reviewStatuses.includes(p.status);
@@ -334,182 +323,175 @@ export default async function BusinessDashboard() {
                     return (
                       <article
                         key={p.id}
-                        className="bg-white border border-stone-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs hover:shadow-xs transition-shadow"
+                        className="bg-white border border-[#F7DFD0] rounded-3xl p-5 shadow-[0_12px_32px_rgba(232,93,59,0.08)]"
                       >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                          <div className="space-y-1 min-w-0 flex-1">
-                            <div className="flex items-center gap-2 text-xs flex-wrap">
-                              <span
-                                className={`font-bold ${
-                                  isReview ? "text-amber-800" : "text-stone-700"
-                                }`}
-                              >
-                                {statusLabel(p.status)}
-                              </span>
-                              <span className="text-stone-300">·</span>
-                              <span className="font-semibold text-stone-600">{p.category}</span>
-                              <span className="text-stone-300">·</span>
-                              <span className="text-stone-500 font-medium">{dueText(p.due_at)}</span>
-                            </div>
+                        {/* Line 1: Category + Due Date + 1 Status Pill */}
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="text-[13px] font-semibold text-[#4A3B36] flex items-center gap-2">
+                            <span>{p.category || "Creative Project"}</span>
+                            <span className="text-[#F7DFD0]">&bull;</span>
+                            <span>{dueText(p.due_at)}</span>
+                          </div>
+                          <span
+                            className={`text-xs font-bold px-3 py-1 rounded-full ${
+                              isReview
+                                ? "bg-[#FF5E3A] text-white"
+                                : "bg-[#FFD8BE] text-[#231714]"
+                            }`}
+                          >
+                            {statusLabel(p.status)}
+                          </span>
+                        </div>
 
-                            <h3 className="text-sm sm:text-base font-extrabold text-stone-950 truncate">
-                              <Link
-                                href={`/projects/${p.id}`}
-                                className="hover:text-[#EB6244] transition-colors"
-                              >
-                                {p.title}
-                              </Link>
-                            </h3>
+                        {/* Line 2: Project Title */}
+                        <h3 className="text-base sm:text-lg font-extrabold text-[#231714] truncate mt-1.5">
+                          <Link
+                            href={`/projects/${p.id}`}
+                            className="hover:text-[#FF5E3A] transition-colors"
+                          >
+                            {p.title}
+                          </Link>
+                        </h3>
 
-                            <div className="flex items-center gap-3 text-xs text-stone-600 pt-0.5">
-                              <span>
-                                Creative:{" "}
-                                <strong className="text-stone-900 font-bold">
-                                  {creative?.full_name ? `✦ ${creative.full_name}` : "Finding match"}
-                                </strong>
-                              </span>
-                              <span className="text-stone-300">·</span>
-                              <span className="tabular-nums font-semibold text-stone-700">
-                                {p.coin_amount} Coins
-                              </span>
-                            </div>
+                        {/* Line 3: Creative Name + Coins + 1 Primary Action Button */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-2.5 pt-2.5 border-t border-[#F7DFD0]/70">
+                          <div className="text-[14px] text-[#4A3B36] flex items-center gap-2.5 flex-wrap">
+                            <span>
+                              Creative:{" "}
+                              <strong className="text-[#231714] font-bold">
+                                {creative?.full_name || "Assigning Creative"}
+                              </strong>
+                            </span>
+                            <span className="text-[#F7DFD0]">&bull;</span>
+                            <span className="tabular-nums font-bold text-[#231714]">
+                              {p.coin_amount} Peach Coins
+                            </span>
                           </div>
 
-                          <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-                            <Link
-                              href={`/projects/${p.id}#chat`}
-                              className="px-2.5 py-1.5 text-xs font-bold text-stone-600 hover:text-stone-950 hover:bg-stone-100 rounded-xl transition-colors"
-                            >
-                              Chat
-                            </Link>
-                            <Link
-                              href={`/projects/${p.id}`}
-                              className={`inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all shadow-2xs ${
-                                isReview
-                                  ? "bg-[#EB6244] hover:bg-[#d85538] !text-white text-white"
-                                  : "bg-[#173328] hover:bg-[#234b3c] !text-white text-white"
-                              }`}
-                            >
-                              <span>{isReview ? "Review Proof" : "Open Room"}</span>
-                              <ArrowRight className="w-3.5 h-3.5" />
-                            </Link>
-                          </div>
+                          <Link
+                            href={isReview ? `/projects/${p.id}?section=proofs` : `/projects/${p.id}`}
+                            className={`inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold text-white transition-colors shrink-0 ${
+                              isReview
+                                ? "bg-[#FF5E3A] hover:bg-[#E84D2B]"
+                                : "bg-[#231714] hover:bg-[#3A2722]"
+                            }`}
+                          >
+                            <span>{isReview ? "Review Proof" : "Open Room"}</span>
+                            <ArrowRight className="w-4 h-4" strokeWidth={1.75} />
+                          </Link>
                         </div>
                       </article>
                     );
                   })}
                 </div>
               ) : (
-                <div className="bg-white border border-stone-200 rounded-2xl p-6 text-center space-y-2">
-                  <p className="text-xs text-stone-500">
-                    No active design requests right now. Use Peach Match AI above to start your next brief.
+                <div className="bg-white border border-[#F7DFD0] rounded-3xl p-6 text-center shadow-[0_12px_32px_rgba(232,93,59,0.08)]">
+                  <p className="text-[15px] text-[#4A3B36] font-medium">
+                    No active projects yet. Describe what you are building in Peachy™ above to generate a live project plan and match with vetted creatives.
                   </p>
                 </div>
               )}
-            </div>
+            </section>
 
-            {/* Escrow Guarantee Accordion */}
-            <details className="border border-stone-200/90 bg-white rounded-2xl p-4 sm:p-5 text-xs text-stone-600 group cursor-pointer shadow-2xs">
-              <summary className="font-bold text-stone-900 flex items-center justify-between list-none">
-                <span className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Peach Escrow &amp; Dispute Protection</span>
+            {/* Subtle Peach Project Protection Accordion */}
+            <details className="bg-white border border-[#F7DFD0] rounded-3xl p-5 shadow-[0_12px_32px_rgba(232,93,59,0.08)] group cursor-pointer">
+              <summary className="font-extrabold text-base text-[#231714] flex items-center justify-between list-none gap-3">
+                <span className="inline-flex items-center gap-2">
+                  <ShieldCheck className="w-[18px] h-[18px] text-[#FF5E3A]" strokeWidth={1.5} />
+                  <span>Peach Project Protection &middot; Review Proofs Before Sign-Off</span>
                 </span>
-                <span className="text-stone-400 group-open:rotate-180 transition-transform">⌄</span>
+                <ChevronDown
+                  className="w-4 h-4 text-[#4A3B36] group-open:rotate-180 transition-transform shrink-0"
+                  strokeWidth={1.5}
+                />
               </summary>
-              <p className="mt-3 text-xs leading-relaxed text-stone-600 border-t border-stone-100 pt-3">
-                All collaborations follow fixed scope and revision rounds. Peach Coins remain held in secure escrow
-                until you approve the final delivery. If an issue ever arises, projects can be disputed directly to
-                Peach admins for full refund, 50/50 split resolution, or reassignment of a new creative from our ecosystem.
+              <p className="mt-3 text-[15px] leading-relaxed text-[#4A3B36] border-t border-[#F7DFD0] pt-3">
+                Every project follows fixed coin pricing and 3 included revision rounds. Coins Reserved for Active
+                Projects stay protected while you review proofs before final sign-off, and you receive 100% ownership
+                transfer upon completion.
               </p>
             </details>
           </main>
 
-          {/* Side Dock: Wallet, Brand Vault, Messages */}
-          <aside className="xl:col-span-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-4 sm:gap-5 min-w-0">
-            {/* Wallet Panel */}
-            <section className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-bold text-stone-900 flex items-center gap-2">
-                  <Wallet className="w-4 h-4 text-[#EB6244]" />
-                  <span>Peach Wallet</span>
-                </h2>
-                <span className="text-[11px] font-semibold text-stone-500">1 Coin = $50 USD</span>
+          {/* RIGHT COLUMN (300px Desktop Rail) */}
+          <aside className="w-full xl:w-[300px] shrink-0 space-y-5">
+            {/* 1. Business Profile Card */}
+            <section className="bg-white border border-[#F7DFD0] rounded-3xl p-5 shadow-[0_12px_32px_rgba(232,93,59,0.08)] space-y-3">
+              <div className="flex items-center gap-3.5">
+                {business.logo_url ? (
+                  <img
+                    src={business.logo_url}
+                    alt={business.name}
+                    className="w-12 h-12 rounded-2xl object-contain bg-[#FFF6EE] border border-[#F7DFD0] p-1 shrink-0"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-2xl bg-[#231714] text-white flex items-center justify-center font-extrabold text-lg shrink-0">
+                    {(business.name?.[0] || "P").toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-base font-extrabold text-[#231714] truncate">
+                    {business.name}
+                  </h2>
+                  <p className="text-[14px] text-[#4A3B36] truncate">
+                    {business.industry || "Commercial & Creative"}
+                  </p>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#231714] bg-[#FFD8BE] px-2.5 py-0.5 rounded-full mt-1">
+                    <MapPin className="w-3 h-3 text-[#FF5E3A]" strokeWidth={1.75} />
+                    <span>{businessHub}</span>
+                  </span>
+                </div>
+              </div>
+              <div className="pt-2 border-t border-[#F7DFD0] flex items-center justify-between text-xs">
+                <span className="font-semibold text-[#4A3B36] truncate">
+                  {membership?.plan_name ? `${membership.plan_name} Member` : "Standard Partner"}
+                </span>
+                <Link
+                  href="/business/account"
+                  className="font-bold text-[#FF5E3A] hover:text-[#231714] shrink-0"
+                >
+                  Edit Profile
+                </Link>
+              </div>
+            </section>
+
+            {/* 2. Brand Readiness Card (0%-100%) */}
+            <BrandReadinessCard readiness={brandReadiness} />
+
+            {/* 3. Peach Coins Wallet Card */}
+            <section className="bg-white border border-[#F7DFD0] rounded-3xl p-5 shadow-[0_12px_32px_rgba(232,93,59,0.08)] space-y-4">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Wallet className="w-[18px] h-[18px] text-[#FF5E3A]" strokeWidth={1.5} />
+                  <h2 className="text-base font-extrabold text-[#231714]">Peach Wallet</h2>
+                </div>
+                <span className="text-xs font-bold text-[#4A3B36]">1 Coin = $50</span>
               </div>
 
-              <div className="bg-[#fff8f4] border border-[#ffd1c2] rounded-xl p-4 text-[#c45439] mb-3.5">
-                <div className="text-2xl font-extrabold text-stone-950 tabular-nums">
-                  {coins} <span className="text-xs font-bold text-stone-600">Peach Coins available</span>
+              <div className="bg-[#FFF6EE] border border-[#F7DFD0] rounded-2xl p-4">
+                <div className="text-2xl font-extrabold text-[#231714] tabular-nums">
+                  {coins}{" "}
+                  <span className="text-sm font-bold text-[#4A3B36]">Peach Coins</span>
                 </div>
-                <p className="text-xs text-stone-600 mt-1 tabular-nums">
-                  {wallet?.held_coins ?? 0} Coins committed in escrow across active collaborations.
+                <p className="text-[13px] text-[#4A3B36] mt-1 tabular-nums">
+                  {heldCoins} Coins Reserved for Active Projects
                 </p>
               </div>
 
               <Link
                 href="/business/wallet"
-                className="w-full inline-flex items-center justify-center py-2.5 px-3 text-xs font-black !text-white text-white bg-[#0B2D22] hover:bg-[#164e3c] rounded-xl transition-colors shadow-2xs"
+                className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-4 text-sm font-bold text-white bg-[#231714] hover:bg-[#3A2722] rounded-2xl transition-colors"
               >
-                Manage Wallet &amp; Buy Coins →
+                <span>Top Up / Buy Coins</span>
+                <ArrowRight className="w-4 h-4" strokeWidth={1.75} />
               </Link>
             </section>
 
-            {/* Brand Vault Panel */}
-            <section className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-bold text-stone-900 flex items-center gap-2">
-                  <FolderArchive className="w-4 h-4 text-[#167b5c]" />
-                  <span>Brand Vault</span>
-                </h2>
-                <span className="text-[11px] font-semibold text-emerald-700">
-                  {brandAssets?.length ?? 0} saved
-                </span>
-              </div>
-              <p className="text-xs text-stone-600 leading-relaxed mb-3">
-                Your logos, vector marks, and color codes are automatically available to your assigned creative.
-              </p>
-
-              <Link
-                href="/business/vault"
-                className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold text-[#EB6244] hover:text-[#d85538] hover:bg-orange-50 rounded-xl transition-colors"
-              >
-                <span>Open Brand Vault →</span>
-              </Link>
-            </section>
-
-            {/* Project Messages Panel */}
-            <section className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-bold text-stone-900 flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-[#173328]" />
-                  <span>Recent Messages</span>
-                </h2>
-                <Link href="/business/messages" className="text-[11px] font-bold text-[#EB6244] hover:underline">
-                  All →
-                </Link>
-              </div>
-
-              {messages?.length ? (
-                <div className="space-y-2.5">
-                  {(messages as any[]).map((msg: any) => (
-                    <Link
-                      key={msg.id}
-                      href={`/projects/${msg.project_id}#chat`}
-                      className="block p-2 rounded-xl hover:bg-stone-50 border border-stone-100 transition-colors"
-                    >
-                      <strong className="text-xs text-stone-900 block truncate">
-                        {peopleMap.get(msg.sender_user_id)?.full_name || "Project Member"}
-                      </strong>
-                      <p className="text-xs text-stone-600 line-clamp-1 mt-0.5">{msg.message}</p>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-stone-500">
-                  No active project messages. Messages will appear here once matching begins.
-                </p>
-              )}
-            </section>
+            {/* 4. Collapsible Brand Vault & Recent Messages */}
+            <CollapsibleRailCards
+              brandAssetCount={brandAssets?.length ?? 0}
+              recentMessages={formattedMessages}
+            />
           </aside>
         </div>
       </div>

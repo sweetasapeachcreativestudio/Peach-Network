@@ -90,10 +90,13 @@ function SignInFormContent() {
       const targetRoute = isPartner ? "/business" : "/creative";
 
       // Always persist the chosen role in cookie and localStorage before OAuth begins
+      const cookieFlags =
+        typeof window !== "undefined" && window.location.protocol === "https:"
+          ? "; SameSite=None; Secure"
+          : "; SameSite=Lax";
       try {
-        const secureFlag = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
-        document.cookie = `peach_role=${assignedRole}; path=/; max-age=604800; SameSite=Lax${secureFlag}`;
-        document.cookie = `peach_target_role=${assignedRole}; path=/; max-age=3600; SameSite=Lax${secureFlag}`;
+        document.cookie = `peach_role=${assignedRole}; path=/; max-age=604800${cookieFlags}`;
+        document.cookie = `peach_target_role=${assignedRole}; path=/; max-age=3600${cookieFlags}`;
         localStorage.setItem("peach_role", assignedRole);
       } catch {}
 
@@ -113,10 +116,9 @@ function SignInFormContent() {
           },
         };
         try {
-          const secureFlag = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
           const serialized = encodeURIComponent(JSON.stringify(user));
-          document.cookie = `peach_session=${serialized}; path=/; max-age=604800; SameSite=Lax${secureFlag}`;
-          document.cookie = `peach_role=${assignedRole}; path=/; max-age=604800; SameSite=Lax${secureFlag}`;
+          document.cookie = `peach_session=${serialized}; path=/; max-age=604800${cookieFlags}`;
+          document.cookie = `peach_role=${assignedRole}; path=/; max-age=604800${cookieFlags}`;
           localStorage.setItem("peach_session", JSON.stringify(user));
           localStorage.setItem("peach_role", assignedRole);
         } catch {}
@@ -193,10 +195,13 @@ function SignInFormContent() {
       const user = data.user;
 
       try {
-        const secureFlag = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
+        const cookieFlags =
+          typeof window !== "undefined" && window.location.protocol === "https:"
+            ? "; SameSite=None; Secure"
+            : "; SameSite=Lax";
         const serialized = encodeURIComponent(JSON.stringify(user));
-        document.cookie = `peach_session=${serialized}; path=/; max-age=604800; SameSite=Lax${secureFlag}`;
-        document.cookie = `peach_role=${assignedRole}; path=/; max-age=604800; SameSite=Lax${secureFlag}`;
+        document.cookie = `peach_session=${serialized}; path=/; max-age=604800${cookieFlags}`;
+        document.cookie = `peach_role=${assignedRole}; path=/; max-age=604800${cookieFlags}`;
         localStorage.setItem("peach_session", JSON.stringify(user));
         localStorage.setItem("peach_role", assignedRole);
       } catch {}

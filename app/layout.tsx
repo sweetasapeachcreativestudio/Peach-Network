@@ -1,7 +1,16 @@
 import type { ReactNode } from "react";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import PWARegister from "./pwa-register";
 import type { Metadata } from "next";
+import BrandSplash from "./components/brand-splash";
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-plus-jakarta",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Peach Network",
@@ -9,12 +18,10 @@ export const metadata: Metadata = {
   applicationName: "Peach Network",
 };
 
-import BrandSplash from "./components/brand-splash";
-
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
+    <html lang="en" className={plusJakarta.variable} suppressHydrationWarning>
+      <body className={plusJakarta.className} suppressHydrationWarning>
         <BrandSplash />
         <PWARegister />
         {children}

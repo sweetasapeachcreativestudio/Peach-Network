@@ -4,10 +4,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PeachAppShell } from "../../components/peach-app-shell";
-import { AcceptedProject } from "../../components/accepted-project";
 import { ProjectViewManager, ProjectItem } from "./project-view-manager";
-import { ArchiveToggleButton } from "./archive-toggle-button";
-import { FolderArchive, Plus, ShieldCheck, Wallet, Sparkles, Layers } from "lucide-react";
+import { formatCityHub } from "@/lib/hubs";
+import { FolderArchive, Plus, ShieldCheck, Wallet, Sparkles, ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +22,9 @@ export default async function BusinessProjectsPage({ searchParams }: BusinessPro
   const requestedView = params.view || "active";
 
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/auth?role=business&mode=signin");
 
   const admin = createAdminClient();
@@ -47,26 +48,26 @@ export default async function BusinessProjectsPage({ searchParams }: BusinessPro
 
   const rawList = (projects ?? []) as ProjectItem[];
   const activeList = rawList.filter((p) => !["completed", "cancelled"].includes(p.status));
-  const archivedList = rawList.filter((p) => ["completed", "cancelled"].includes(p.status));
-  const acceptedProject = activeList.find((p) => p.status === "accepted");
+  const completedList = rawList.filter((p) => p.status === "completed");
 
-  // Fetch creative names for all assigned creatives
   const creativeIds = [...new Set(rawList.map((p) => p.assigned_creative_id).filter(Boolean))];
   const { data: creatives } = creativeIds.length
-    ? await admin.from("creatives").select("id,user_id").in("id", creativeIds)
+    ? await admin.from("creatives").select("id,user_id,city,state").in("id", creativeIds)
     : { data: [] };
 
-  const userIds = ((creatives ?? []) as any[]).map((c: any) => c.user_id);
+  const userIds = ((creatives ?? []) as any[]).map((c: any) => c.user_id).filter(Boolean);
   const { data: people } = userIds.length
     ? await admin.from("profiles").select("id,full_name").in("id", userIds)
     : { data: [] };
 
   const namesMap: Record<string, string> = {};
+  const hubsMap: Record<string, string> = {};
   ((creatives ?? []) as any[]).forEach((c: any) => {
     const person = ((people ?? []) as any[]).find((p: any) => p.id === c.user_id);
     if (person?.full_name) {
       namesMap[c.id] = person.full_name;
     }
+    hubsMap[c.id] = formatCityHub(c.city, c.state);
   });
 
   return (
@@ -80,23 +81,22 @@ export default async function BusinessProjectsPage({ searchParams }: BusinessPro
     >
       <ProjectRefresh />
       <div className="space-y-6">
-        {/* Top Header */}
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-stone-200/60">
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#F7DFD0]">
           <div>
-            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#EB6244] mb-1">
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#FF5E3A] mb-1">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Project Collaboration Workspace</span>
+              <span>Project Rooms</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-950 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#231714] tracking-tight">
               {business.name} Projects
             </h1>
-            <p className="text-xs sm:text-sm text-stone-600 mt-1 flex items-center gap-2 flex-wrap">
+            <p className="text-[15px] text-[#4A3B36] mt-1 flex items-center gap-2 flex-wrap">
               <span>
-                <strong className="text-stone-900 tabular-nums">{activeList.length}</strong> active collaboration{activeList.length === 1 ? "" : "s"}
+                <strong className="text-[#231714] tabular-nums">{activeList.length}</strong> active project{activeList.length === 1 ? "" : "s"}
               </span>
-              <span className="text-stone-300 font-normal" aria-hidden="true">·</span>
+              <span className="text-[#E6C5B5]" aria-hidden="true">·</span>
               <span>
-                <strong className="text-stone-900 tabular-nums">{archivedList.length}</strong> in completed archive
+                <strong className="text-[#231714] tabular-nums">{completedList.length}</strong> completed
               </span>
             </p>
           </div>
@@ -104,149 +104,96 @@ export default async function BusinessProjectsPage({ searchParams }: BusinessPro
           <div className="flex items-center gap-2.5">
             <Link
               href="/business"
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#EB6244] hover:bg-[#d85538] text-white text-xs font-bold rounded-xl shadow-xs hover:shadow transition-all"
+              className="inline-flex items-center gap-2 px-5 py-3 bg-[#FF5E3A] hover:bg-[#EB4D29] text-white text-sm font-bold rounded-2xl shadow-[0_8px_20px_rgba(255,94,58,0.22)] transition-all"
             >
               <Plus className="w-4 h-4" />
-              <span>Scope with Peach Match AI</span>
+              <span>Start Project with Peachy™</span>
             </Link>
           </div>
         </header>
 
-        {/* Accepted Kickoff Project Announcement (if any) */}
-        {acceptedProject && (
-          <AcceptedProject
-            project={acceptedProject}
-            creativeName={namesMap[acceptedProject.assigned_creative_id || ""]}
-            assetCount={assets?.length ?? 0}
-          />
-        )}
-
-        {/* Main Two-Column Layout */}
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 sm:gap-6 items-start">
-          {/* Main Column: Project View Manager (Active vs Archived Tabs) */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
           <main className="xl:col-span-8 space-y-5 min-w-0">
             {error ? (
-              <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-red-800 text-sm">
+              <div className="bg-red-50 border border-red-200 rounded-3xl p-6 text-red-800 text-sm">
                 Projects could not be loaded at this time. Please refresh the page to retry.
               </div>
             ) : (
               <ProjectViewManager
                 initialProjects={rawList}
                 creativeNames={namesMap}
+                creativeHubs={hubsMap}
                 initialView={requestedView}
                 businessName={business.name}
                 assetCount={assets?.length ?? 0}
               />
             )}
 
-            {/* Peach Guarantee Card */}
-            <details className="border border-stone-200/90 bg-white rounded-2xl p-4 sm:p-5 text-xs text-stone-600 group cursor-pointer shadow-2xs">
-              <summary className="font-bold text-stone-900 flex items-center justify-between list-none">
-                <span className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Peach Project &amp; Escrow Guarantee</span>
+            <details className="bg-white border border-[#F7DFD0] rounded-3xl p-5 text-sm text-[#4A3B36] group cursor-pointer shadow-[0_12px_32px_rgba(232,93,59,0.08)]">
+              <summary className="font-bold text-[#231714] flex items-center justify-between list-none">
+                <span className="flex items-center gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-[#FF5E3A] shrink-0" />
+                  <span>Peach Project Protection &amp; Ownership Guarantee</span>
                 </span>
-                <span className="text-stone-400 group-open:rotate-180 transition-transform">⌄</span>
+                <span className="text-[#8E776E] group-open:rotate-180 transition-transform text-xs">▼</span>
               </summary>
-              <p className="mt-3 text-xs leading-relaxed text-stone-600 border-t border-stone-100 pt-3">
-                All Peach Network collaborations follow clear milestone scope, agreed revision rounds, and
-                proof reviews inside your dedicated Project Room. Peach Coins remain protected in escrow until you approve
-                the final work. Completed deliverables remain accessible in your archive and sync to your Brand Vault.
+              <p className="mt-3 text-sm leading-relaxed text-[#4A3B36] border-t border-[#F7DFD0] pt-3">
+                All Peach Network collaborations include 3 revision rounds, milestone proof reviews, and clear deliverables inside your dedicated Project Room. Peach Coins remain reserved under Peach Project Protection until you approve final deliverables, and completed files sync straight to your Brand Vault.
               </p>
             </details>
           </main>
 
-          {/* Side Dock: Room Guide & Wallet/Brand Vault Summary (Organized into responsive 2-col on iPad, 1-col on Desktop) */}
-          <aside className="xl:col-span-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-4 sm:gap-5 min-w-0">
-            {/* Quick Archive Summary Card */}
-            <section className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-bold text-stone-900 flex items-center gap-2">
-                  <FolderArchive className="w-4 h-4 text-[#167b5c]" />
-                  <span>Archive &amp; Vault Access</span>
+          <aside className="xl:col-span-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-5 min-w-0">
+            <section className="bg-white border border-[#F7DFD0] rounded-3xl p-6 shadow-[0_12px_32px_rgba(232,93,59,0.08)] space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-extrabold text-[#231714] flex items-center gap-2">
+                  <Wallet className="w-4 h-4 text-[#FF5E3A]" />
+                  <span>Peach Wallet</span>
                 </h2>
-                <span className="text-[11px] font-semibold text-emerald-700">
-                  Permanent Storage
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#FFD8BE] text-[#231714]">
+                  $50 / Coin
                 </span>
               </div>
-              <p className="text-xs text-stone-600 leading-relaxed mb-3.5">
-                Completed work stays in your archive forever. Final vector files and color systems flow directly
-                into your Brand Vault for reuse across future design requests.
-              </p>
 
-              <div className="bg-[#FAF8F5] border border-stone-200/70 rounded-xl p-3.5 space-y-2 mb-3.5 text-xs">
-                <div className="flex items-center justify-between font-medium text-stone-700">
-                  <span>Archived Deliverables:</span>
-                  <strong className="text-stone-900 tabular-nums">{archivedList.length} projects</strong>
-                </div>
-                <div className="flex items-center justify-between font-medium text-stone-700">
-                  <span>Brand Vault Assets:</span>
-                  <strong className="text-stone-900 tabular-nums">{assets?.length ?? 0} saved</strong>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <ArchiveToggleButton />
-                <Link
-                  href="/business/vault"
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold text-[#EB6244] hover:text-[#d85538] hover:bg-orange-50 rounded-xl transition-colors"
-                >
-                  <span>Open Brand Vault →</span>
-                </Link>
-              </div>
-            </section>
-
-            {/* Wallet Overview Card */}
-            <section className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs">
-              <h2 className="text-sm font-bold text-stone-900 flex items-center gap-2 mb-3">
-                <Wallet className="w-4 h-4 text-[#EB6244]" />
-                <span>Wallet Summary</span>
-              </h2>
-
-              <div className="bg-[#fff8f4] border border-[#ffd1c2] rounded-xl p-4 text-[#c45439] mb-3.5">
-                <div className="text-2xl font-extrabold text-stone-950 tabular-nums">
+              <div className="bg-[#FFF6EE] border border-[#F7DFD0] rounded-2xl p-4 space-y-1">
+                <div className="text-2xl font-extrabold text-[#231714] tabular-nums">
                   {wallet?.available_coins ?? 0}{" "}
-                  <span className="text-xs font-bold text-stone-600">Peach Coins available</span>
+                  <span className="text-xs font-bold text-[#4A3B36]">Coins available</span>
                 </div>
-                <p className="text-xs text-stone-600 mt-1 tabular-nums">
-                  {wallet?.held_coins ?? 0} Coins committed in escrow across active collaborations.
+                <p className="text-xs text-[#4A3B36] tabular-nums">
+                  {wallet?.held_coins ?? 0} Coins reserved for active projects.
                 </p>
               </div>
 
               <Link
                 href="/business/wallet"
-                className="w-full inline-flex items-center justify-center py-2 px-3 text-xs font-bold text-white bg-[#0B2D22] hover:bg-[#164e3c] rounded-xl transition-colors shadow-2xs"
+                className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 text-sm font-bold text-white bg-[#231714] hover:bg-[#3A2823] rounded-2xl transition-colors"
               >
-                Manage Wallet &amp; Buy Coins →
+                <span>Manage Wallet &amp; Buy Coins</span>
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </section>
 
-            {/* Project Room Checklist */}
-            <section className="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs">
-              <h2 className="text-sm font-bold text-stone-900 mb-2">
-                What to Expect Inside Each Room
-              </h2>
-              <p className="text-xs text-stone-500 mb-3 leading-relaxed">
-                Every Peach Network request gets a dedicated workspace:
+            <section className="bg-white border border-[#F7DFD0] rounded-3xl p-6 shadow-[0_12px_32px_rgba(232,93,59,0.08)] space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-extrabold text-[#231714] flex items-center gap-2">
+                  <FolderArchive className="w-4 h-4 text-[#FF5E3A]" />
+                  <span>Brand Vault</span>
+                </h2>
+                <span className="text-xs font-semibold text-[#4A3B36]">
+                  {assets?.length ?? 0} assets
+                </span>
+              </div>
+              <p className="text-sm text-[#4A3B36] leading-relaxed">
+                Logos, colors, and completed deliverables are stored safely here for future campaigns.
               </p>
-              <ol className="space-y-2.5 text-xs text-stone-700">
-                <li className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-stone-100 text-stone-800 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
-                  <span><strong className="text-stone-900">Direct Creative Messaging</strong> — Chat with your designer in one thread.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-stone-100 text-stone-800 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
-                  <span><strong className="text-stone-900">Vault Integration</strong> — Logos, fonts and color codes load automatically.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-stone-100 text-stone-800 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
-                  <span><strong className="text-stone-900">Proof Review &amp; Revisions</strong> — Request tweaks or approve with confidence.</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-stone-100 text-stone-800 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">4</span>
-                  <span><strong className="text-stone-900">Final Hand-off &amp; Archive</strong> — Delivery triggers payout and permanent archive.</span>
-                </li>
-              </ol>
+              <Link
+                href="/business/vault"
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 text-sm font-bold text-[#231714] bg-[#FFD8BE] hover:bg-[#FFCBAA] rounded-2xl transition-colors"
+              >
+                <span>Open Brand Vault</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </section>
           </aside>
         </div>

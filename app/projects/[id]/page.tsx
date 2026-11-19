@@ -1,72 +1,217 @@
-import Link from "next/link";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, isRealSupabaseEnv } from "@/lib/supabase/admin";
+import { isSignedContractStatus } from "@/lib/brand-vault";
+import {
+  getProjectCollaboratorsAndPod,
+  isApprovedProjectCollaborator,
+} from "@/lib/collaborators";
+import { formatCityHub } from "@/lib/hubs";
 import { redirect, notFound } from "next/navigation";
-import WorkspaceClient from "./workspace-client";
-import { AppHeader, BottomNav } from "../../components/app-nav";
-import { ProjectProgress, projectPercent } from "../../components/project-progress";
 import BusinessProjectRoom from "./business-project-room";
 import { PeachAppShell } from "../../components/peach-app-shell";
 import MatchShortlist from "./match-shortlist";
-import { ProofFilePreviewer } from "./proof-file-previewer";
 import { DoorDashDispatchTracker } from "./door-dash-dispatch-tracker";
+import { PhoneAlertsBanner } from "../../components/phone-alerts-banner";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProjectWorkspace({ params, searchParams }: { params: Promise<{id:string}>; searchParams: Promise<{created?:string;view?:string}> }) {
+export default async function ProjectWorkspace({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ created?: string; view?: string; section?: string }>;
+}) {
   const { id } = await params;
-  const { created, view } = await searchParams;
+  const { created, view, section } = await searchParams;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/auth?mode=signin");
 
   const admin = createAdminClient();
-  const { data: profile } = await admin.from("profiles").select("full_name,role").eq("id", user.id).single();
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("full_name,role")
+    .eq("id", user.id)
+    .maybeSingle();
   if (!profile) redirect("/auth?mode=signin");
 
-  const { data: project } = await admin.from("projects")
-    .select("id,title,description,category,current_revision_round,status,coin_amount,due_at,revision_rounds,business_id,assigned_creative_id,waiting_on_client_since,created_at")
-    .eq("id", id).single();
+  const { data: project } = await admin
+    .from("projects")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
   if (!project) notFound();
 
-  const { data: business } = await admin.from("businesses").select("owner_user_id,name,logo_url").eq("id", project.business_id).single();
-  const { data: assignedCreative } = project.assigned_creative_id ? await admin.from("creatives").select("id,user_id,primary_specialty,peach_level,city").eq("id", project.assigned_creative_id).single() : { data: null } as any;
-  const isBusiness = business?.owner_user_id === user.id;
-  const isCreative = assignedCreative?.user_id === user.id;
+  const { data: business } = await admin
+    .from("businesses")
+    .select("owner_user_id,name,logo_url,city,state,industry,description,common_needs,website")
+    .eq("id", project.business_id)
+    .maybeSingle();
+
+  const { data: assignedCreative } = project.assigned_creative_id
+    ? await admin
+        .from("creatives")
+        .select("id,user_id,primary_specialty,peach_level,city,state")
+        .eq("id", project.assigned_creative_id)
+        .maybeSingle()
+    : ({ data: null } as any);
+
+  const cookieStore = await cookies();
+  const roleCookie = cookieStore.get("peach_role")?.value;
+  const preferCreativePreview = !isRealSupabaseEnv() && (roleCookie === "creative" || view === "creative");
+  const isBusiness = !preferCreativePreview && business?.owner_user_id === user.id;
+  const isLeadCreative =
+    assignedCreative?.user_id === user.id ||
+    (!isRealSupabaseEnv() && (user.id === "usr_creative_demo" || preferCreativePreview) && !isBusiness && Boolean(project.assigned_creative_id));
+  const isApprovedCollab = await isApprovedProjectCollaborator(admin, id, user.id);
+  const isCreative = isLeadCreative || isApprovedCollab;
   const isAdmin = profile.role === "admin";
   if (!isBusiness && !isCreative && !isAdmin) notFound();
-  const role: "business"|"creative"|"admin" = isAdmin ? "admin" : isBusiness ? "business" : "creative";
 
-  const [{ data: updates }, { data: messages }, { data: wallet }, { data: creativeProfile }, { data: files }, { data: requests }] = await Promise.all([
-    admin.from("project_updates").select("id,stage,progress_percent,note,evidence_path,created_at,creative_id").eq("project_id",id).order("created_at",{ascending:false}),
-    admin.from("project_messages").select("id,message,created_at,sender_user_id").eq("project_id",id).order("created_at",{ascending:true}),
-    isBusiness ? admin.from("coin_wallets").select("available_coins").eq("business_id",project.business_id).maybeSingle() : Promise.resolve({data:null}),
-    assignedCreative ? admin.from("profiles").select("full_name,avatar_url").eq("id",assignedCreative.user_id).maybeSingle() : Promise.resolve({data:null}),
-    admin.from("project_files").select("id,file_kind,original_name,mime_type,size_bytes,note,created_at,uploaded_by").eq("project_id",id).order("created_at",{ascending:false}),
-    admin.from("project_client_requests").select("id,request_type,note,status,created_at").eq("project_id",id).eq("status","open").order("created_at",{ascending:false}),
+  const role: "business" | "creative" | "admin" = isAdmin
+    ? "admin"
+    : isBusiness
+    ? "business"
+    : "creative";
+
+  const { collaborators, podInfo } = await getProjectCollaboratorsAndPod(admin, id);
+
+  const [
+    { data: messages },
+    { data: wallet },
+    { data: creativeProfile },
+    { data: files },
+    { data: requests },
+    { data: auditLogs },
+    { data: showcasePhotos },
+  ] = await Promise.all([
+    admin
+      .from("project_messages")
+      .select("id,message,created_at,sender_user_id")
+      .eq("project_id", id)
+      .order("created_at", { ascending: true }),
+    isBusiness
+      ? admin.from("coin_wallets").select("available_coins").eq("business_id", project.business_id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    assignedCreative
+      ? admin.from("profiles").select("full_name,avatar_url").eq("id", assignedCreative.user_id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    admin
+      .from("project_files")
+      .select("id,file_kind,original_name,mime_type,size_bytes,note,created_at,uploaded_by")
+      .eq("project_id", id)
+      .order("created_at", { ascending: false }),
+    admin
+      .from("project_client_requests")
+      .select("id,request_type,note,status,created_at")
+      .eq("project_id", id)
+      .eq("status", "open")
+      .order("created_at", { ascending: false }),
+    admin
+      .from("audit_log")
+      .select("action,metadata,created_at")
+      .eq("entity_id", id)
+      .order("created_at", { ascending: false }),
+    admin
+      .from("business_brand_assets")
+      .select("id,label,original_name")
+      .eq("business_id", project.business_id)
+      .eq("kind", "photo")
+      .limit(6),
   ]);
 
-  const canViewVault = isBusiness || isAdmin || !["completed","cancelled"].includes(project.status);
-  const {data:brandAssets} = canViewVault ? await admin.from("business_brand_assets").select("id,label,value,notes,storage_path,original_name").eq("business_id",project.business_id).order("kind") : {data:[]};
+  const isActiveCollab = await isApprovedProjectCollaborator(admin, id, user.id, { requireSigned: true });
+  const canViewVault =
+    isBusiness ||
+    isAdmin ||
+    ((isLeadCreative || isActiveCollab) && isSignedContractStatus(project.status));
+  const { data: brandAssets } = canViewVault
+    ? await admin
+        .from("business_brand_assets")
+        .select("id,label,value,notes,storage_path,original_name")
+        .eq("business_id", project.business_id)
+        .order("kind")
+    : { data: [] };
 
-  const senderIds = [...new Set((messages ?? []).map((m:any)=>m.sender_user_id).filter(Boolean))];
-  const senderMap = new Map<string,string>();
+  const vaultAccessState: "open_active" | "closed_completed" | "closed_pending_signatures" =
+    ["completed", "cancelled"].includes(project.status)
+      ? "closed_completed"
+      : isSignedContractStatus(project.status)
+      ? "open_active"
+      : "closed_pending_signatures";
+
+  const lockLog = (auditLogs ?? []).find((l: any) => l.action === "project_brief_locked");
+  const modeLog = (auditLogs ?? []).find(
+    (l: any) =>
+      l.action === "project_brief_updated" || l.action === "project_created_via_peach_match_ai"
+  );
+  const briefLocked = Boolean(lockLog || project.status !== "draft");
+  const briefMode = (lockLog?.metadata?.brief_mode ||
+    modeLog?.metadata?.brief_mode ||
+    "undecided") as "undecided" | "own" | "ai";
+
+  const clientSigLog = (auditLogs ?? []).find((l: any) => l.action === "contract_signed_client");
+  const creativeSigLog = (auditLogs ?? []).find((l: any) => l.action === "contract_signed_creative");
+
+  const initialClientSignature = project.business_signature_name
+    ? {
+        name: project.business_signature_name,
+        signedAt: project.business_signed_at || project.created_at,
+      }
+    : clientSigLog
+    ? {
+        name:
+          clientSigLog.metadata?.business_signature_name ||
+          clientSigLog.metadata?.signer_name ||
+          business?.name ||
+          "Business Owner",
+        signedAt: clientSigLog.metadata?.business_signed_at || clientSigLog.metadata?.signed_at || clientSigLog.created_at,
+      }
+    : null;
+
+  const initialCreativeSignature = project.creative_signature_name
+    ? {
+        name: project.creative_signature_name,
+        signedAt: project.creative_signed_at || project.created_at,
+      }
+    : creativeSigLog
+    ? {
+        name:
+          creativeSigLog.metadata?.creative_signature_name ||
+          creativeSigLog.metadata?.signer_name ||
+          creativeProfile?.full_name ||
+          "Peach Creative",
+        signedAt:
+          creativeSigLog.metadata?.creative_signed_at ||
+          creativeSigLog.metadata?.signed_at ||
+          creativeSigLog.created_at,
+      }
+    : null;
+
+  const senderIds = [...new Set((messages ?? []).map((m: any) => m.sender_user_id).filter(Boolean))];
+  const senderMap = new Map<string, string>();
   if (senderIds.length) {
     const { data: senders } = await admin.from("profiles").select("id,full_name").in("id", senderIds);
-    (senders ?? []).forEach((s:any)=>senderMap.set(s.id,s.full_name ?? "Project member"));
+    (senders ?? []).forEach((s: any) => senderMap.set(s.id, s.full_name ?? "Project member"));
   }
 
-  // Pre-generate signed preview URLs for all image proofs and files
   const previewUrls: Record<string, string> = {};
-  const imageFiles = ((files ?? []) as any[]).filter((f: any) =>
-    f.mime_type?.startsWith("image/") || ["application/pdf"].includes(f.mime_type ?? "")
+  const imageFiles = ((files ?? []) as any[]).filter(
+    (f: any) => f.mime_type?.startsWith("image/") || ["application/pdf"].includes(f.mime_type ?? "")
   );
 
   if (imageFiles.length > 0) {
     const { data: filePaths } = await admin
       .from("project_files")
       .select("id,storage_path")
-      .in("id", imageFiles.map((f: any) => f.id));
+      .in(
+        "id",
+        imageFiles.map((f: any) => f.id)
+      );
 
     if (filePaths?.length) {
       await Promise.all(
@@ -80,137 +225,124 @@ export default async function ProjectWorkspace({ params, searchParams }: { param
               previewUrls[fp.id] = signed.signedUrl;
             }
           } catch {
-            // Client fallback will fetch on demand
+            // fallback
           }
         })
       );
     }
   }
 
-  const latestImageProof = ((files ?? []) as any[]).find((f: any) => f.file_kind === "proof" && ["image/png", "image/jpeg", "image/webp"].includes(f.mime_type ?? ""));
+  const latestImageProof = ((files ?? []) as any[]).find(
+    (f: any) => f.file_kind === "proof" && ["image/png", "image/jpeg", "image/webp"].includes(f.mime_type ?? "")
+  );
   const proofThumbnailUrl = latestImageProof ? previewUrls[latestImageProof.id] ?? null : null;
 
-  const creativeCity = assignedCreative?.city?.toLowerCase() ?? "";
-  const creativeHub = creativeCity.includes("atlanta")
-    ? "Atlanta Hub"
-    : creativeCity.includes("huntsville")
-    ? "Huntsville Hub"
-    : creativeCity.includes("montgomery")
-    ? "Montgomery Hub"
-    : "Birmingham Hub";
-
-  const days = project.due_at ? Math.ceil((new Date(project.due_at).getTime()-Date.now())/86400000) : null;
+  const creativeHub = formatCityHub(assignedCreative?.city, assignedCreative?.state);
+  const businessHub = formatCityHub(business?.city, business?.state);
   const appRole = role === "creative" ? "creative" : "business";
-  const headerName = profile.full_name;
 
-  if (isBusiness) {
-    const isMatchingOrOffered = ["matching", "offer_sent"].includes(project.status);
-
-    return (
-      <PeachAppShell role="business" active="projects" name={profile.full_name} businessName={business?.name} logoUrl={business?.logo_url} coinCount={wallet?.available_coins??0}>
-        {created === "1" && <p className="auth-message">Project created. Your brief is ready while matching begins.</p>}
-
-        {/* DoorDash-Style Dispatch Tracker */}
-        {isMatchingOrOffered && (
-          <DoorDashDispatchTracker
-            projectId={id}
-            projectTitle={project.title}
-            category={project.category}
-            coins={project.coin_amount}
-            creativeName={creativeProfile?.full_name ?? "Jordan Ellis"}
-            creativeAvatar={creativeProfile?.avatar_url ?? "/Creative1.JPG"}
-            creativeSpecialty={assignedCreative?.primary_specialty ?? "Commercial Graphics"}
-            creativeHub={creativeHub}
-            status={project.status}
-            businessName={business?.name ?? "Your business"}
-            description={project.description}
-            dueAt={project.due_at}
-          />
-        )}
-
-        {!project.assigned_creative_id && ["matching","offer_sent","draft"].includes(project.status) && <MatchShortlist projectId={id}/>}
-
-        {/* Full Active Project Room */}
-        <BusinessProjectRoom
-          proofThumbnail={proofThumbnailUrl}
-          previewUrls={previewUrls}
-          project={project}
-          businessName={business?.name??"Your business"}
-          creative={assignedCreative?{name:creativeProfile?.full_name??"Your creative",avatar:creativeProfile?.avatar_url??null,specialty:assignedCreative.primary_specialty,hub:creativeHub}:null}
-          files={files??[]}
-          assets={brandAssets??[]}
-          requests={requests??[]}
-          initialBrief={view==="brief"}
-          messages={((messages??[]) as any[]).map((m: any)=>({...m,sender:m.sender_user_id===user.id?"You":senderMap.get(m.sender_user_id)??"Project member"}))}
-        />
-        <style>{`.peach-business-workspace .peach-workspace-content{max-width:1750px;padding:22px 26px 40px}.peach-business-workspace .peach-workspace-topbar{height:52px}@media(max-width:700px){.peach-business-workspace .peach-workspace-content{padding:18px 14px 90px}}`}</style>
-      </PeachAppShell>
-    );
+  const initialCheckedPieces: Record<number, boolean> = {};
+  const initialReadyPieces: Record<number, boolean> = {};
+  for (const log of [...(auditLogs ?? [])].reverse()) {
+    const idx = log?.metadata?.deliverableIndex;
+    if (typeof idx !== "number") continue;
+    if (log.action === "deliverable_approved") {
+      initialCheckedPieces[idx] = true;
+      initialReadyPieces[idx] = true;
+    } else if (log.action === "deliverable_feedback") {
+      initialCheckedPieces[idx] = false;
+      initialReadyPieces[idx] = false;
+    } else if (log.action === "deliverable_ready_for_review") {
+      initialReadyPieces[idx] = Boolean(log.metadata?.ready);
+    }
   }
 
-  return <main className="app-shell">
-    <AppHeader name={headerName} role={appRole} coinCount={isBusiness ? (wallet as any)?.available_coins ?? 0 : undefined}/>
-
-    {created === "1" && <div className="auth-message" style={{marginBottom:14}}><strong>Project created.</strong> Peach has your scope. Your project now has a home while matching begins.</div>}
-
-    <section className="workspace-header-card">
-      <div className="workspace-header-top">
-        <div>
-          <span className="eyebrow" style={{color:"#ffd1ba"}}>{project.assigned_creative_id ? "ACTIVE PEACH PROJECT" : "PEACH MATCH"}</span>
-          <h1>{project.title}</h1>
-          <p>{project.description || "Project details will appear here."}</p>
-          {creativeProfile?.full_name && <p style={{marginBottom:0}}><strong>Working with {creativeProfile.full_name}</strong>{assignedCreative?.primary_specialty ? ` · ${assignedCreative.primary_specialty}` : ""}</p>}
+  return (
+    <PeachAppShell
+      role={appRole}
+      active="projects"
+      name={profile.full_name}
+      businessName={appRole === "business" ? business?.name : undefined}
+      logoUrl={appRole === "business" ? business?.logo_url : undefined}
+      coinCount={isBusiness ? wallet?.available_coins ?? 0 : undefined}
+    >
+      <PhoneAlertsBanner role={role} />
+      {created === "1" && (
+        <div className="mb-4 rounded-2xl bg-[#FFF6EE] border border-[#F7DFD0] px-4 py-3 text-sm font-bold text-[#231714]">
+          Project created. Review or customize your Creative Brief in Step 1 below.
         </div>
-        <div className="workspace-deadline"><small>DEADLINE</small><strong>{project.due_at ? new Date(project.due_at).toLocaleDateString() : "Flexible"}</strong>{days !== null && <div>{days<0?`${Math.abs(days)} days overdue`:days===0?"Due today":`${days} days remaining`}</div>}</div>
-      </div>
-      <ProjectProgress status={project.status}/>
-      <div style={{display:"flex",justifyContent:"space-between",gap:15,flexWrap:"wrap",marginTop:14}}><span className={`status-label ${project.status}`}>{project.status.replaceAll("_"," ")}</span><strong>{projectPercent(project.status)}% through the Peach journey</strong></div>
-    </section>
+      )}
 
-    {!project.assigned_creative_id && ["matching","offer_sent","draft"].includes(project.status) && isBusiness && <MatchShortlist projectId={id}/>}
+      {isBusiness && project.status === "matching" && (
+        <DoorDashDispatchTracker
+          projectId={id}
+          projectTitle={project.title}
+          category={project.category}
+          coins={project.coin_amount}
+          creativeName={creativeProfile?.full_name ?? "Matched Creative"}
+          creativeAvatar={creativeProfile?.avatar_url ?? "/Creative1.JPG"}
+          creativeSpecialty={assignedCreative?.primary_specialty ?? "Commercial Graphics"}
+          creativeHub={creativeHub}
+          status={project.status}
+          businessName={business?.name ?? "Your business"}
+          description={project.description}
+          dueAt={project.due_at}
+        />
+      )}
 
-    <div className="workspace-tabs"><a href="#overview">Overview</a><a href="#chat">Chat</a><a href="#progress">Progress</a><a href="#proofs">Proofs</a><a href="#timeline">Timeline</a></div>
+      {isBusiness && !project.assigned_creative_id && ["matching", "offer_sent", "draft"].includes(project.status) && (
+        <MatchShortlist projectId={id} />
+      )}
 
-    <section className="workspace-grid" id="overview">
-      <div id="chat" className="chat-card">
-        <div className="chat-head"><div><strong>Project Chat</strong><div className="muted" style={{fontSize:13}}>Keep decisions attached to the project.</div></div><span className="status-label">{messages?.length ?? 0} messages</span></div>
-        <div className="chat-thread">
-          {(messages ?? []).map((m:any)=>{
-            const mine = m.sender_user_id === user.id;
-            return <div key={m.id} className={`chat-bubble ${mine?"mine":""}`}><strong>{mine?"You":senderMap.get(m.sender_user_id)??"Project member"}</strong>{m.message}<small>{new Date(m.created_at).toLocaleString()}</small></div>
-          })}
-          {(!messages || messages.length===0)&&<div className="muted">No messages yet. Start the project conversation here.</div>}
-        </div>
-        <WorkspaceClient projectId={id} role={role} status={project.status} openRequests={requests ?? []}/>
-      </div>
-
-      <aside className="side-stack">
-        {canViewVault&&<details className="action-card"><summary style={{cursor:"pointer",fontWeight:800}}>Brand Vault · {brandAssets?.length??0} saved assets</summary><p>Reusable assets from {business?.name}. Use these throughout the project.</p><div className="file-list">{((brandAssets??[]) as any[]).map((asset: any)=><div key={asset.id} className="file-row"><div><strong>{asset.label}</strong><span>{asset.value||asset.original_name}</span>{asset.notes&&<span>{asset.notes}</span>}</div>{asset.storage_path&&<a href={`/api/brand-vault/${asset.id}?project=${id}`}>Download</a>}</div>)}{!brandAssets?.length&&<span className="muted">No saved brand assets yet.</span>}</div>{isBusiness&&<Link href="/business/vault" className="text-link">Manage your Brand Vault →</Link>}</details>}
-        <div className="action-card"><span className="eyebrow">SCOPE</span><h3>{project.coin_amount} Peach Coin{project.coin_amount===1?"":"s"}</h3><p>{project.revision_rounds} revision round{project.revision_rounds===1?"":"s"} included in the current scope.</p></div>
-        <div className="action-card" id="proofs" style={{padding:0,background:'transparent',border:'none',boxShadow:'none'}}>
-          <ProofFilePreviewer
-            projectId={id}
-            files={(files ?? []) as any[]}
-            initialPreviewUrls={previewUrls}
-            title="Proofs & Project Files"
-            isOwnerOrClient={isBusiness}
-          />
-        </div>
-        {project.status === "waiting_on_client" && <div className="action-card" style={{background:"#fff0de"}}><h3>Waiting on client</h3><p>The creative has marked this project as blocked while they wait for client information.</p></div>}
-      </aside>
-    </section>
-
-    <section id="progress" className="card" style={{marginTop:18}}>
-      <div className="section-row" style={{marginTop:0}}><div><h2>Progress history</h2><p>Check-ins make the work visible before final delivery.</p></div></div>
-      <div className="timeline-list">
-        {(updates ?? []).map((u:any)=><div className="timeline-row" key={u.id}><span className="timeline-dot"/><div><strong>{u.progress_percent}% · {u.stage.replaceAll("_"," ")}</strong><p>{u.note || "Progress update"} · {new Date(u.created_at).toLocaleString()}</p></div></div>)}
-        {(!updates || updates.length===0)&&<p className="muted">No creative check-ins yet.</p>}
-      </div>
-    </section>
-
-    <section id="timeline" className="card" style={{marginTop:18}}><h2>Project timeline</h2><div className="timeline-list"><div className="timeline-row"><span className="timeline-dot"/><div><strong>Project created</strong><p>{new Date(project.created_at).toLocaleString()}</p></div></div>{project.assigned_creative_id&&<div className="timeline-row"><span className="timeline-dot"/><div><strong>Creative matched</strong><p>{creativeProfile?.full_name ?? "A Peach creative"} is attached to this project.</p></div></div>}{(updates??[]).slice().reverse().map((u:any)=><div className="timeline-row" key={`t-${u.id}`}><span className="timeline-dot"/><div><strong>{u.stage.replaceAll("_"," ")}</strong><p>{u.note || "Progress update"}</p></div></div>)}</div></section>
-
-    {role !== "admin" && <BottomNav role={role} active="projects"/>}
-    {role === "admin" && <div style={{marginTop:20}}><Link className="text-link" href="/admin">← Admin HQ</Link></div>}
-  </main>
+      <BusinessProjectRoom
+        role={role}
+        isLeadCreative={isLeadCreative || isAdmin}
+        currentUserId={user.id}
+        initialCollaborators={collaborators}
+        initialPodInfo={podInfo}
+        coinBalance={wallet?.available_coins ?? 0}
+        proofThumbnail={proofThumbnailUrl}
+        previewUrls={previewUrls}
+        project={project}
+        businessName={business?.name ?? "Your business"}
+        businessProfile={{
+          name: business?.name ?? "Your business",
+          logoUrl: business?.logo_url ?? null,
+          hub: businessHub,
+          industry: business?.industry ?? null,
+          description: business?.description ?? null,
+          website: business?.website ?? null,
+          commonNeeds: Array.isArray(business?.common_needs) ? business.common_needs : [],
+          showcasePhotos: (showcasePhotos ?? []) as Array<{ id: string; label?: string | null; original_name?: string | null }>,
+        }}
+        creative={
+          assignedCreative
+            ? {
+                name: creativeProfile?.full_name ?? "Matched Creative",
+                avatar: creativeProfile?.avatar_url ?? null,
+                specialty: assignedCreative.primary_specialty,
+                hub: creativeHub,
+              }
+            : null
+        }
+        files={files ?? []}
+        assets={brandAssets ?? []}
+        requests={requests ?? []}
+        initialBrief={view === "brief"}
+        initialSection={section}
+        briefLocked={briefLocked}
+        briefMode={briefMode}
+        initialClientSignature={initialClientSignature}
+        initialCreativeSignature={initialCreativeSignature}
+        initialCheckedPieces={initialCheckedPieces}
+        initialReadyPieces={initialReadyPieces}
+        vaultAccessState={vaultAccessState}
+        messages={((messages ?? []) as any[]).map((m: any) => ({
+          ...m,
+          sender: m.sender_user_id === user.id ? "You" : senderMap.get(m.sender_user_id) ?? "Project member",
+        }))}
+      />
+      <style>{`.peach-business-workspace .peach-workspace-content{max-width:1750px;padding:22px 26px 40px}.peach-business-workspace .peach-workspace-topbar{height:52px}@media(max-width:700px){.peach-business-workspace .peach-workspace-content{padding:18px 14px 90px}}`}</style>
+    </PeachAppShell>
+  );
 }

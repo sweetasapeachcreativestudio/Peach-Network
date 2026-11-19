@@ -31,7 +31,7 @@ export async function createPeachNotification({
 
   const { data: profile } = await admin
     .from("profiles")
-    .select("email")
+    .select("email,phone")
     .eq("id", userId)
     .single();
 
@@ -45,5 +45,10 @@ export async function createPeachNotification({
     } catch (error) {
       console.error("[peach-email:error]", error);
     }
+  }
+
+  // Check SMS notification trigger
+  if (profile?.phone) {
+    console.log(`[peach-sms:trigger] Dispatching SMS alert to ${profile.phone}: "Peach Network: ${title} - ${body}"`);
   }
 }

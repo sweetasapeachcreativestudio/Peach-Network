@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 
 type Asset={id:string;label:string;kind:string;value:string|null;notes:string|null;original_name:string|null;storage_path:string|null;size_bytes:number};
 const groups=[['logo','Logos & marks'],['color','Brand colors'],['font','Typefaces & fonts'],['photo','Photos & imagery'],['guide','Brand guides'],['other','Other assets']];
@@ -13,10 +12,16 @@ export default function VaultManager({assets}:{assets:Asset[]}) {
   async function save(event:React.FormEvent){event.preventDefault();setBusy(true);setMessage("");try {
     if(file){
       if(file.size>25*1024*1024)throw Error("Choose a file 25 MB or smaller.");
-      const upload=await json("/api/brand-vault","POST",{action:"upload",name:file.name});
-      const {error}=await createClient().storage.from("brand-vault").uploadToSignedUrl(upload.path,upload.token,file,{contentType:file.type||"application/octet-stream"});
-      if(error)throw Error(error.message);
-      await json("/api/brand-vault","POST",{...form,path:upload.path});
+      const fd=new FormData();
+      fd.append("file",file);
+      fd.append("kind",form.kind);
+      fd.append("label",form.label);
+      if(form.value)fd.append("value",form.value);
+      if(form.notes)fd.append("notes",form.notes);
+      if(form.id)fd.append("id",form.id);
+      const response=await fetch("/api/brand-vault",{method:"POST",body:fd});
+      const data=await response.json();
+      if(!response.ok)throw Error(data.error||"Could not upload asset.");
     } else if(form.id)await json(`/api/brand-vault/${form.id}`,"PATCH",form);
     else await json("/api/brand-vault","POST",form);
     setEditing(false);setFile(null);setMessage("Asset saved. It is ready for your projects.");router.refresh();

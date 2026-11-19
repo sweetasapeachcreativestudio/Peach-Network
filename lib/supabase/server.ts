@@ -7,7 +7,17 @@ export async function createClient() {
 
   const sessionCookie = cookieStore.get("peach_session");
   const roleCookie = cookieStore.get("peach_role");
+  const headerRole = reqHeaders.get("x-peach-role");
+  const effectiveRoleHint =
+    roleCookie?.value === "creative" || roleCookie?.value === "business"
+      ? roleCookie.value
+      : headerRole === "creative" || headerRole === "business"
+      ? headerRole
+      : undefined;
+  const pathname = reqHeaders.get("x-pathname") || "";
+  const referer = reqHeaders.get("referer") || "";
   let user: any = null;
+  let ssrClient: ReturnType<typeof createServerClient> | null = null;
 
   // Try real Supabase SSR session if env vars or cookies are present
   const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -31,7 +41,7 @@ export async function createClient() {
     !supabaseUrl.includes("your-project")
   ) {
     try {
-      const ssrClient = createServerClient(supabaseUrl, supabaseAnonKey, {
+      ssrClient = createServerClient(supabaseUrl, supabaseAnonKey, {
         cookies: {
           getAll() {
             return cookieStore.getAll();
@@ -63,45 +73,78 @@ export async function createClient() {
     }
   }
 
-  // If no cookie was transmitted, infer user from role cookie or route context
-  if (!user) {
-    const pathname = reqHeaders.get("x-pathname") || "";
-    const referer = reqHeaders.get("referer") || "";
+  const demoCreativeUser = {
+    id: "usr_creative_demo",
+    email: "creative@peachnetwork.com",
+    app_metadata: { provider: "google" },
+    user_metadata: {
+      full_name: "Peach Creative",
+      role: "creative",
+    },
+    aud: "authenticated",
+    created_at: new Date().toISOString(),
+  };
 
+  const demoBusinessUser = {
+    id: "usr_business_demo",
+    email: "partner@peachnetwork.com",
+    app_metadata: { provider: "google" },
+    user_metadata: {
+      full_name: "Peach Partner",
+      role: "business",
+      business_name: "Magic City Brands",
+    },
+    aud: "authenticated",
+    created_at: new Date().toISOString(),
+  };
+
+  const isDemoUser =
+    Boolean(user?.id) &&
+    (user.id === "usr_business_demo" || user.id === "usr_creative_demo" || user.id === "usr_admin_demo");
+
+  const isSharedRoute =
+    pathname.startsWith("/projects") ||
+    pathname.startsWith("/account") ||
+    pathname.startsWith("/notifications") ||
+    pathname.startsWith("/api/");
+
+  // Keep preview/demo role consistent when switching between Creative Studio and Business Studio
+  if (isDemoUser) {
+    if (
+      pathname.startsWith("/creative") ||
+      (isSharedRoute && (effectiveRoleHint === "creative" || referer.includes("/creative")))
+    ) {
+      user = demoCreativeUser;
+    } else if (
+      pathname.startsWith("/business") ||
+      (isSharedRoute && effectiveRoleHint === "business")
+    ) {
+      user = demoBusinessUser;
+    }
+  }
+
+  // If no cookie was transmitted, infer user from role cookie, header, or authenticated route context
+  if (!user) {
     if (
       pathname.startsWith("/creative") ||
       referer.includes("/creative") ||
-      roleCookie?.value === "creative"
+      effectiveRoleHint === "creative"
     ) {
-      user = {
-        id: "usr_creative_demo",
-        email: "creative@peachnetwork.com",
-        app_metadata: { provider: "google" },
-        user_metadata: {
-          full_name: "Peach Creative",
-          role: "creative",
-        },
-        aud: "authenticated",
-        created_at: new Date().toISOString(),
-      };
+      user = demoCreativeUser;
     } else if (
       pathname.startsWith("/business") ||
       pathname.startsWith("/projects") ||
       referer.includes("/business") ||
-      roleCookie?.value === "business"
+      effectiveRoleHint === "business"
     ) {
-      user = {
-        id: "usr_business_demo",
-        email: "partner@peachnetwork.com",
-        app_metadata: { provider: "google" },
-        user_metadata: {
-          full_name: "Peach Partner",
-          role: "business",
-          business_name: "Magic City Brands",
-        },
-        aud: "authenticated",
-        created_at: new Date().toISOString(),
-      };
+      user = demoBusinessUser;
+    } else if (
+      pathname.startsWith("/account") ||
+      pathname.startsWith("/notifications") ||
+      referer.includes("/account") ||
+      referer.includes("/notifications")
+    ) {
+      user = effectiveRoleHint === "business" ? demoBusinessUser : demoCreativeUser;
     } else if (pathname.startsWith("/admin") || referer.includes("/admin")) {
       user = {
         id: "usr_admin_demo",
@@ -126,6 +169,11 @@ export async function createClient() {
         return { data: { session: user ? { user } : null }, error: null };
       },
       async signOut() {
+        if (ssrClient) {
+          try {
+            await ssrClient.auth.signOut();
+          } catch {}
+        }
         try {
           cookieStore.delete("peach_session");
           cookieStore.delete("peach_role");

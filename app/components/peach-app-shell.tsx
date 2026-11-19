@@ -1,6 +1,24 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import {
+  Award,
+  Bell,
+  Briefcase,
+  Coins,
+  Compass,
+  FolderKanban,
+  Globe,
+  Home,
+  Layers,
+  MessageSquare,
+  Sparkles,
+  User,
+  Wallet,
+} from "lucide-react";
 import { AskArtDirectorButton } from "./ask-art-director-modal";
+import { PeachMobileDrawer } from "./peach-mobile-drawer";
+import { SidebarAvatar } from "./sidebar-avatar";
+import { LogoutButton } from "./logout-button";
 
 type Role = "business" | "creative";
 
@@ -11,7 +29,8 @@ const businessNav = [
   ["messages", "/business/messages", "Messages"],
   ["vault", "/business/vault", "Brand Vault"],
   ["wallet", "/business/wallet", "Wallet & Billing"],
-  ["account", "/account?edit=1", "Account"],
+  ["notifications", "/notifications#sms-settings", "Alerts & SMS"],
+  ["account", "/business/account", "Account"],
 ] as const;
 
 const creativeNav = [
@@ -20,12 +39,45 @@ const creativeNav = [
   ["opportunities", "/creative/offers", "Opportunities"],
   ["projects", "/creative/projects", "Projects"],
   ["messages", "/creative/messages", "Messages"],
-  ["portfolio", "/account?edit=1", "Profile & Portfolio"],
+  ["portfolio", "/creative/profile", "Profile & Portfolio"],
   ["academy", "/creative/academy", "Academy & Resources"],
   ["social", "/network", "Peach Social"],
   ["earnings", "/creative/payouts", "Earnings & Payouts"],
+  ["notifications", "/notifications#sms-settings", "Alerts & SMS"],
   ["account", "/account?edit=1", "Account"],
 ] as const;
+
+function NavIcon({ itemKey }: { itemKey: string }) {
+  const cls = "w-[18px] h-[18px] shrink-0";
+  switch (itemKey) {
+    case "home":
+      return <Home className={cls} strokeWidth={1.5} />;
+    case "peach_business":
+      return <Briefcase className={cls} strokeWidth={1.5} />;
+    case "projects":
+      return <FolderKanban className={cls} strokeWidth={1.5} />;
+    case "messages":
+      return <MessageSquare className={cls} strokeWidth={1.5} />;
+    case "vault":
+      return <Layers className={cls} strokeWidth={1.5} />;
+    case "wallet":
+      return <Wallet className={cls} strokeWidth={1.5} />;
+    case "studio_ai":
+      return <Sparkles className={cls} strokeWidth={1.5} />;
+    case "opportunities":
+      return <Compass className={cls} strokeWidth={1.5} />;
+    case "academy":
+      return <Award className={cls} strokeWidth={1.5} />;
+    case "social":
+      return <Globe className={cls} strokeWidth={1.5} />;
+    case "earnings":
+      return <Coins className={cls} strokeWidth={1.5} />;
+    case "notifications":
+      return <Bell className={cls} strokeWidth={1.5} />;
+    default:
+      return <User className={cls} strokeWidth={1.5} />;
+  }
+}
 
 export function PeachAppShell({
   role,
@@ -45,59 +97,165 @@ export function PeachAppShell({
   children: ReactNode;
 }) {
   const nav = role === "business" ? businessNav : creativeNav;
+  const navItems = nav.map(([key, href, label]) => ({ key, href, label }));
   const first = name?.trim()?.split(" ")[0] || (role === "business" ? "Partner" : "Creative");
+  const displayOrgName = businessName?.trim() || name?.trim() || first;
+  const userSubtitle = role === "business" ? `${first} · Business owner` : "Peach creative";
 
-  return <div className={`peach-workspace ${role === "business" ? "peach-business-workspace" : ""}`}>
-    <aside className="peach-sidebar">
-      <Link href={role === "business" ? "/business" : "/creative"} className="peach-sidebar-brand" aria-label="Peach Network home">
-        <img src="/brand/peach-wordmark.png" alt="Peach Network"/>
-      </Link>
-      <div className="peach-sidebar-role">{role === "business" ? "BUSINESS PORTAL" : "CREATIVE PORTAL"}</div>
-      <nav className="peach-sidebar-nav" aria-label={role === "business" ? "Business navigation" : "Creative navigation"}>
-        {nav.map(([key, href, label]) => <Link key={key} href={href} className={active === key ? "active" : ""}><span className="peach-nav-dot"/>{label}</Link>)}
-      </nav>
-      <div className="peach-sidebar-bottom">
-        <Link href="/account?edit=1" className="peach-user-badge" aria-label="Edit your business or profile"><span>{logoUrl ? <img src={logoUrl} alt=""/> : (businessName || first)[0]?.toUpperCase()}</span><div><strong>{businessName || name || first}</strong><small>{role === "business" ? `${first} · Edit business profile` : "Peach creative"}</small></div></Link>
-        <form action="/auth/signout" method="post"><button type="submit">Log out</button></form>
-      </div>
-    </aside>
+  return (
+    <div className={`peach-workspace ${role === "business" ? "peach-business-workspace" : "peach-creative-workspace"}`}>
+      {/* Fixed 240px Desktop Left Sidebar */}
+      <aside className="peach-sidebar">
+        <Link
+          href={role === "business" ? "/business" : "/creative"}
+          className="peach-sidebar-brand"
+          aria-label="Peach Network home"
+        >
+          <img src="/brand/peach-wordmark.png" alt="Peach Network" />
+        </Link>
 
-    <div className="peach-workspace-main">
-      <header className="peach-workspace-topbar">
-        <div className="peach-mobile-brand"><img src="/brand/peach-wordmark.png" alt="Peach Network"/></div>
-        <div className="peach-topbar-actions">
-          {role === "business" && <AskArtDirectorButton businessName={businessName} />}
-          {role === "business" && typeof coinCount === "number" && <Link href="/business/wallet" className="peach-coin-chip"><span/> {coinCount} Coins</Link>}
-          <Link href="/notifications" className="peach-topbar-button" aria-label="Notifications">Notifications</Link>
-          <Link href="/account?edit=1" className="peach-avatar" aria-label="Account">{first[0]?.toUpperCase()}</Link>
+        <div className="peach-sidebar-role">
+          {role === "business" ? "PEACH STUDIO" : "CREATIVE STUDIO"}
         </div>
-      </header>
-      <div className="peach-workspace-content">{children}</div>
+
+        <nav
+          className="peach-sidebar-nav"
+          aria-label={role === "business" ? "Business navigation" : "Creative navigation"}
+        >
+          {nav.map(([key, href, label]) => {
+            const isActive = active === key;
+            return (
+              <Link key={key} href={href} className={isActive ? "active" : ""}>
+                <span className="peach-nav-icon">
+                  <NavIcon itemKey={key} />
+                </span>
+                <span>{label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="peach-sidebar-bottom">
+          <Link
+            href={role === "business" ? "/business/account" : "/account?edit=1"}
+            className="peach-user-badge"
+            aria-label="Edit your business or profile"
+          >
+            <SidebarAvatar logoUrl={logoUrl} label={displayOrgName} />
+            <div>
+              <strong>{displayOrgName}</strong>
+              <small>{userSubtitle}</small>
+            </div>
+          </Link>
+          <LogoutButton label="Log out" />
+        </div>
+      </aside>
+
+      <div className="peach-workspace-main">
+        {/* Clean Sticky Topbar for Mobile Drawer Trigger & Quick Wallet */}
+        <header className="peach-workspace-topbar">
+          <div className="peach-mobile-left">
+            <PeachMobileDrawer
+              role={role}
+              active={active}
+              navItems={navItems}
+              displayOrgName={displayOrgName}
+              subtitle={userSubtitle}
+            />
+            <Link
+              href={role === "business" ? "/business" : "/creative"}
+              className="peach-mobile-brand"
+              aria-label="Peach Home"
+            >
+              <img src="/brand/peach-wordmark.png" alt="Peach Network" />
+            </Link>
+          </div>
+
+          <div className="peach-topbar-actions">
+            {role === "business" && typeof coinCount === "number" && (
+              <Link href="/business/wallet" className="peach-coin-chip tabular-nums">
+                {coinCount} Peach Coins
+              </Link>
+            )}
+            <Link
+              href={role === "business" ? "/business/account" : "/account?edit=1"}
+              className="peach-avatar"
+              aria-label="Account"
+            >
+              {(displayOrgName[0] || first[0] || "P").toUpperCase()}
+            </Link>
+          </div>
+        </header>
+
+        <div className="peach-workspace-content">{children}</div>
+      </div>
+
+      {/* Floating Bottom-Right Concierge Button (Accessible on All Screens) */}
+      <AskArtDirectorButton businessName={displayOrgName} variant="floating" />
+
+      {/* Mobile Bottom Tab Bar */}
+      <nav className="peach-mobile-nav" aria-label="Mobile navigation">
+        {nav.slice(0, 5).map(([key, href, label]) => {
+          const isActive = active === key;
+          return (
+            <Link key={key} href={href} className={isActive ? "active" : ""}>
+              <NavIcon itemKey={key} />
+              <span>
+                {label
+                  .replace("Peach Business", "Business")
+                  .replace("Brand Vault", "Vault")
+                  .replace("Profile & Portfolio", "Profile")
+                  .replace("Creative Director AI", "Studio AI")}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      <style>{`
+        .peach-workspace{min-height:100vh;background:#FFF6EE;color:#231714;font-family:var(--font-plus-jakarta),"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+        .peach-sidebar{position:fixed;inset:0 auto 0 0;width:240px;background:#FFFFFF;color:#231714;border-right:1px solid #F7DFD0;padding:24px 14px 20px;display:flex;flex-direction:column;z-index:50}
+        .peach-sidebar-brand{display:block;padding:0 10px}
+        .peach-sidebar-brand img{width:118px;max-height:42px;object-fit:contain;object-position:left}
+        .peach-sidebar-role{margin:24px 10px 10px;color:#FF5E3A;font-size:11px;font-weight:800;letter-spacing:.14em}
+        .peach-sidebar-nav{display:grid;gap:4px}
+        .peach-sidebar-nav a{position:relative;display:flex;align-items:center;gap:11px;color:#4A3B36;text-decoration:none;padding:10px 12px;border-radius:14px;font-size:14px;font-weight:600;transition:background .16s ease,color .16s ease}
+        .peach-sidebar-nav a .peach-nav-icon{color:#4A3B36;display:inline-flex;align-items:center}
+        .peach-sidebar-nav a:hover{background:#FFF6EE;color:#231714}
+        .peach-sidebar-nav a:hover .peach-nav-icon{color:#FF5E3A}
+        .peach-sidebar-nav a.active{background:#FFF6EE;color:#231714;font-weight:800}
+        .peach-sidebar-nav a.active .peach-nav-icon{color:#FF5E3A}
+        .peach-sidebar-nav a.active::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:0 4px 4px 0;background:#FF5E3A}
+        .peach-sidebar-bottom{margin-top:auto;border-top:1px solid #F7DFD0;padding:16px 8px 0}
+        .peach-user-badge{display:flex;align-items:center;gap:10px;text-decoration:none;color:#231714}
+        .peach-user-avatar,.peach-avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#231714;color:#FFFFFF;font-weight:800;font-size:14px;text-decoration:none;flex:0 0 auto;overflow:hidden;border:1px solid #F7DFD0}
+        .peach-user-avatar img{width:100%;height:100%;object-fit:contain;background:#FFFFFF;padding:3px}
+        .peach-user-badge div{display:grid;min-width:0}
+        .peach-user-badge strong{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#231714}
+        .peach-user-badge small{font-size:12px;color:#4A3B36}
+        .peach-sidebar-bottom button{border:0;background:transparent;color:#FF5E3A;padding:12px 2px 0;font-size:13px;font-weight:700;cursor:pointer}
+        .peach-workspace-main{margin-left:240px;min-height:100vh}
+        .peach-workspace-topbar{min-height:64px;border-bottom:1px solid #F7DFD0;background:rgba(255,246,238,.92);display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:8px 32px;position:sticky;top:0;z-index:30;backdrop-filter:blur(12px)}
+        .peach-mobile-left{display:none}.peach-mobile-brand{display:none}
+        .peach-topbar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+        .peach-coin-chip{border:1px solid #F7DFD0;background:#FFFFFF;color:#231714;text-decoration:none;border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 4px 12px rgba(232,93,59,0.06)}
+        .peach-workspace-content{max-width:1340px;margin:0 auto;padding:24px 32px 96px}
+        .peach-mobile-nav{display:none}
+        @media(max-width:960px){
+          .peach-sidebar{display:none}
+          .peach-workspace-main{margin-left:0}
+          .peach-workspace-topbar{min-height:60px;padding:10px 16px;justify-content:space-between;flex-wrap:wrap;gap:8px}
+          .peach-mobile-left{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+          .peach-mobile-brand{display:block;flex:0 0 auto}
+          .peach-mobile-brand img{width:82px;max-height:30px;object-fit:contain}
+          .peach-topbar-actions{gap:8px}
+          .peach-coin-chip{padding:6px 11px;font-size:12px}
+          .peach-workspace-content{padding:18px 16px 110px}
+          .peach-mobile-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:60;background:#FFFFFF;border-top:1px solid #F7DFD0;padding:9px 4px calc(9px + env(safe-area-inset-bottom))}
+          .peach-mobile-nav a{display:grid;justify-items:center;gap:4px;text-decoration:none;color:#4A3B36;font-size:11px;font-weight:700;text-align:center}
+          .peach-mobile-nav a.active{color:#FF5E3A;font-weight:800}
+        }
+      `}</style>
     </div>
-
-    <nav className="peach-mobile-nav" aria-label="Mobile navigation">
-      {nav.slice(0,5).map(([key, href, label]) => <Link key={key} href={href} className={active === key ? "active" : ""}><span className="peach-nav-dot"/>{label.replace("Peach Business","Business").replace("Brand Vault","Vault").replace("Profile & Portfolio","Profile")}</Link>)}
-    </nav>
-
-    <style>{`
-      .peach-workspace{min-height:100vh;background:#f8f6f0;color:#183126;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-      .peach-sidebar{position:fixed;inset:0 auto 0 0;width:248px;background:#173328;color:#fff;padding:26px 18px 22px;display:flex;flex-direction:column;z-index:50}
-      .peach-sidebar-brand{display:block;padding:0 10px}.peach-sidebar-brand img{width:122px;max-height:44px;object-fit:contain;object-position:left}
-      .peach-sidebar-role{margin:28px 12px 10px;color:#f2a07e;font-size:10px;font-weight:850;letter-spacing:.16em}
-      .peach-sidebar-nav{display:grid;gap:4px}.peach-sidebar-nav a{display:flex;align-items:center;gap:10px;color:#dce7e1;text-decoration:none;padding:11px 12px;border-radius:12px;font-size:13px;font-weight:700;transition:.18s ease}
-      .peach-sidebar-nav a:hover,.peach-sidebar-nav a.active{background:#294b3d;color:#fff}.peach-nav-dot{width:7px;height:7px;border:1.5px solid currentColor;border-radius:50%;opacity:.75;flex:0 0 auto}.peach-sidebar-nav a.active .peach-nav-dot{background:#f37a59;border-color:#f37a59;opacity:1}
-      .peach-sidebar-bottom{margin-top:auto;border-top:1px solid #36564a;padding:18px 8px 0}.peach-user-badge{display:flex;align-items:center;gap:10px}.peach-user-badge>span,.peach-avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#f4a07e;color:#173328;font-weight:900;text-decoration:none}.peach-user-badge div{display:grid;min-width:0}.peach-user-badge strong{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.peach-user-badge small{font-size:10px;color:#9fb3aa}.peach-sidebar-bottom button{border:0;background:transparent;color:#f4c0ad;padding:13px 0 0;font-weight:750;cursor:pointer}
-      .peach-workspace-main{margin-left:248px;min-height:100vh}.peach-workspace-topbar{height:70px;border-bottom:1px solid #e4e5df;background:rgba(248,246,240,.94);display:flex;align-items:center;justify-content:flex-end;padding:0 34px;position:sticky;top:0;z-index:30;backdrop-filter:blur(12px)}
-      .peach-mobile-brand{display:none}.peach-topbar-actions{display:flex;align-items:center;gap:10px}.peach-coin-chip,.peach-topbar-button{border:1px solid #d9ded9;background:#fff;color:#244235;text-decoration:none;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:800}.peach-coin-chip span{display:inline-block;width:7px;height:7px;border-radius:50%;background:#f37a59;margin-right:5px}
-      .peach-workspace-content{max-width:1280px;margin:0 auto;padding:30px 34px 70px}.peach-mobile-nav{display:none}
-      .peach-user-badge{text-decoration:none;color:inherit}.peach-user-badge>span{overflow:hidden}.peach-user-badge img{width:100%;height:100%;object-fit:contain;background:white;padding:3px}
-      .peach-business-workspace .peach-sidebar{background:#fff0e7;color:#263f36;border-right:1px solid #efdfd4}
-      .peach-business-workspace .peach-sidebar-role{color:#a84c32}
-      .peach-business-workspace .peach-sidebar-nav a{color:#52645d;font-size:14px}
-      .peach-business-workspace .peach-sidebar-nav a:hover{background:#ffe1d0;color:#263f36}
-      .peach-business-workspace .peach-sidebar-nav a.active{background:#fff;color:#263f36;box-shadow:0 2px 8px #a85a2e0a;border:1px solid #efd7c8}
-      .peach-business-workspace .peach-sidebar-bottom{border-color:#e7d7cc}.peach-business-workspace .peach-user-badge small{color:#65766e}.peach-business-workspace .peach-sidebar-bottom button{color:#a84c32}
-      @media(max-width:900px){.peach-sidebar{display:none}.peach-workspace-main{margin-left:0}.peach-workspace-topbar{height:62px;padding:0 16px;justify-content:space-between}.peach-mobile-brand{display:block}.peach-mobile-brand img{width:100px;max-height:34px;object-fit:contain}.peach-topbar-button{display:none}.peach-workspace-content{padding:20px 16px 88px}.peach-mobile-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:60;background:#fff;border-top:1px solid #dde2dd;padding:7px 4px calc(7px + env(safe-area-inset-bottom))}.peach-mobile-nav a{display:grid;justify-items:center;gap:4px;text-decoration:none;color:#738078;font-size:9px;font-weight:750;text-align:center}.peach-mobile-nav a.active{color:#173328}.peach-mobile-nav a.active .peach-nav-dot{background:#f37a59;border-color:#f37a59}}
-    `}</style>
-  </div>;
+  );
 }

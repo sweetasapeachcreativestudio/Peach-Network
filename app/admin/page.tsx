@@ -38,6 +38,7 @@ export default async function AdminDashboardPage(){
         <a className="active" href="#overview">Overview</a>
         <Link href="/admin/creatives">Creative Applications <b>{pending?.length??0}</b></Link>
         <Link href="/admin/projects">Projects & Matches</Link>
+        <Link href="/admin/banners">Banner Manager</Link>
         <a href="#people">People</a><a href="#coins">Coins & Memberships</a>
         <Link href="/admin/disputes">Disputes <b>{disputes?.length??0}</b></Link>
       </nav>

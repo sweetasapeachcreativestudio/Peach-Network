@@ -40,6 +40,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Business owner authorization required." }, { status: 403 });
   }
 
+  await admin.from("audit_log").insert({
+    actor_user_id: user.id,
+    action: approved ? "deliverable_approved" : "deliverable_feedback",
+    entity_type: "project",
+    entity_id: projectId,
+    metadata: {
+      deliverableIndex,
+      deliverableText,
+      approved: Boolean(approved),
+      feedback: feedback?.trim() || null,
+    },
+  });
+
   // Record approval or revision feedback in project updates & messages
   if (approved) {
     await admin.from("project_messages").insert({

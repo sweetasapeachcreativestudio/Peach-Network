@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PeachAppShell } from "@/app/components/peach-app-shell";
+import { getActivePeachBusinessEvents } from "@/lib/business-banners";
 import { BusinessFeedbackForm } from "./feedback-form";
 import { BusinessFAQSection } from "./faq-section";
 import {
@@ -43,13 +44,16 @@ export default async function PeachBusinessPage() {
     .eq("owner_user_id", user.id)
     .maybeSingle();
 
-  const { data: wallet } = business
-    ? await admin
-        .from("coin_wallets")
-        .select("available_coins,held_coins")
-        .eq("business_id", business.id)
-        .maybeSingle()
-    : { data: null };
+  const [{ data: wallet }, activeEvents] = await Promise.all([
+    business
+      ? admin
+          .from("coin_wallets")
+          .select("available_coins,held_coins")
+          .eq("business_id", business.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    getActivePeachBusinessEvents(admin),
+  ]);
 
   const coins = wallet?.available_coins ?? 0;
   const bizName = business?.name || "Peach Partner";
@@ -108,6 +112,47 @@ export default async function PeachBusinessPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {activeEvents.map((ev) => (
+              <div
+                key={ev.id}
+                className="bg-white border border-[#D6CFC7] rounded-2xl p-5 space-y-3"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-white bg-[#D9532F] px-2.5 py-0.5 rounded-full">
+                    {ev.badge}
+                  </span>
+                  {ev.event_date ? (
+                    <span className="text-xs text-[#3C4A42] font-bold">
+                      {new Date(ev.event_date).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                      {ev.location ? ` · ${ev.location}` : ""}
+                    </span>
+                  ) : ev.location ? (
+                    <span className="text-xs text-[#3C4A42] font-bold">{ev.location}</span>
+                  ) : null}
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-[#17251E]">{ev.title}</h3>
+                  {ev.subtitle && (
+                    <p className="text-xs font-bold text-[#3C4A42] mt-0.5">{ev.subtitle}</p>
+                  )}
+                  <p className="text-sm text-[#3C4A42] mt-1.5 leading-relaxed">{ev.description}</p>
+                </div>
+                <div className="pt-1">
+                  <Link
+                    href={ev.cta_href || "/business"}
+                    className="inline-flex items-center gap-1.5 text-sm font-bold text-[#D9532F] hover:underline"
+                  >
+                    <span>{ev.cta_label || "Learn More"}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+
             {/* Special 1: 2026 Master Rates Rollout */}
             <div className="bg-gradient-to-br from-[#FFF9F6] to-white border border-[#F2C2B2] rounded-2xl p-5 shadow-2xs space-y-3">
               <div className="flex items-center justify-between">

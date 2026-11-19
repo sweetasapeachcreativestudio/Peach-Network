@@ -1,11 +1,41 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import {
   MASTER_2026_CATALOG,
   PEACH_COIN_USD_RATE,
   findCategoryByKeywords,
 } from "@/lib/project-pricing";
+import {
+  computeBusinessBrandReadiness,
+  computeCreativeBusinessReadiness,
+  type BusinessBrandReadinessResult,
+} from "@/lib/readiness";
+import { formatCityHub } from "@/lib/hubs";
+
+export interface ProjectPlanItem {
+  id: string;
+  service: string;
+  serviceKey: string;
+  package: string;
+  category: string;
+  coins: number;
+  usd: number;
+  status: "needed" | "optional" | "completed";
+  estimatedTurnaround: string;
+  reason: string;
+  deliverables: string[];
+  requiredFromBusiness: string[];
+}
+
+export interface ProjectPlanPayload {
+  goalSummary: string;
+  clientBudgetCoins: number | null;
+  recommendedItems: ProjectPlanItem[];
+  totalCoins: number;
+  walletCoverage: "covered" | "partial" | "top_up_needed";
+}
 
 interface CreativeCandidate {
   id: string;
@@ -158,13 +188,12 @@ const APPROVED_CREATIVES_FALLBACK: CreativeCandidate[] = [
   },
 ];
 
-const PEACH_MATCH_SYSTEM_INSTRUCTION = `You are Peach Match AI v1.1, the Senior Creative Director concierge for Peach Network based in Birmingham, Alabama.
-You speak like a calm, high-end agency creative director talking to a business owner like a trusted partner.
-Keep your answers concise, scannable in 5 seconds, and friendly.
+const PEACH_MATCH_SYSTEM_INSTRUCTION = `You are Peachy™, the Senior Creative Director for Peach Network based in Birmingham, Alabama.
+You are a warm, welcoming, sharp, and lightly sassy seasoned female Creative Director who uses plain language, zero agency buzzwords, and keeps advice and scoping punchy, insightful, and decisive.
 
 MASTER PRICING LAW:
 - 1 Peach Coin = Exactly $50 USD.
-- Every project includes 3 revision rounds, protected escrow, and 100% administrative site and asset ownership transfer upon completion.
+- Every project includes 3 revision rounds, Peach Project Protection (review proofs before sign-off), and 100% administrative site and asset ownership transfer upon completion.
 
 2026 MASTER RATES TIERS & CATALOG:
 1. Website Design (UI/UX, Responsive, Webflow / Squarespace / Shopify):
@@ -209,7 +238,7 @@ MASTER PRICING LAW:
      (Up to 4-page menu or tri-fold brochure, or custom folding carton box/label dieline with print-ready CMYK specs).
 
 CRITICAL CONVERSATIONAL & SCOPING RULES:
-Rule 0: "STRICT V1 SCOPE GUARDRAIL".
+Rule 0: "STRICT V1 SCOPE GUARDRAIL & MIXED REQUESTS".
 In Version 1, Peach Network ONLY offers 6 disciplines:
 1. Graphic Design (print flyers, packaging die-lines, brochures, vector graphics)
 2. Branding Design (core logos, vector kits, brand sheets, brand overhauls)
@@ -218,109 +247,250 @@ In Version 1, Peach Network ONLY offers 6 disciplines:
 5. Commercial Photography (executive portraits, product tabletop shoots, on-location culinary & venue shoots)
 6. Creative Direction (scoping, art direction, and creative curation)
 
-If a business owner asks for any service outside this V1 catalog (including but not limited to: mobile app development (iOS/Android native apps), custom software coding, backend engineering, full SEO or ad-buying retainers (PPC/Google Ads/Meta Ads), 3D CGI or visual effects, PR / public relations / press releases, copywriting-only or blog writing, video games, etc.):
-- NEVER invent a coin price or pretend we offer it.
-- NEVER return diagnostic questions or package cards for out-of-scope services.
-- Instead, respond warmly with:
-  "We currently do not offer [requested service] in Version 1, but you can submit this to our **Peach Business** feedback tab to let our team know it's something you want to see in the app. Every piece of feedback helps us grow—so you are growing with us!"
-- Set mode to "out_of_scope" and showFeedbackButton to true.
+A. If a business owner asks purely for a service outside V1 (e.g., mobile app development, custom software coding, backend engineering, full SEO/ad-buying retainers, 3D CGI, PR, copywriting-only, video games):
+- Respond warmly: "We currently do not offer [requested service] in Version 1, but you can submit this to our **Peach Business** feedback tab to let our team know it's something you want to see in the app. Every piece of feedback helps us grow—so you are growing with us!"
+- Set mode: "out_of_scope" and showFeedbackButton: true.
 
-Rule 1: "DIAGNOSE FIRST, PRICE SECOND".
-Never quote a price or return a "scope" card on the very first message when a user makes an open-ended request (e.g. "I need a website for my restaurant", "I need a logo", "I need photos").
-Instead, ask 2 to 3 short diagnostic questions to understand:
-(1) Technical functionality / core features (e.g., simple menu vs table reservations vs e-commerce),
-(2) Asset readiness (e.g., logo, high-res photos ready, or need photographer/sourcing),
-(3) Target launch timeline.
-Provide clickable short pill suggestions for each question (e.g., ["Simple Menu & Hours", "Interactive Menu & Table Reservations", "Full E-Commerce Store"]).
+B. If a business owner submits a MIXED REQUEST (one part out of scope, but another part IN SCOPE, e.g. "I need a website and a mobile app" or "I need a logo and custom software coding"):
+- Clearly explain that the out-of-scope part is not in V1 (point to feedback tab), but emphasize that we DO offer the in-scope deliverable (e.g., Website Design or Branding)!
+- Ask if they'd like to scope the in-scope part first.
+- Set mode: "mixed_scope", showFeedbackButton: true. Include quickReplies like ["Yes, scope my Website Design →", "Go to Peach Business Feedback →"].
 
-Rule 2: "LOCK IN ONE DEFINITIVE RECOMMENDATION".
-Only AFTER the user answers the diagnostic questions (or if they give complete technical specs upfront), return mode "recommendation" with ONE definitive package from the 2026 Master Rates that best fits their exact needs and any necessary add-ons. Explain why in 1-2 friendly sentences.
+Rule 1: "STRICT 4-STAGE STATE MACHINE".
+Stage 1: GENERAL ADVICE (mode: "advice"):
+- If user asks open-ended questions, creative tips, typography advice, platform comparisons:
+- 2–4 sentence sharp advice. NO pricing, NO diagnostic questions, NO package cards, NO creatives.
+- Include quickReplies pills.
 
-Rule 3: "SKILL-ACCURATE CREATIVE MATCHING".
-When returning a recommendation, nominate 3 creative IDs from the available pool whose verified experience and past work match that exact tier.
+Stage 2: SCOPING QUESTIONS / DIAGNOSTIC (mode: "diagnostic"):
+- When user wants to start a project but requirements aren't dialed in:
+- Ask 2–3 short diagnostic questions with clickable pills and a "Submit Answers & Get Pricing →" button.
+- Check their Brand Vault! If logos, colors, or fonts exist, acknowledge them and do not ask redundant questions.
+- NO prices and NO creatives.
 
-Rule 4: "CLIENT WALLET & SUBSCRIPTION AWARENESS".
-When recommending a scope requiring N coins:
-- If client has enough coins (availableCoins >= N):
-  In your answer, celebrate: "Great news—you have enough Peach Coins in your wallet to start this project right away!" and introduce the 3 vetted creatives from our ecosystem with verified portfolio matches and skill fit.
-- If client does not have enough coins (availableCoins < N):
-  State the required coins, the current balance, and the exact deficit needed to start.
-  - If the client is an active subscriber:
-    Remind them that as an active member, they can top up extra coins at their member rate right now, or wait until their next monthly coin drop.
-  - If the client does not have a subscription:
-    Remind them about Peach Network monthly subscriptions (recurring coin allowances, rollover protection, and member discounts): "If you don't want to subscribe, that's completely okay—you can just do a quick one-time top up right here!"
+Stage 2.5: ITEMIZED MULTI-SERVICE QUOTE (mode: "multi_service_quote"):
+- Whenever the user's request or diagnostic answers require MORE THAN ONE creative discipline (e.g., Website + Commercial Photography, Branding + Website, Photography + Social Media, Branding + Packaging/Graphic Design):
+  - Price EACH service clearly from the 2026 Master Rates:
+    - Option 1 — [Service A] Only
+    - Option 2 — [Service B] Only
+    - Option 3 — Both Together (Combined Total; note Art Director Pod Supervision is included free if Combined Total > 20 Coins)
+  - Check their live Coin Balance and tell them clearly what their current Coins cover right now vs. how many Coins to top up for the other service or Both Together.
+  - Let them choose "Just [Service A]", "Just [Service B]", or "Both Together" BEFORE showing any creatives (topCreativeIds: []).
+
+Stage 3: PRICE QUOTE (mode: "price_quote"):
+- When user provides full specifications or submits diagnostic answers for a SINGLE discipline:
+- Lock in ONE definitive package from the 2026 Master Rates.
+- Present ONLY the package deliverables, turnaround, and Coin/USD price (1 Coin = $50 USD).
+- Ask: "Want me to find 3 vetted creatives for this project?" with findCreativesPrompt.
+- DO NOT RETURN CREATIVES YET (set topCreativeIds: []). Creatives must only be presented after user confirms.
+
+Stage 4: MATCHED CREATIVES (mode: "matched_creatives"):
+- Triggered when user confirms finding creatives (clicks "Yes, Find My Creatives →" or sends creative request).
+- Nominate 3 vetted creatives from the candidate pool with verified match scores and reasons.
+- Report wallet balance vs project cost (celebrate if sufficient, or explain top up / subscription).
+
+Rule 2: "MULTIMODAL REFERENCE IMAGE ANALYSIS".
+If user uploads 1–3 reference images:
+- Identify deliverable type, verify if inside V1 catalog, comment on aesthetic, and diagnose first before quoting.
 
 OUTPUT FORMAT REQUIREMENTS:
-You MUST respond with strictly valid JSON adhering to one of these three structures:
+You MUST respond with strictly valid JSON adhering to one of these formats:
 
-If OUT OF SCOPE (services outside V1: mobile apps, backend software, SEO retainers, ad-buying, 3D CGI, PR, copywriting-only, etc.):
+If GENERAL ADVICE:
+{
+  "mode": "advice",
+  "headline": "Punchy Creative Director Insight",
+  "answer": "Warm, sharp 2-4 sentence advice.",
+  "quickReplies": ["Scope a Website Project", "Ask Another Question", "See 2026 Master Rates"],
+  "diagnosticQuestions": null,
+  "scope": null,
+  "topCreativeIds": []
+}
+
+If OUT OF SCOPE:
 {
   "mode": "out_of_scope",
   "headline": "Service Outside Version 1 Catalog",
-  "answer": "We currently do not offer [requested service] in Version 1, but you can submit this to our **Peach Business** feedback tab to let our team know it's something you want to see in the app. Every piece of feedback helps us grow—so you are growing with us!",
+  "answer": "We currently do not offer [service] in Version 1, but you can submit this to our **Peach Business** feedback tab...",
   "showFeedbackButton": true,
   "diagnosticQuestions": null,
   "scope": null,
   "topCreativeIds": []
 }
 
-If DIAGNOSING (initial open-ended inquiry):
+If MIXED SCOPE:
+{
+  "mode": "mixed_scope",
+  "headline": "Mixed Service Request",
+  "answer": "We currently do not offer [out-of-scope service] in Version 1, but we DO offer full [in-scope service]! Would you like to move forward with [in-scope service]?",
+  "showFeedbackButton": true,
+  "quickReplies": ["Yes, scope my [in-scope deliverable] →", "Go to Peach Business Feedback →"],
+  "diagnosticQuestions": null,
+  "scope": null,
+  "topCreativeIds": []
+}
+
+If DIAGNOSING / SCOPING QUESTIONS:
 {
   "mode": "diagnostic",
-  "headline": "Short punchy diagnostic headline (e.g. 'Let\\'s dial in your restaurant website')",
-  "answer": "Warm, concise 1-2 sentence Creative Director intro explaining what we need to clarify first so you don't overpay.",
+  "headline": "Let's dial in your requirements",
+  "answer": "Warm 1-2 sentence Creative Director intro.",
   "diagnosticQuestions": [
     {
       "id": "q1",
       "question": "What core functionality does the site need?",
-      "pills": ["Simple Menu & Hours", "Interactive Menu & Table Reservations", "Full Online Takeout & Catering Hub"]
-    },
-    {
-      "id": "q2",
-      "question": "Do you have brand assets and dish photography ready?",
-      "pills": ["Logos & Photos Ready", "Need Creative to Source Stock Photos", "Need an On-Location Photographer (+12 Coins)"]
-    },
-    {
-      "id": "q3",
-      "question": "What is your target launch timeline?",
-      "pills": ["Urgent (5–7 Days)", "Standard (2–3 Weeks)", "Flexible Launch"]
+      "pills": ["Option 1", "Option 2", "Option 3"]
     }
   ],
   "scope": null,
   "topCreativeIds": []
 }
 
-If RECOMMENDING (after diagnostic answers or explicit detailed spec):
+If PRICE QUOTE (STAGE 3 - NO CREATIVES YET):
 {
-  "mode": "recommendation",
-  "headline": "Definitive Agency Recommendation",
-  "answer": "Friendly 2-sentence explanation of why this specific tier fits their operational needs and timeline.",
+  "mode": "price_quote",
+  "headline": "Definitive Agency Recommendation & Price Quote",
+  "answer": "Friendly 2-sentence explanation of why this specific package fits their operational needs and timeline.",
   "diagnosticQuestions": null,
   "scope": {
-    "title": "Exact title of recommended package (e.g. 'Option C: Advanced Retail E-Commerce or Restaurant Hub')",
+    "title": "Exact title of recommended package",
     "category": "Website" | "Brand & Illustration" | "Photography" | "Design",
     "serviceKey": "website_design" | "branding_design" | "commercial_photography" | "social_media" | "graphic_design",
-    "coins": 26,
-    "usdAmount": 1300,
-    "deliverables": [
-      "Categorized interactive food & drink menu",
-      "Table reservation widget integration",
-      "Mobile responsive design & speed optimization",
-      "100% administrative site ownership transfer"
-    ],
-    "requiredFromBusiness": [
-      "Menu items, descriptions, & pricing spreadsheet",
-      "High-res dish photos or schedule shoot",
-      "Domain & hosting credentials"
-    ],
-    "estimatedTurnaround": "12–16 Business Days",
+    "coins": 18,
+    "usdAmount": 900,
+    "deliverables": ["Deliverable 1", "Deliverable 2", "100% administrative site ownership transfer"],
+    "requiredFromBusiness": ["Requirement 1", "Requirement 2"],
+    "estimatedTurnaround": "8–12 Business Days",
     "revisionRounds": 3,
-    "reason": "Locked in for your multi-page menu, online reservations, and custom domain setup."
+    "reason": "Locked in for your multi-page website."
   },
+  "findCreativesPrompt": "Want me to find 3 vetted creatives for this project?",
+  "topCreativeIds": [],
+  "projectPlan": {
+    "goalSummary": "Concise 1-sentence project goal summary",
+    "clientBudgetCoins": null,
+    "recommendedItems": [
+      {
+        "id": "plan-main",
+        "service": "Website Design",
+        "serviceKey": "website_design",
+        "package": "Option B: Standard Multi-Page Business Site (3-5 Pages)",
+        "category": "Website",
+        "coins": 18,
+        "usd": 900,
+        "status": "needed",
+        "estimatedTurnaround": "8-12 Business Days",
+        "reason": "Fits multi-page business goals.",
+        "deliverables": ["Up to 5 custom responsive pages", "100% administrative site ownership transfer"],
+        "requiredFromBusiness": ["Written copy", "Brand logo assets"]
+      }
+    ],
+    "totalCoins": 18,
+    "walletCoverage": "covered"
+  }
+}
+
+If MATCHED CREATIVES (STAGE 4):
+{
+  "mode": "matched_creatives",
+  "headline": "3 Vetted Creatives Ready for Your Project",
+  "answer": "I have matched 3 top specialists with verified portfolio matches and high skill fit.",
+  "diagnosticQuestions": null,
+  "scope": { ...same scope as price quote... },
   "topCreativeIds": [
-    { "id": "cr_nia", "score": 98, "reason": "Extensive experience with restaurant menus, table reservation integrations, and Webflow/Shopify." }
+    { "id": "cr_nia", "score": 98, "reason": "Extensive experience with restaurant menus and Webflow/Shopify." }
   ]
 }`;
+
+function extractBudgetCoinsFromText(text: string): number | null {
+  const q = text || "";
+  const coinMatch = q.match(/(\d+(?:\.\d+)?)\s*(?:peach\s*)?coins?\b/i);
+  if (coinMatch) {
+    const val = Math.round(Number(coinMatch[1]));
+    return val > 0 ? val : null;
+  }
+  const usdMatch = q.match(/\$\s*([\d,]+(?:\.\d+)?)/);
+  if (usdMatch) {
+    const dollars = Number(usdMatch[1].replace(/,/g, ""));
+    if (dollars >= 50) {
+      return Math.max(1, Math.round(dollars / PEACH_COIN_USD_RATE));
+    }
+  }
+  const budgetMatch = q.match(/budget(?:\s+of|\s+is|\s+around|\s*:)?\s*([\d,]+)/i);
+  if (budgetMatch) {
+    const dollars = Number(budgetMatch[1].replace(/,/g, ""));
+    if (dollars >= 50) {
+      return Math.max(1, Math.round(dollars / PEACH_COIN_USD_RATE));
+    }
+  }
+  return null;
+}
+
+function buildLiveProjectPlan(params: {
+  goalSummary: string;
+  primaryItems: Array<{
+    id: string;
+    service: string;
+    serviceKey: string;
+    package: string;
+    category: string;
+    coins: number;
+    usd: number;
+    estimatedTurnaround: string;
+    reason: string;
+    deliverables: string[];
+    requiredFromBusiness: string[];
+    status?: "needed" | "optional" | "completed";
+  }>;
+  availableCoins: number;
+  clientBudgetCoins: number | null;
+  brandReadiness: BusinessBrandReadinessResult | null;
+}): ProjectPlanPayload {
+  const items: ProjectPlanItem[] = params.primaryItems.map((it) => ({
+    ...it,
+    status: it.status || "needed",
+  }));
+
+  if (params.brandReadiness && params.brandReadiness.suggestedServices.length > 0) {
+    const alreadyHasBranding = items.some((i) => i.serviceKey === "branding_design");
+    if (!alreadyHasBranding) {
+      const suggestion = params.brandReadiness.suggestedServices[0];
+      items.push({
+        id: "plan-brand-readiness",
+        service: suggestion.serviceName,
+        serviceKey: suggestion.serviceKey,
+        package: suggestion.packageTitle,
+        category: suggestion.category,
+        coins: suggestion.coins,
+        usd: suggestion.usd,
+        status: "optional",
+        estimatedTurnaround: suggestion.estimatedTurnaround,
+        reason: suggestion.reason,
+        deliverables: suggestion.deliverables,
+        requiredFromBusiness: ["Company name & aesthetic direction"],
+      });
+    }
+  }
+
+  const neededCoins = items
+    .filter((i) => i.status === "needed")
+    .reduce((sum, i) => sum + i.coins, 0);
+
+  const walletCoverage: ProjectPlanPayload["walletCoverage"] =
+    params.availableCoins >= neededCoins
+      ? "covered"
+      : params.availableCoins > 0
+      ? "partial"
+      : "top_up_needed";
+
+  return {
+    goalSummary: params.goalSummary,
+    clientBudgetCoins: params.clientBudgetCoins,
+    recommendedItems: items,
+    totalCoins: neededCoins,
+    walletCoverage,
+  };
+}
 
 function buildDefaultDiagnostic(queryText: string) {
   const q = queryText.toLowerCase();
@@ -448,96 +618,590 @@ function buildDefaultDiagnostic(queryText: string) {
   };
 }
 
-function checkOutOfScopeService(queryText: string): { isOutOfScope: boolean; serviceName: string } {
+interface ScopeAnalysisResult {
+  isOutOfScope: boolean;
+  isMixed: boolean;
+  outOfScopeService: string;
+  inScopeService: string;
+  inScopeCategory: string;
+}
+
+function analyzeScopeInquiry(queryText: string): ScopeAnalysisResult {
   const q = queryText.toLowerCase().trim();
 
-  // If user explicitly asks for website design, branding, logo, photography, flyer, or social media for their app/business, that is IN SCOPE
-  const isRequestingDesignOrWebsite = /\b(website|landing page|web page|web design|logo|brand identity|branding|photo shoot|photography|flyer|social media|reels|creative director|graphic design)\b/i.test(q);
-
-  // 1. Mobile App Development
+  // Detect Out-of-Scope Services (outside V1 catalog)
+  let detectedOutOfScope = "";
   if (
     /\b(mobile app development|ios development|android development|app developer|build a mobile app|create a mobile app|make a mobile app|code an app|ios app development|android app development|react native app|flutter app|swift app|kotlin app)\b/i.test(q) ||
-    (/\b(mobile app|ios app|android app|native app)\b/i.test(q) && !isRequestingDesignOrWebsite)
+    /\b(mobile app|ios app|android app|native app)\b/i.test(q)
   ) {
-    return { isOutOfScope: true, serviceName: "mobile app development" };
-  }
-
-  // 2. Custom Software Coding / Backend Engineering
-  if (
+    detectedOutOfScope = "mobile app development";
+  } else if (
     /\b(custom software|software engineering|backend engineering|backend developer|api development|database engineering|devops|full-stack code|backend code|build software|fullstack engineering)\b/i.test(q)
   ) {
-    return { isOutOfScope: true, serviceName: "custom software coding & backend engineering" };
-  }
-
-  // 3. Full SEO / Ad-Buying Retainers / PPC
-  if (
+    detectedOutOfScope = "custom software coding & backend engineering";
+  } else if (
     /\b(ad-buying|ad buying|media buying|ppc campaign|google ads retainer|facebook ads management|meta ads retainer|full seo retainer|monthly seo retainer|link building|ad spend management)\b/i.test(q)
   ) {
-    return { isOutOfScope: true, serviceName: "full SEO & ad-buying retainers" };
-  }
-
-  // 4. 3D CGI / VFX
-  if (
+    detectedOutOfScope = "full SEO & ad-buying retainers";
+  } else if (
     /\b(3d cgi|cgi animation|vfx|visual effects|3d visual effects|special effects|hollywood cgi|cgi render)\b/i.test(q)
   ) {
-    return { isOutOfScope: true, serviceName: "3D CGI & visual effects" };
-  }
-
-  // 5. PR / Public Relations
-  if (
+    detectedOutOfScope = "3D CGI & visual effects";
+  } else if (
     /\b(public relations|pr agency|pr retainer|press release distribution|media outreach|press release writing|crisis pr)\b/i.test(q)
   ) {
-    return { isOutOfScope: true, serviceName: "public relations & PR retainers" };
-  }
-
-  // 6. Copywriting-only / Blog Writing
-  if (
+    detectedOutOfScope = "public relations & PR retainers";
+  } else if (
     /\b(copywriting-only|copywriting only|blog writing|article writing|ghostwriting|blog posts only|seo articles|write my blog)\b/i.test(q)
   ) {
-    return { isOutOfScope: true, serviceName: "copywriting-only services" };
-  }
-
-  // 7. Video Games
-  if (
+    detectedOutOfScope = "copywriting-only services";
+  } else if (
     /\b(video game|game development|unity game|unreal engine|build a game)\b/i.test(q)
   ) {
-    return { isOutOfScope: true, serviceName: "video game development" };
+    detectedOutOfScope = "video game development";
   }
 
-  return { isOutOfScope: false, serviceName: "" };
+  // Detect In-Scope Services in V1 Catalog
+  let detectedInScope = "";
+  let detectedInScopeCat = "";
+  if (/\b(website|landing page|web page|web design|storefront|shopify|webflow|squarespace|e-commerce|ecommerce|online ordering|reservation site)\b/i.test(q)) {
+    detectedInScope = "Website Design";
+    detectedInScopeCat = "website_design";
+  } else if (/\b(branding|brand identity|logo|logomark|vector kit|brand sheet|rebrand|typography|visual identity)\b/i.test(q)) {
+    detectedInScope = "Branding Design";
+    detectedInScopeCat = "branding_design";
+  } else if (/\b(photography|photo shoot|headshot|portrait|tabletop shoot|culinary shoot|dish photo|food photo|product shoot)\b/i.test(q)) {
+    detectedInScope = "Commercial Photography";
+    detectedInScopeCat = "commercial_photography";
+  } else if (/\b(social media|instagram|carousel|video reel|motion teaser|reels|tiktok graphics|social campaign)\b/i.test(q)) {
+    detectedInScope = "Social Media Design";
+    detectedInScopeCat = "social_media";
+  } else if (/\b(graphic design|flyer|promo poster|menu design|brochure|packaging|die-line|dieline|packaging design)\b/i.test(q)) {
+    detectedInScope = "Graphic Design";
+    detectedInScopeCat = "graphic_design";
+  }
+
+  if (detectedOutOfScope && detectedInScope) {
+    return {
+      isOutOfScope: false,
+      isMixed: true,
+      outOfScopeService: detectedOutOfScope,
+      inScopeService: detectedInScope,
+      inScopeCategory: detectedInScopeCat,
+    };
+  }
+
+  if (detectedOutOfScope && !detectedInScope) {
+    return {
+      isOutOfScope: true,
+      isMixed: false,
+      outOfScopeService: detectedOutOfScope,
+      inScopeService: "",
+      inScopeCategory: "",
+    };
+  }
+
+  return {
+    isOutOfScope: false,
+    isMixed: false,
+    outOfScopeService: "",
+    inScopeService: detectedInScope,
+    inScopeCategory: detectedInScopeCat,
+  };
+}
+
+interface ServiceOptionQuote {
+  serviceKey: string;
+  serviceName: string;
+  category: string;
+  title: string;
+  coins: number;
+  usdAmount: number;
+  estimatedTurnaround: string;
+  deliverables: string[];
+  requiredFromBusiness: string[];
+  reason: string;
+}
+
+interface MultiServiceQuotePayload {
+  serviceA: ServiceOptionQuote;
+  serviceB: ServiceOptionQuote;
+  combined: {
+    title: string;
+    coins: number;
+    usdAmount: number;
+    estimatedTurnaround: string;
+    includesPodSupervision: boolean;
+    deliverables: string[];
+    requiredFromBusiness: string[];
+  };
+  walletCoverageMessage: string;
+}
+
+const DISCIPLINE_KEYWORDS: Record<string, RegExp> = {
+  website_design: /\b(website|web site|landing page|web page|web design|storefront|shopify|webflow|squarespace|framer|e-commerce|ecommerce|online ordering|reservation site|multi-page business site|conversion hub)\b/i,
+  commercial_photography: /\b(photography|photographer|on-location photographer|photo shoot|headshot|portrait|tabletop|culinary shoot|dish photo|food photo|product shoot|camera|studio shoot)\b/i,
+  branding_design: /\b(branding|brand identity|logo|logomark|vector kit|brand sheet|rebrand|typography|visual identity|brand overhaul)\b/i,
+  social_media: /\b(social media|instagram|carousel|video reel|motion teaser|reels|tiktok|social campaign|monthly social)\b/i,
+  graphic_design: /\b(graphic design|flyer|promo poster|menu design|brochure|packaging|die-line|dieline|packaging design|business card)\b/i,
+};
+
+function creativeMatchesDiscipline(creative: CreativeCandidate, serviceKey: string): boolean {
+  const profileBlob = [creative.headline, creative.bio, ...(creative.specialties || [])]
+    .join(" ")
+    .toLowerCase();
+  const portfolioBlob = [
+    creative.featured_work?.title || "",
+    creative.featured_work?.industry || "",
+    ...(creative.featured_work?.tags || []),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  const matchesPatterns: Record<string, RegExp> = {
+    website_design: /(web|website|landing|shopify|webflow|squarespace|wix|framer|ui\/ux|e-commerce|ecommerce|digital experience)/i,
+    commercial_photography: /(photo|photography|photographer|portrait|tabletop|culinary|product shoot|studio lighting)/i,
+    branding_design: /(brand|branding|logo|identity|typography|illustration|visual identity|stationery)/i,
+    social_media: /(social|carousel|reel|video|motion|tiktok|instagram)/i,
+    graphic_design: /(graphic|flyer|poster|menu|brochure|packaging|dieline|print)/i,
+  };
+
+  const rx = matchesPatterns[serviceKey] || matchesPatterns.graphic_design;
+  return rx.test(profileBlob) && (rx.test(portfolioBlob) || rx.test(profileBlob));
+}
+
+function creativeStrictlyVerifiedForDiscipline(creative: CreativeCandidate, serviceKey: string): boolean {
+  const profileBlob = [creative.headline, ...(creative.specialties || [])].join(" ").toLowerCase();
+  const portfolioBlob = [
+    creative.featured_work?.title || "",
+    ...(creative.featured_work?.tags || []),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  const matchesPatterns: Record<string, RegExp> = {
+    website_design: /(web|website|landing|shopify|webflow|squarespace|wix|framer|ui\/ux|e-commerce|ecommerce)/i,
+    commercial_photography: /(photo|photography|photographer|portrait|tabletop|culinary|product shoot|studio lighting)/i,
+    branding_design: /(brand|branding|logo|identity|typography|brand guidelines|stationery)/i,
+    social_media: /(social|carousel|reel|video|motion|tiktok|instagram)/i,
+    graphic_design: /(graphic|flyer|poster|menu|brochure|packaging|dieline|print)/i,
+  };
+
+  const rx = matchesPatterns[serviceKey] || matchesPatterns.graphic_design;
+  return rx.test(profileBlob) && rx.test(portfolioBlob);
+}
+
+function rankCreativesForService(
+  pool: CreativeCandidate[],
+  serviceKey: string,
+  businessHub?: string
+): CreativeCandidate[] {
+  const localPriority =
+    (serviceKey === "commercial_photography" || serviceKey === "graphic_design") &&
+    Boolean(businessHub) &&
+    businessHub !== "US Remote";
+
+  return [...pool]
+    .sort((a, b) => {
+      const aStrict = creativeStrictlyVerifiedForDiscipline(a, serviceKey) ? 2 : creativeMatchesDiscipline(a, serviceKey) ? 1 : 0;
+      const bStrict = creativeStrictlyVerifiedForDiscipline(b, serviceKey) ? 2 : creativeMatchesDiscipline(b, serviceKey) ? 1 : 0;
+      if (aStrict !== bStrict) return bStrict - aStrict;
+
+      if (localPriority) {
+        const aLocal = a.hub?.toLowerCase() === businessHub?.toLowerCase() ? 1 : 0;
+        const bLocal = b.hub?.toLowerCase() === businessHub?.toLowerCase() ? 1 : 0;
+        if (aLocal !== bLocal) return bLocal - aLocal;
+      }
+
+      return (b.reliability_score || 0) - (a.reliability_score || 0);
+    })
+    .map((c) => {
+      if (localPriority && c.hub?.toLowerCase() === businessHub?.toLowerCase()) {
+        return {
+          ...c,
+          match_score: Math.min(99, (c.match_score || 95) + 2),
+          match_reason: `${businessHub} local specialist · ${c.match_reason}`,
+        };
+      }
+      return c;
+    });
+}
+
+function resolveOptionForService(serviceKey: string, queryLower: string): ServiceOptionQuote {
+  const cat = MASTER_2026_CATALOG[serviceKey] || MASTER_2026_CATALOG.graphic_design;
+  let optKey: "option_a" | "option_b" | "option_c" = "option_b";
+
+  if (cat.id === "website_design") {
+    if (/(e-commerce|ecommerce|store|shop|shoe|restaurant|online ordering|reservation|interactive menu)/.test(queryLower)) {
+      optKey = "option_c";
+    } else if (/(landing|single page|lead capture|one page)/.test(queryLower)) {
+      optKey = "option_a";
+    } else {
+      optKey = "option_b";
+    }
+  } else if (cat.id === "branding_design") {
+    if (/(overhaul|full brand|guidelines|stationery|rebrand)/.test(queryLower)) {
+      optKey = "option_c";
+    } else if (/(brand sheet|starter|palette|typography)/.test(queryLower)) {
+      optKey = "option_b";
+    } else {
+      optKey = "option_a";
+    }
+  } else if (cat.id === "commercial_photography") {
+    if (/(restaurant|food|culinary|chef|dish|drinks|on-location|venue)/.test(queryLower)) {
+      optKey = "option_c";
+    } else if (/(tabletop|product|shoe|retail|bottle)/.test(queryLower)) {
+      optKey = "option_b";
+    } else if (/(portrait|headshot|executive)/.test(queryLower)) {
+      optKey = "option_a";
+    } else {
+      optKey = "option_c";
+    }
+  } else if (cat.id === "social_media") {
+    if (/(monthly|30 day|calendar|video|reel)/.test(queryLower)) {
+      optKey = "option_c";
+    } else if (/(carousel|slide)/.test(queryLower)) {
+      optKey = "option_b";
+    } else {
+      optKey = "option_a";
+    }
+  } else {
+    if (/(menu|packaging|die-line|dieline|box|brochure)/.test(queryLower)) {
+      optKey = "option_c";
+    } else if (/(flyer|poster|event|promo)/.test(queryLower)) {
+      optKey = "option_b";
+    } else {
+      optKey = "option_a";
+    }
+  }
+
+  const opt = cat.options[optKey];
+  return {
+    serviceKey: cat.id,
+    serviceName: cat.title,
+    category: cat.categoryTag,
+    title: opt.tierName,
+    coins: opt.coins,
+    usdAmount: opt.coins * PEACH_COIN_USD_RATE,
+    estimatedTurnaround: opt.typicalTurnaround,
+    deliverables: opt.deliverables,
+    requiredFromBusiness: opt.requiredFromBusiness,
+    reason: `Matched ${cat.title} tier based on your requirements (${opt.coins} Coins / $${opt.coins * PEACH_COIN_USD_RATE} USD).`,
+  };
+}
+
+function buildWalletCoverageMessage(
+  availableCoins: number,
+  serviceA: ServiceOptionQuote,
+  serviceB: ServiceOptionQuote,
+  combinedCoins: number
+): string {
+  const availUsd = availableCoins * PEACH_COIN_USD_RATE;
+  const coversA = availableCoins >= serviceA.coins;
+  const coversB = availableCoins >= serviceB.coins;
+  const coversBoth = availableCoins >= combinedCoins;
+
+  if (coversBoth) {
+    return `You currently have ${availableCoins} Coins ($${availUsd.toLocaleString()})—that covers **Both Together** (${combinedCoins} Coins / $${(combinedCoins * PEACH_COIN_USD_RATE).toLocaleString()}) right now, or you can book just one discipline.`;
+  }
+
+  const topUpBoth = combinedCoins - availableCoins;
+  if (coversA && !coversB) {
+    return `You currently have ${availableCoins} Coins ($${availUsd.toLocaleString()})—that covers **${serviceA.serviceName}** (${serviceA.coins} Coins) right now, or you can top up ${topUpBoth} Coins to launch **Both Together**!`;
+  }
+  if (coversB && !coversA) {
+    return `You currently have ${availableCoins} Coins ($${availUsd.toLocaleString()})—that covers **${serviceB.serviceName}** (${serviceB.coins} Coins) right now, or you can top up ${topUpBoth} Coins to launch **Both Together**!`;
+  }
+  if (coversA && coversB) {
+    return `You currently have ${availableCoins} Coins ($${availUsd.toLocaleString()})—that covers **${serviceA.serviceName}** (${serviceA.coins} Coins) or **${serviceB.serviceName}** (${serviceB.coins} Coins) right now, or you can top up ${topUpBoth} Coins to launch **Both Together**!`;
+  }
+
+  const cheaper = serviceA.coins <= serviceB.coins ? serviceA : serviceB;
+  const shortCheaper = cheaper.coins - availableCoins;
+  return `You currently have ${availableCoins} Coins ($${availUsd.toLocaleString()}). Top up ${shortCheaper} Coins to start with **${cheaper.serviceName}** (${cheaper.coins} Coins), or top up ${topUpBoth} Coins to launch **Both Together** (${combinedCoins} Coins)!`;
+}
+
+function detectMultiServiceDisciplines(text: string): string[] {
+  const ordered = [
+    "website_design",
+    "branding_design",
+    "commercial_photography",
+    "social_media",
+    "graphic_design",
+  ];
+  const found: string[] = [];
+  for (const key of ordered) {
+    if (DISCIPLINE_KEYWORDS[key].test(text)) {
+      found.push(key);
+    }
+  }
+  return found;
+}
+
+function buildMultiServiceQuote(
+  disciplineKeys: string[],
+  queryLower: string,
+  availableCoins: number
+): MultiServiceQuotePayload {
+  const [keyA, keyB] = disciplineKeys.slice(0, 2);
+  const serviceA = resolveOptionForService(keyA, queryLower);
+  const serviceB = resolveOptionForService(keyB, queryLower);
+  const combinedCoins = serviceA.coins + serviceB.coins;
+  const includesPodSupervision = combinedCoins > 20;
+
+  return {
+    serviceA,
+    serviceB,
+    combined: {
+      title: `${serviceA.serviceName} + ${serviceB.serviceName} Linked Package`,
+      coins: combinedCoins,
+      usdAmount: combinedCoins * PEACH_COIN_USD_RATE,
+      estimatedTurnaround: `${serviceA.estimatedTurnaround} (Coordinated Launch)`,
+      includesPodSupervision,
+      deliverables: [
+        ...serviceA.deliverables.slice(0, 2),
+        ...serviceB.deliverables.slice(0, 2),
+        ...(includesPodSupervision
+          ? ["Art Director Pod Supervision included free (combined project over 20 Coins)"]
+          : []),
+      ],
+      requiredFromBusiness: [
+        ...new Set([...serviceA.requiredFromBusiness, ...serviceB.requiredFromBusiness]),
+      ].slice(0, 4),
+    },
+    walletCoverageMessage: buildWalletCoverageMessage(
+      availableCoins,
+      serviceA,
+      serviceB,
+      combinedCoins
+    ),
+  };
 }
 
 export async function POST(req: Request) {
   try {
-    const { message, history, clientContext } = await req.json();
+    const {
+      message,
+      history,
+      clientContext,
+      referenceImages,
+      action,
+      currentScope,
+      multiServiceQuote,
+    } = await req.json();
 
-    if (!message || typeof message !== "string" || !message.trim()) {
-      return NextResponse.json({ error: "Please enter a question or project brief." }, { status: 400 });
+    const isFindingBothCreatives = action === "find_both_creatives";
+    const isFindingCreatives =
+      !isFindingBothCreatives &&
+      (action === "find_creatives" ||
+        /(find my creatives|find creatives|yes, find|match creatives|show creatives|vetted creatives)/i.test(
+          message || ""
+        ));
+
+    if (
+      !isFindingCreatives &&
+      !isFindingBothCreatives &&
+      (!message || typeof message !== "string" || !message.trim()) &&
+      (!referenceImages || referenceImages.length === 0)
+    ) {
+      return NextResponse.json({ error: "Please enter a question or attach a reference image." }, { status: 400 });
     }
 
-    const availableCoins = Math.max(0, Number(clientContext?.availableCoins) || 0);
+    let availableCoins = Math.max(0, Number(clientContext?.availableCoins) || 0);
     const hasSubscription = Boolean(clientContext?.hasSubscription);
     const subscriptionPlan = clientContext?.subscriptionPlan ? String(clientContext.subscriptionPlan) : null;
 
-    const trimmed = message.trim();
+    const trimmed = (message || "").trim();
 
-    // Strict V1 Scope Guardrail check
-    const outOfScopeCheck = checkOutOfScopeService(trimmed);
-    if (outOfScopeCheck.isOutOfScope) {
-      return NextResponse.json({
-        mode: "out_of_scope",
-        headline: "Service Outside Version 1 Catalog",
-        answer: `We currently do not offer ${outOfScopeCheck.serviceName} in Version 1, but you can submit this to our **Peach Business** feedback tab to let our team know it's something you want to see in the app. Every piece of feedback helps us grow—so you are growing with us!`,
-        showFeedbackButton: true,
-        diagnosticQuestions: null,
-        scope: null,
-        matchedCreatives: [],
-      });
+    // Check scope inquiries (pure out-of-scope vs mixed-scope)
+    if (!isFindingCreatives && !isFindingBothCreatives && trimmed) {
+      const scopeAnalysis = analyzeScopeInquiry(trimmed);
+
+      // Mixed Scope: User asked for both in-scope and out-of-scope together
+      if (scopeAnalysis.isMixed) {
+        return NextResponse.json({
+          mode: "mixed_scope",
+          headline: "Mixed Service Scope Request",
+          answer: `We currently do not offer **${scopeAnalysis.outOfScopeService}** in Version 1, but you can submit this to our **Peach Business** feedback tab so our team knows you want it! However, **we DO offer full ${scopeAnalysis.inScopeService}**. Would you like me to scope your ${scopeAnalysis.inScopeService} project first?`,
+          showFeedbackButton: true,
+          quickReplies: [
+            `Yes, scope my ${scopeAnalysis.inScopeService} →`,
+            "Go to Peach Business Feedback →",
+            "Ask Peachy™ Another Question",
+          ],
+          diagnosticQuestions: null,
+          scope: null,
+          matchedCreatives: [],
+          uploadedImageUrls: [],
+        });
+      }
+
+      // Pure Out-of-Scope
+      if (scopeAnalysis.isOutOfScope) {
+        return NextResponse.json({
+          mode: "out_of_scope",
+          headline: "Service Outside Version 1 Catalog",
+          answer: `We currently do not offer ${scopeAnalysis.outOfScopeService} in Version 1, but you can submit this to our **Peach Business** feedback tab to let our team know it's something you want to see in the app. Every piece of feedback helps us grow—so you are growing with us!`,
+          showFeedbackButton: true,
+          diagnosticQuestions: null,
+          scope: null,
+          matchedCreatives: [],
+          uploadedImageUrls: [],
+        });
+      }
     }
 
     const admin = createAdminClient();
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    // Query approved creatives from Supabase
+    // 1. Fetch Brand Vault, Brand Readiness, Business Profile & Past Projects
+    let brandVaultContext = "Brand Vault: Brand-new user / no assets saved yet.";
+    let pastProjectsContext = "Past Projects: None yet on Peach Network.";
+    let clientBusinessName = "Client Business";
+    let businessHub = "US Remote";
+    let brandReadiness: BusinessBrandReadinessResult | null = null;
+
+    if (user?.id) {
+      try {
+        const { data: business } = await admin
+          .from("businesses")
+          .select("id, name, industry, description, logo_url, common_needs, city, state, website")
+          .eq("owner_user_id", user.id)
+          .maybeSingle();
+
+        if (business) {
+          clientBusinessName = business.name || clientBusinessName;
+          businessHub = formatCityHub(business.city, business.state);
+          const [{ data: liveWallet }, { data: brandAssets }, { data: pastProjects }] = await Promise.all([
+            admin
+              .from("coin_wallets")
+              .select("available_coins")
+              .eq("business_id", business.id)
+              .maybeSingle(),
+            admin
+              .from("business_brand_assets")
+              .select("id, label, kind, value, original_name, notes")
+              .eq("business_id", business.id),
+            admin
+              .from("projects")
+              .select("id, title, category, status, coin_amount, created_at")
+              .eq("business_id", business.id)
+              .order("created_at", { ascending: false })
+              .limit(3),
+          ]);
+
+          if (typeof liveWallet?.available_coins === "number") {
+            availableCoins = Math.max(0, liveWallet.available_coins);
+          }
+
+          brandReadiness = computeBusinessBrandReadiness(business, brandAssets || []);
+
+          const logos = (brandAssets || []).filter((a: any) => a.kind === "logo" || a.kind === "vector" || a.label?.toLowerCase().includes("logo"));
+          const colors = (brandAssets || []).filter((a: any) => a.kind === "color" || a.value?.startsWith("#"));
+          const fonts = (brandAssets || []).filter((a: any) => a.kind === "font" || a.label?.toLowerCase().includes("font"));
+          const photos = (brandAssets || []).filter((a: any) => a.kind === "photo" || a.kind === "image");
+          const socialAsset = (brandAssets || []).find(
+            (a: any) => a.kind === "other" && String(a.label || "").toLowerCase() === "social handles"
+          );
+
+          const assetBullets: string[] = [];
+          if (logos.length > 0) {
+            assetBullets.push(`• Primary Logos on file (${logos.length}): ${logos.map((l: any) => l.label || l.original_name).join(", ")}`);
+          } else {
+            assetBullets.push("• Logos: None uploaded yet in Brand Vault");
+          }
+          if (colors.length > 0) {
+            assetBullets.push(`• Brand Colors saved: ${colors.map((c: any) => c.value || c.label).join(", ")}`);
+          } else {
+            assetBullets.push("• Brand Colors: None saved");
+          }
+          if (fonts.length > 0) {
+            assetBullets.push(`• Fonts / Typography: ${fonts.map((f: any) => f.value || f.label).join(", ")}`);
+          } else {
+            assetBullets.push("• Fonts / Typography: None specified");
+          }
+          if (photos.length > 0) {
+            assetBullets.push(
+              `• Showcase Photo Library (${photos.length} photos): ${photos
+                .slice(0, 6)
+                .map((p: any) => p.label || p.original_name || "Photo")
+                .join(", ")}`
+            );
+          } else {
+            assetBullets.push("• Showcase Photo Library: No storefront/product photography uploaded yet");
+          }
+
+          const dailyNeedsList = Array.isArray(business.common_needs) && business.common_needs.length > 0
+            ? business.common_needs.join(", ")
+            : "Not specified yet";
+          const socialSummary = socialAsset?.value ? `Social Handles: ${socialAsset.value}` : "Social Handles: Not added yet";
+
+          brandVaultContext = `Business: "${business.name}" (${business.industry || "Commercial"})\nCity Hub: ${businessHub}\nWebsite: ${business.website || "Not listed"}\n${socialSummary}\nBusiness Bio / Vibe: ${business.description || "Not added yet"}\nDaily & Ongoing Creative Needs: ${dailyNeedsList}\nBrand Readiness Score: ${brandReadiness.score}% (${brandReadiness.completedCount}/4 essentials complete)\nMissing Brand Essentials: ${brandReadiness.missingLabels.length ? brandReadiness.missingLabels.join(", ") : "None (100% Brand Ready)"}\n${assetBullets.join("\n")}`;
+
+          if (pastProjects && pastProjects.length > 0) {
+            pastProjectsContext = pastProjects
+              .map((p: any) => `• "${p.title}" (${p.category}, ${p.coin_amount} Coins, Status: ${p.status})`)
+              .join("\n");
+          }
+        }
+      } catch (vaultErr) {
+        console.warn("Brand vault lookup notice:", vaultErr);
+      }
+    }
+
+    const clientBudgetCoins = extractBudgetCoinsFromText(
+      `${history?.map((h: any) => h?.content || "").join(" ") || ""} ${trimmed}`
+    );
+
+    // 2. Upload reference image(s) to Supabase Storage if provided
+    const uploadedImageUrls: string[] = [];
+    const validReferenceImages: Array<{ data: string; mimeType: string; name?: string }> = [];
+
+    if (Array.isArray(referenceImages) && referenceImages.length > 0) {
+      for (const [idx, img] of referenceImages.slice(0, 3).entries()) {
+        if (img?.data && typeof img.data === "string") {
+          validReferenceImages.push({
+            data: img.data,
+            mimeType: img.mimeType || "image/jpeg",
+            name: img.name,
+          });
+
+          try {
+            const buffer = Buffer.from(img.data, "base64");
+            const safeName = (img.name || `ref-${idx + 1}.jpg`).replace(/[^a-zA-Z0-9._-]/g, "_").slice(-100);
+            const storagePath = `peachy-references/${user?.id || "anon"}/${Date.now()}-${safeName}`;
+
+            const { error: upErr } = await admin.storage
+              .from("project-files")
+              .upload(storagePath, buffer, {
+                contentType: img.mimeType || "image/jpeg",
+                upsert: false,
+              });
+
+            if (!upErr) {
+              const { data: signed } = await admin.storage
+                .from("project-files")
+                .createSignedUrl(storagePath, 60 * 60 * 24 * 365);
+              if (signed?.signedUrl) {
+                uploadedImageUrls.push(signed.signedUrl);
+              } else {
+                uploadedImageUrls.push(`data:${img.mimeType || "image/jpeg"};base64,${img.data}`);
+              }
+            } else {
+              uploadedImageUrls.push(`data:${img.mimeType || "image/jpeg"};base64,${img.data}`);
+            }
+          } catch (e) {
+            uploadedImageUrls.push(`data:${img.mimeType || "image/jpeg"};base64,${img.data}`);
+          }
+        }
+      }
+    }
+
+    // Query approved creatives from Supabase & enforce 100% Creative Business Readiness
     let pool: CreativeCandidate[] = APPROVED_CREATIVES_FALLBACK;
     try {
       const [{ data: realRows }, { data: realProfiles }, { data: realWorks }] = await Promise.all([
@@ -547,51 +1211,261 @@ export async function POST(req: Request) {
       ]);
 
       if (realRows && realRows.length > 0) {
-        const nameMap = new Map((realProfiles ?? []).map((p: any) => [p.id, p.full_name]));
-        const avatarMap = new Map((realProfiles ?? []).map((p: any) => [p.id, p.avatar_url]));
-
-        pool = realRows.map((r: any, idx: number) => {
-          const fw = (realWorks ?? []).find((w: any) => w.creative_id === r.id);
-          const fallback = APPROVED_CREATIVES_FALLBACK[idx % APPROVED_CREATIVES_FALLBACK.length];
-          return {
-            id: r.id,
-            name: nameMap.get(r.user_id) || r.name || fallback.name,
-            avatar_url: r.profile_image_url || avatarMap.get(r.user_id) || fallback.avatar_url,
-            peach_level: r.peach_level || fallback.peach_level,
-            headline: r.primary_specialty || fallback.headline,
-            city: r.city || fallback.city,
-            state: r.state || fallback.state,
-            hub:
-              r.hub ||
-              (r.city?.toLowerCase().includes("atlanta")
-                ? "Atlanta Hub"
-                : r.city?.toLowerCase().includes("huntsville")
-                ? "Huntsville Hub"
-                : r.city?.toLowerCase().includes("montgomery")
-                ? "Montgomery Hub"
-                : "Birmingham Hub"),
-            reliability_score: Number(r.reliability_score) || fallback.reliability_score,
-            bio: r.bio || fallback.bio,
-            match_score: 95,
-            match_reason: "Verified commercial portfolio executing this exact tier.",
-            specialties: [r.primary_specialty, ...(r.secondary_specialties ?? [])].filter(Boolean),
-            featured_work: fw
-              ? {
-                  title: fw.title,
-                  image_url: fw.image_url || fallback.featured_work.image_url,
-                  industry: fw.industry || fallback.featured_work.industry,
-                  tags: Array.isArray(fw.tags) ? fw.tags : fallback.featured_work.tags,
-                }
-              : fallback.featured_work,
-          };
+        const readyRows = realRows.filter((r: any) => {
+          const worksForCreative = (realWorks ?? []).filter((w: any) => w.creative_id === r.id);
+          return computeCreativeBusinessReadiness(r, worksForCreative.length).isEligibleForMatching;
         });
+
+        if (readyRows.length > 0) {
+          const nameMap = new Map((realProfiles ?? []).map((p: any) => [p.id, p.full_name]));
+          const avatarMap = new Map((realProfiles ?? []).map((p: any) => [p.id, p.avatar_url]));
+
+          pool = readyRows.map((r: any, idx: number) => {
+            const fw = (realWorks ?? []).find((w: any) => w.creative_id === r.id);
+            const fallback = APPROVED_CREATIVES_FALLBACK[idx % APPROVED_CREATIVES_FALLBACK.length];
+            return {
+              id: r.id,
+              name: nameMap.get(r.user_id) || r.name || fallback.name,
+              avatar_url: r.profile_image_url || avatarMap.get(r.user_id) || fallback.avatar_url,
+              peach_level: r.peach_level || fallback.peach_level,
+              headline: r.primary_specialty || fallback.headline,
+              city: r.city || fallback.city,
+              state: r.state || fallback.state,
+              hub:
+                r.hub ||
+                (r.city?.toLowerCase().includes("atlanta")
+                  ? "Atlanta Hub"
+                  : r.city?.toLowerCase().includes("huntsville")
+                  ? "Huntsville Hub"
+                  : r.city?.toLowerCase().includes("montgomery")
+                  ? "Montgomery Hub"
+                  : "Birmingham Hub"),
+              reliability_score: Number(r.reliability_score) || fallback.reliability_score,
+              bio: r.bio || fallback.bio,
+              match_score: 95,
+              match_reason: "100% Business Ready · Verified commercial portfolio executing this exact tier.",
+              specialties: [r.primary_specialty, ...(r.secondary_specialties ?? [])].filter(Boolean),
+              featured_work: fw
+                ? {
+                    title: fw.title,
+                    image_url: fw.image_url || fallback.featured_work.image_url,
+                    industry: fw.industry || fallback.featured_work.industry,
+                    tags: Array.isArray(fw.tags) ? fw.tags : fallback.featured_work.tags,
+                  }
+                : fallback.featured_work,
+            };
+          });
+        }
       }
     } catch (dbErr) {
       console.warn("Peach Match creative fetch fallback:", dbErr);
     }
 
+    // Smart Matching for "Both Together" (Hybrid OR Split Specialists)
+    if (isFindingBothCreatives && multiServiceQuote?.serviceA && multiServiceQuote?.serviceB) {
+      const sA: ServiceOptionQuote = multiServiceQuote.serviceA;
+      const sB: ServiceOptionQuote = multiServiceQuote.serviceB;
+      const combinedCoins = Math.max(1, Number(multiServiceQuote.combined?.coins) || sA.coins + sB.coins);
+      const includesPodSupervision = combinedCoins > 20;
+      const hasEnough = availableCoins >= combinedCoins;
+      const deficitCoins = Math.max(0, combinedCoins - availableCoins);
+
+      // 1. Check Supabase pool for any real vetted creative verified in BOTH specialties
+      const hybridMatches = pool.filter(
+        (c) =>
+          creativeStrictlyVerifiedForDiscipline(c, sA.serviceKey) &&
+          creativeStrictlyVerifiedForDiscipline(c, sB.serviceKey)
+      );
+
+      // 2. Always prepare up to 3 vetted specialists for Service A and Service B (with local City Hub priority for on-location/print)
+      const serviceACreatives = rankCreativesForService(pool, sA.serviceKey, businessHub).slice(0, 3);
+      const serviceBCreatives = rankCreativesForService(pool, sB.serviceKey, businessHub)
+        .filter((c) => c.id !== serviceACreatives[0]?.id || pool.length <= 3)
+        .slice(0, 3);
+
+      const isHybrid = hybridMatches.length > 0;
+      let answerCopy = isHybrid
+        ? `Good news—I found ${hybridMatches.length} hybrid Peach creative${hybridMatches.length === 1 ? "" : "s"} verified in both **${sA.serviceName}** and **${sB.serviceName}** (or you can split into two specialists below).`
+        : `No single creative in our vetted pool covers both **${sA.serviceName}** and **${sB.serviceName}** end-to-end, so I split your match into two dedicated specialist pods so neither deliverable gets compromised!`;
+
+      if (includesPodSupervision) {
+        answerCopy += ` Since your combined project is **${combinedCoins} Coins** (over 20 Coins), **Art Director Pod Supervision** is included free so both creatives stay aligned.`;
+      }
+
+      if (hasEnough) {
+        answerCopy += `\n\nYou have **${availableCoins} Coins** available—enough to launch Both Together (${combinedCoins} Coins) right now!`;
+      } else {
+        answerCopy += `\n\nThis combined scope requires **${combinedCoins} Coins** ($${combinedCoins * PEACH_COIN_USD_RATE} USD), and you currently have **${availableCoins} Coins** (${deficitCoins} more needed to launch Both Together).`;
+      }
+
+      return NextResponse.json({
+        mode: "matched_both_creatives",
+        matchStrategy: isHybrid ? "hybrid" : "split",
+        headline: isHybrid
+          ? `Hybrid & Split Creative Matches (${sA.serviceName} + ${sB.serviceName})`
+          : `Split Specialist Match: Pick Your ${sA.serviceName} & ${sB.serviceName} Creatives`,
+        answer: answerCopy,
+        diagnosticQuestions: null,
+        multiServiceQuote,
+        hybridCreatives: hybridMatches.slice(0, 3),
+        serviceACreatives,
+        serviceBCreatives,
+        includesPodSupervision,
+        walletStatus: {
+          hasEnough,
+          requiredCoins: combinedCoins,
+          availableCoins,
+          deficitCoins,
+          hasSubscription,
+          subscriptionPlan,
+        },
+        uploadedImageUrls,
+      });
+    }
+
+    // If user clicked "Yes, Find My Creatives →" or requested creatives: execute Stage 4 immediately
+    if (isFindingCreatives) {
+      const scopeData = currentScope || {
+        title: "Standard Multi-Page Business Site (3–5 Pages)",
+        category: "Website",
+        serviceKey: "website_design",
+        coins: 18,
+        usdAmount: 900,
+        deliverables: [
+          "Up to 5 custom responsive pages",
+          "Mobile breakpoints & speed optimization",
+          "Domain & 100% administrative site ownership transfer",
+        ],
+        requiredFromBusiness: ["Brand assets & copy outline", "Domain credentials"],
+        estimatedTurnaround: "8–12 Business Days",
+        revisionRounds: 3,
+        reason: "Locked in based on your required features, assets, and timeline.",
+      };
+
+      const coins = Math.max(1, Number(scopeData.coins) || 10);
+      const hasEnough = availableCoins >= coins;
+      const deficitCoins = Math.max(0, coins - availableCoins);
+
+      let answerCopy = "";
+      if (hasEnough) {
+        answerCopy = `Great news—you have enough Peach Coins in your wallet to start this project right away (${coins} Coins needed, you currently have ${availableCoins} Coins available)! Below are 3 vetted specialists with verified portfolio matches ready to begin. Click **Select [Creative Name]** on your preferred creative to review your brief and open your project.`;
+      } else {
+        answerCopy = `This project scope requires ${coins} Coins ($${coins * PEACH_COIN_USD_RATE} USD) and you currently have ${availableCoins} Coins in your wallet (${deficitCoins} more needed to hire). Before hiring, you can top up your wallet right below.`;
+        if (hasSubscription) {
+          answerCopy += ` As an active ${subscriptionPlan || "Peach Network"} member, you can top up the extra ${deficitCoins} Coins at your member rate right now, or wait until your next monthly coin drop.`;
+        } else {
+          answerCopy += ` Did you know? Peach Network monthly memberships give you recurring coin allowances, rollover protection, and member discounts. If you don't want to subscribe, that's completely okay—you can just do a quick one-time top up right here!`;
+        }
+      }
+
+      const rankedPool = rankCreativesForService(
+        pool,
+        scopeData.serviceKey || "website_design",
+        businessHub
+      );
+
+      return NextResponse.json({
+        mode: "matched_creatives",
+        headline: "3 Vetted Creatives Ready for Your Project",
+        answer: answerCopy,
+        diagnosticQuestions: null,
+        scope: scopeData,
+        walletStatus: {
+          hasEnough,
+          requiredCoins: coins,
+          availableCoins,
+          deficitCoins,
+          hasSubscription,
+          subscriptionPlan,
+        },
+        matchedCreatives: rankedPool.slice(0, 3),
+        uploadedImageUrls,
+      });
+    }
+
     const historyArray: Array<{ role: string; content: string }> = Array.isArray(history) ? history : [];
     const hasPreviousDiagnosticTurn = historyArray.some((h) => h.role === "assistant");
+
+    // Multi-Service Detection: check latest message + recent user answers
+    const combinedContextForMulti = [
+      ...historyArray.filter((h) => h.role === "user").slice(-2).map((h) => h.content),
+      trimmed,
+    ].join(" ");
+    const detectedDisciplines = detectMultiServiceDisciplines(trimmed);
+    const detectedAcrossAnswers =
+      trimmed.startsWith("Diagnostic Specifications:") || hasPreviousDiagnosticTurn
+        ? detectMultiServiceDisciplines(combinedContextForMulti)
+        : detectedDisciplines;
+
+    const multiDisciplines =
+      detectedDisciplines.length >= 2
+        ? detectedDisciplines
+        : detectedAcrossAnswers.length >= 2 && trimmed.startsWith("Diagnostic Specifications:")
+        ? detectedAcrossAnswers
+        : [];
+
+    if (multiDisciplines.length >= 2) {
+      const mQuote = buildMultiServiceQuote(multiDisciplines, combinedContextForMulti.toLowerCase(), availableCoins);
+      const podNote = mQuote.combined.includesPodSupervision
+        ? " (includes free **Art Director Pod Supervision** since combined total is over 20 Coins)"
+        : "";
+      const projectPlan = buildLiveProjectPlan({
+        goalSummary: `${mQuote.serviceA.serviceName} + ${mQuote.serviceB.serviceName} launch for ${clientBusinessName}`,
+        primaryItems: [
+          {
+            id: "plan-service-a",
+            service: mQuote.serviceA.serviceName,
+            serviceKey: mQuote.serviceA.serviceKey,
+            package: mQuote.serviceA.title,
+            category: mQuote.serviceA.category,
+            coins: mQuote.serviceA.coins,
+            usd: mQuote.serviceA.usdAmount,
+            estimatedTurnaround: mQuote.serviceA.estimatedTurnaround,
+            reason: mQuote.serviceA.reason,
+            deliverables: mQuote.serviceA.deliverables,
+            requiredFromBusiness: mQuote.serviceA.requiredFromBusiness,
+            status: "needed",
+          },
+          {
+            id: "plan-service-b",
+            service: mQuote.serviceB.serviceName,
+            serviceKey: mQuote.serviceB.serviceKey,
+            package: mQuote.serviceB.title,
+            category: mQuote.serviceB.category,
+            coins: mQuote.serviceB.coins,
+            usd: mQuote.serviceB.usdAmount,
+            estimatedTurnaround: mQuote.serviceB.estimatedTurnaround,
+            reason: mQuote.serviceB.reason,
+            deliverables: mQuote.serviceB.deliverables,
+            requiredFromBusiness: mQuote.serviceB.requiredFromBusiness,
+            status: "needed",
+          },
+        ],
+        availableCoins,
+        clientBudgetCoins,
+        brandReadiness,
+      });
+
+      return NextResponse.json({
+        mode: "multi_service_quote",
+        headline: `Itemized Multi-Service Quote: ${mQuote.serviceA.serviceName} + ${mQuote.serviceB.serviceName}`,
+        answer: `Your project spans two creative disciplines—here is the clear, itemized breakdown so you can book exactly what fits your budget today${podNote}:\n\n• **Option 1 — ${mQuote.serviceA.serviceName} Only:** ${mQuote.serviceA.coins} Coins ($${mQuote.serviceA.usdAmount.toLocaleString()})\n• **Option 2 — ${mQuote.serviceB.serviceName} Only:** ${mQuote.serviceB.coins} Coins ($${mQuote.serviceB.usdAmount.toLocaleString()})\n• **Option 3 — Both Together:** ${mQuote.combined.coins} Coins ($${mQuote.combined.usdAmount.toLocaleString()})\n\n${mQuote.walletCoverageMessage}`,
+        diagnosticQuestions: null,
+        scope: null,
+        multiServiceQuote: mQuote,
+        projectPlan,
+        walletStatus: {
+          hasEnough: availableCoins >= mQuote.combined.coins,
+          requiredCoins: mQuote.combined.coins,
+          availableCoins,
+          deficitCoins: Math.max(0, mQuote.combined.coins - availableCoins),
+          hasSubscription,
+          subscriptionPlan,
+        },
+        matchedCreatives: [],
+        uploadedImageUrls,
+      });
+    }
 
     const compactPool = pool.slice(0, 6).map((c) => ({
       id: c.id,
@@ -611,21 +1485,33 @@ ${historyArray
   .join("\n")}
 
 LATEST BUSINESS INQUIRY:
-USER: ${trimmed}
+USER: ${trimmed || "[Attached reference image for Peachy™ review]"}
+
+REFERENCE IMAGES ATTACHED: ${validReferenceImages.length > 0 ? `${validReferenceImages.length} image(s) attached for visual analysis` : "None"}
+
+CLIENT BRAND VAULT (READ-ONLY CONTEXT):
+${brandVaultContext}
+
+PAST PROJECTS (LAST 3):
+${pastProjectsContext}
 
 IS_FIRST_MESSAGE_IN_CONVERSATION: ${!hasPreviousDiagnosticTurn}
 
 CLIENT WALLET & MEMBERSHIP CONTEXT:
 - Available Coin Balance: ${availableCoins} Peach Coins ($${availableCoins * 50} USD)
+- Mentioned Client Budget: ${clientBudgetCoins ? `${clientBudgetCoins} Coins ($${clientBudgetCoins * 50} USD)` : "Not explicitly stated"}
 - Active Subscription: ${hasSubscription ? `YES (Plan: ${subscriptionPlan || "Active Member"})` : "NO (Non-subscriber)"}
 
-AVAILABLE CREATIVE CANDIDATES (Choose 3 with skill-proven fit if recommending a package):
+AVAILABLE CREATIVE CANDIDATES:
 ${JSON.stringify(compactPool, null, 2)}
 
 TASK:
-Evaluate whether to DIAGNOSE (ask 2-3 quick diagnostic questions with short clickable pill options) or RECOMMEND (lock in 1 definitive package with coins, USD, turnaround, deliverables, required assets, and 3 matched creatives).
-Remember: If this is an open-ended initial inquiry (e.g. "I need a website for my restaurant"), DIAGNOSE FIRST. Do not quote a price or return a package card on the first turn.
-Output strictly valid JSON matching the schema in the system prompt.`;
+Determine if user wants:
+1. "advice" (General questions, creative advice, definitions, tips — warm 2–4 sentences, no quote, no cards, no creatives).
+2. "diagnostic" (Scoping project on an open-ended request or with reference image — ask 2–3 questions with pills, acknowledging Brand Readiness & assets already in Brand Vault).
+3. "price_quote" / "recommendation" (User answered diagnostic questions or provided complete specifications — lock in 1 package card + structured projectPlan; do NOT return matched creatives yet).
+If Brand Readiness has missing brand essentials (like Primary Logo or Brand Sheet), proactively acknowledge them and offer them as optional items in projectPlan.
+Output strictly valid JSON adhering to PEACH_MATCH_SYSTEM_INSTRUCTION.`;
 
     let parsed: any = null;
     let rateLimitEncountered = false;
@@ -641,8 +1527,22 @@ Output strictly valid JSON matching the schema in the system prompt.`;
         },
       });
 
-      // Prioritize low-latency gemini-3.1-flash-lite, with gemini-3.8-flash as secondary
-      const modelsToTry = ["gemini-3.1-flash-lite", "gemini-3.8-flash"];
+      const modelsToTry = ["gemini-4-hydrogen", "gemini-3.8-flash"];
+
+      // Multimodal contents assembly
+      const contentsPayload = validReferenceImages.length > 0
+        ? {
+            parts: [
+              ...validReferenceImages.map((img) => ({
+                inlineData: {
+                  mimeType: img.mimeType,
+                  data: img.data,
+                },
+              })),
+              { text: conversationPrompt },
+            ],
+          }
+        : conversationPrompt;
 
       for (const model of modelsToTry) {
         let timer: ReturnType<typeof setTimeout> | undefined;
@@ -654,7 +1554,7 @@ Output strictly valid JSON matching the schema in the system prompt.`;
 
           const geminiCall = ai.models.generateContent({
             model,
-            contents: conversationPrompt,
+            contents: contentsPayload,
             config: {
               systemInstruction: PEACH_MATCH_SYSTEM_INSTRUCTION,
               responseMimeType: "application/json",
@@ -682,11 +1582,11 @@ Output strictly valid JSON matching the schema in the system prompt.`;
 
           if (is429) {
             rateLimitEncountered = true;
-            console.warn(`[Peach Match AI] Gemini 429/Quota on ${model}:`, callErr?.message);
+            console.warn(`[Peachy AI] Gemini 429/Quota on ${model}:`, callErr?.message);
           } else if (errMsg.includes("timeout")) {
-            console.info(`[Peach Match AI] ${model} response timed out after 8s. Falling back smoothly.`);
+            console.info(`[Peachy AI] ${model} response timed out after 8s. Falling back smoothly.`);
           } else {
-            console.warn(`[Peach Match AI] Notice on ${model}:`, callErr?.message);
+            console.warn(`[Peachy AI] Notice on ${model}:`, callErr?.message);
           }
         }
       }
@@ -719,97 +1619,127 @@ Output strictly valid JSON matching the schema in the system prompt.`;
         diagnosticQuestions: null,
         scope: null,
         matchedCreatives: [],
+        uploadedImageUrls,
+      });
+    }
+
+    // Check if model returned general creative advice mode
+    if (parsed && parsed.mode === "advice") {
+      return NextResponse.json({
+        mode: "advice",
+        headline: parsed.headline || "Peachy™ · Creative Director Advice",
+        answer: parsed.answer || "Here is my creative direction recommendation for your project.",
+        quickReplies: Array.isArray(parsed.quickReplies) && parsed.quickReplies.length > 0
+          ? parsed.quickReplies
+          : ["Scope a Website Project", "Scope Brand Identity", "Ask Another Question"],
+        diagnosticQuestions: null,
+        scope: null,
+        matchedCreatives: [],
+        uploadedImageUrls,
       });
     }
 
     // If Gemini did not return a valid response (offline, timeout, or missing key), use intelligent deterministic concierge
-    if (!parsed || (!parsed.diagnosticQuestions && !parsed.scope)) {
+    if (!parsed || (!parsed.diagnosticQuestions && !parsed.scope && parsed.mode !== "advice")) {
       const qLower = trimmed.toLowerCase();
       const hasExplicitTier =
         /(landing page|e-commerce|ecommerce|shopify|webflow|table reservations|menu and hours|brand sheet|logo overhaul|tabletop shoot|culinary shoot|portrait session|carousel drop|monthly social|flyer launch kit|packaging die-line)/.test(
           qLower
         );
 
-      const isDiagnosis = !hasPreviousDiagnosticTurn && !hasExplicitTier;
+      const isGeneralQuestion =
+        !hasExplicitTier &&
+        /^(what|how|why|should|can you explain|difference between|tell me about|recommend a color|advice on|best font|best platform|which platform)\b/i.test(qLower) &&
+        !/(build|make|create|design|need|want|hire|scope|quote|price)\b/i.test(qLower);
 
-      if (isDiagnosis) {
-        const diag = buildDefaultDiagnostic(trimmed);
+      if (isGeneralQuestion) {
         parsed = {
-          mode: "diagnostic",
-          headline: diag.headline,
-          answer: diag.answer,
-          diagnosticQuestions: diag.questions,
+          mode: "advice",
+          headline: "Peachy™ · Creative Director Perspective",
+          answer:
+            "From an agency creative direction standpoint, the most effective approach depends on your target customer touchpoint. High-converting brands pair clear typography with focused visual hierarchy rather than overcrowding. Tell me a bit more about your brand aesthetic, or tap below to lock in an exact scope!",
+          quickReplies: ["Scope a Website Project", "Scope Brand Identity", "Ask Peachy™ Another Question"],
+          diagnosticQuestions: null,
           scope: null,
           matchedCreatives: [],
         };
       } else {
-        const cat = findCategoryByKeywords(trimmed);
-        let optKey: "option_a" | "option_b" | "option_c" = "option_b";
+        const isDiagnosis = !hasPreviousDiagnosticTurn && !hasExplicitTier;
 
-        if (cat.id === "website_design") {
-          if (/(e-commerce|ecommerce|store|shop|shoe|restaurant|online ordering|reservation|menu)/.test(qLower)) {
-            optKey = "option_c"; // 26 Coins
-          } else if (/(landing|single page|lead capture|one page)/.test(qLower)) {
-            optKey = "option_a"; // 10 Coins
-          } else {
-            optKey = "option_b"; // 18 Coins
-          }
-        } else if (cat.id === "branding_design") {
-          if (/(overhaul|full brand|guidelines|stationery|rebrand)/.test(qLower)) {
-            optKey = "option_c"; // 12 Coins
-          } else if (/(brand sheet|starter|palette|typography)/.test(qLower)) {
-            optKey = "option_b"; // 6 Coins
-          } else {
-            optKey = "option_a"; // 4 Coins
-          }
-        } else if (cat.id === "commercial_photography") {
-          if (/(restaurant|food|culinary|chef|dish|drinks)/.test(qLower)) {
-            optKey = "option_c"; // 12 Coins
-          } else if (/(tabletop|product|shoe|retail|bottle)/.test(qLower)) {
-            optKey = "option_b"; // 10 Coins
-          } else {
-            optKey = "option_a"; // 6 Coins
-          }
-        } else if (cat.id === "social_media") {
-          if (/(monthly|30 day|calendar|video|reel)/.test(qLower)) {
-            optKey = "option_c"; // 8 Coins
-          } else if (/(carousel|slide)/.test(qLower)) {
-            optKey = "option_b"; // 4 Coins
-          } else {
-            optKey = "option_a"; // 3 Coins
-          }
+        if (isDiagnosis) {
+          const diag = buildDefaultDiagnostic(trimmed);
+          parsed = {
+            mode: "diagnostic",
+            headline: diag.headline,
+            answer: diag.answer,
+            diagnosticQuestions: diag.questions,
+            scope: null,
+            matchedCreatives: [],
+          };
         } else {
-          if (/(menu|packaging|die-line|dieline|box|brochure)/.test(qLower)) {
-            optKey = "option_c"; // 6 Coins
-          } else if (/(flyer|poster|event|promo)/.test(qLower)) {
-            optKey = "option_b"; // 2 Coins
+          const cat = findCategoryByKeywords(trimmed);
+          let optKey: "option_a" | "option_b" | "option_c" = "option_b";
+
+          if (cat.id === "website_design") {
+            if (/(e-commerce|ecommerce|store|shop|shoe|restaurant|online ordering|reservation|menu)/.test(qLower)) {
+              optKey = "option_c"; // 26 Coins
+            } else if (/(landing|single page|lead capture|one page)/.test(qLower)) {
+              optKey = "option_a"; // 10 Coins
+            } else {
+              optKey = "option_b"; // 18 Coins
+            }
+          } else if (cat.id === "branding_design") {
+            if (/(overhaul|full brand|guidelines|stationery|rebrand)/.test(qLower)) {
+              optKey = "option_c"; // 12 Coins
+            } else if (/(brand sheet|starter|palette|typography)/.test(qLower)) {
+              optKey = "option_b"; // 6 Coins
+            } else {
+              optKey = "option_a"; // 4 Coins
+            }
+          } else if (cat.id === "commercial_photography") {
+            if (/(restaurant|food|culinary|chef|dish|drinks)/.test(qLower)) {
+              optKey = "option_c"; // 12 Coins
+            } else if (/(tabletop|product|shoe|retail|bottle)/.test(qLower)) {
+              optKey = "option_b"; // 10 Coins
+            } else {
+              optKey = "option_a"; // 6 Coins
+            }
+          } else if (cat.id === "social_media") {
+            if (/(monthly|30 day|calendar|video|reel)/.test(qLower)) {
+              optKey = "option_c"; // 8 Coins
+            } else if (/(carousel|slide)/.test(qLower)) {
+              optKey = "option_b"; // 4 Coins
+            } else {
+              optKey = "option_a"; // 3 Coins
+            }
           } else {
-            optKey = "option_a"; // 1 Coin
+            if (/(menu|packaging|die-line|dieline|box|brochure)/.test(qLower)) {
+              optKey = "option_c"; // 6 Coins
+            } else if (/(flyer|poster|event|promo)/.test(qLower)) {
+              optKey = "option_b"; // 2 Coins
+            } else {
+              optKey = "option_a"; // 1 Coin
+            }
           }
-        }
 
-        const opt = cat.options[optKey];
-        const requiredCoins = opt.coins;
-        const hasEnough = availableCoins >= requiredCoins;
-        const deficit = Math.max(0, requiredCoins - availableCoins);
+          const opt = cat.options[optKey];
+          const requiredCoins = opt.coins;
+          const hasEnough = availableCoins >= requiredCoins;
+          const deficit = Math.max(0, requiredCoins - availableCoins);
 
-        let answerCopy = `Based on your technical requirements, I recommend **${opt.tierName}** (${requiredCoins} Coins = $${requiredCoins * PEACH_COIN_USD_RATE} USD). This provides a complete commercial scope with 100% administrative transfer and 3 included revision rounds.`;
-        if (hasEnough) {
-          answerCopy += ` Great news—you have enough Peach Coins in your wallet to start this project right away (${requiredCoins} Coins needed, you currently have ${availableCoins} Coins available)! Below are 3 vetted specialists with verified portfolio matches ready to begin.`;
-        } else {
-          answerCopy += ` Note: This scope requires ${requiredCoins} Coins ($${requiredCoins * PEACH_COIN_USD_RATE} USD) and you currently have ${availableCoins} Coins in your wallet (${deficit} more Coins needed to hire).`;
-          if (hasSubscription) {
-            answerCopy += ` As an active ${subscriptionPlan || "Peach Network"} member, you can top up the extra ${deficit} Coins at your member rate right now, or wait until your next monthly coin drop.`;
+          let answerCopy = `Based on your technical requirements, I recommend **${opt.tierName}** (${requiredCoins} Coins = $${requiredCoins * PEACH_COIN_USD_RATE} USD). This provides a complete commercial scope with 100% administrative transfer and 3 included revision rounds.`;
+          if (hasEnough) {
+            answerCopy += `\n\nGreat news—you have enough Peach Coins in your wallet to start this project right away (${requiredCoins} Coins needed, you currently have ${availableCoins} Coins available)!`;
           } else {
-            answerCopy += ` Did you know? Peach Network monthly memberships give you recurring coin allowances, rollover protection, and member discounts. If you don't want to subscribe, that's completely okay—you can just do a quick one-time top up right here!`;
+            answerCopy += `\n\nNote: This scope requires ${requiredCoins} Coins ($${requiredCoins * PEACH_COIN_USD_RATE} USD) and you currently have ${availableCoins} Coins in your wallet (${deficit} more Coins needed to hire).`;
+            if (hasSubscription) {
+              answerCopy += ` As an active ${subscriptionPlan || "Peach Network"} member, you can top up the extra ${deficit} Coins at your member rate right now, or wait until your next monthly coin drop.`;
+            } else {
+              answerCopy += ` Did you know? Peach Network monthly memberships give you recurring coin allowances, rollover protection, and member discounts. If you don't want to subscribe, that's completely okay—you can just do a quick one-time top up right here!`;
+            }
           }
-        }
 
-        parsed = {
-          mode: "recommendation",
-          headline: "Definitive Agency Recommendation",
-          answer: answerCopy,
-          scope: {
+          const resolvedScope = {
             title: opt.tierName,
             category: cat.categoryTag,
             serviceKey: cat.id,
@@ -820,42 +1750,65 @@ Output strictly valid JSON matching the schema in the system prompt.`;
             estimatedTurnaround: opt.typicalTurnaround,
             revisionRounds: 3,
             reason: `Locked in based on your required features, assets, and timeline (${opt.coins} Coins = $${opt.coins * PEACH_COIN_USD_RATE} USD).`,
-          },
-          topCreativeIds: [
-            { id: pool[0]?.id || "cr_nia", score: 98, reason: "Verified commercial portfolio executing this exact tier." },
-            { id: pool[1]?.id || "cr_maya", score: 96, reason: "Specialized in commercial brand systems and digital collateral." },
-            { id: pool[2]?.id || "cr_jordan", score: 94, reason: "Proven track record delivering high-impact commercial launches." },
-          ],
-        };
+          };
+
+          parsed = {
+            mode: isFindingCreatives ? "matched_creatives" : "price_quote",
+            headline: isFindingCreatives
+              ? "3 Vetted Creatives Ready for Your Project"
+              : "Definitive Agency Recommendation & Price Quote",
+            answer: answerCopy,
+            scope: resolvedScope,
+            findCreativesPrompt: "Want me to find 3 vetted creatives for this project?",
+            topCreativeIds: [
+              { id: pool[0]?.id || "cr_nia", score: 98, reason: "Verified commercial portfolio executing this exact tier." },
+              { id: pool[1]?.id || "cr_maya", score: 96, reason: "Specialized in commercial brand systems and digital collateral." },
+              { id: pool[2]?.id || "cr_jordan", score: 94, reason: "Proven track record delivering high-impact commercial launches." },
+            ],
+          };
+        }
       }
     }
 
-    // Process Recommendation Mode
-    if (parsed.mode === "recommendation" && parsed.scope) {
-      const scopeData = parsed.scope;
-      const coins = Math.max(1, Number(scopeData.coins) || 10);
-      const matchedIds: Array<{ id: string; score: number; reason: string }> = Array.isArray(parsed?.topCreativeIds)
-        ? parsed.topCreativeIds
-        : [];
+    // Process Advice Mode
+    if (parsed.mode === "advice") {
+      return NextResponse.json({
+        mode: "advice",
+        headline: parsed.headline || "Peachy™ · Creative Director Advice",
+        answer: parsed.answer || "Here is my creative direction advice for your project.",
+        quickReplies: Array.isArray(parsed.quickReplies) ? parsed.quickReplies : ["Scope a Project", "Ask Another Question"],
+        diagnosticQuestions: null,
+        scope: null,
+        matchedCreatives: [],
+        uploadedImageUrls,
+      });
+    }
 
+    // Helper to assemble 3 best-fit creatives for a given scope
+    const buildMatchedCreatives = (scopeData: any, nominatedIds: any[]) => {
       const matchedCreatives: CreativeCandidate[] = [];
       const poolById = new Map(pool.map((c) => [c.id, c]));
 
-      // 1. Add model-nominated creatives
-      for (const item of matchedIds) {
-        const c = poolById.get(item.id);
-        if (c && !matchedCreatives.some((m) => m.id === c.id)) {
-          matchedCreatives.push({
-            ...c,
-            match_score: Math.max(75, Math.min(99, Number(item.score) || 96)),
-            match_reason: String(item.reason || c.match_reason),
-          });
+      if (Array.isArray(nominatedIds)) {
+        for (const item of nominatedIds) {
+          const c = poolById.get(item.id);
+          if (c && !matchedCreatives.some((m) => m.id === c.id)) {
+            matchedCreatives.push({
+              ...c,
+              match_score: Math.max(75, Math.min(99, Number(item.score) || 96)),
+              match_reason: String(item.reason || c.match_reason),
+            });
+          }
         }
       }
 
-      // 2. Fill to 3 candidates prioritizing exact specialty match
-      const targetCategoryTag = (scopeData.category || "web").toLowerCase();
-      const sortedPool = [...pool].sort((a, b) => {
+      const rankedForScope = rankCreativesForService(
+        pool,
+        scopeData?.serviceKey || "website_design",
+        businessHub
+      );
+      const targetCategoryTag = (scopeData?.category || "web").toLowerCase();
+      const sortedPool = [...rankedForScope].sort((a, b) => {
         const aMatches = a.specialties.some((s) => s.toLowerCase().includes(targetCategoryTag));
         const bMatches = b.specialties.some((s) => s.toLowerCase().includes(targetCategoryTag));
         if (aMatches && !bMatches) return -1;
@@ -870,27 +1823,50 @@ Output strictly valid JSON matching the schema in the system prompt.`;
         }
       }
 
+      return matchedCreatives.slice(0, 3);
+    };
+
+    // Stage 4: User requested to find / match creatives (either via button or text)
+    if (isFindingCreatives || parsed.mode === "matched_creatives") {
+      const scopeData = currentScope || parsed.scope || {
+        title: "Commercial Multi-Page Website",
+        category: "Website",
+        serviceKey: "website_design",
+        coins: 18,
+        usdAmount: 900,
+        deliverables: [
+          "Up to 5 custom responsive pages",
+          "Mobile breakpoints & speed optimization",
+          "Domain & 100% administrative site ownership transfer",
+        ],
+        requiredFromBusiness: ["Brand assets & copy outline", "Domain credentials"],
+        estimatedTurnaround: "8–12 Business Days",
+        revisionRounds: 3,
+        reason: "Selected tier for commercial website architecture.",
+      };
+
+      const coins = Math.max(1, Number(scopeData.coins) || 10);
       const hasEnough = availableCoins >= coins;
       const deficitCoins = Math.max(0, coins - availableCoins);
 
-      let finalAnswer = parsed.answer || "";
-      // Ensure the wallet status and subscription info are clearly stated in the message text
-      const ansLower = finalAnswer.toLowerCase();
-      if (!hasEnough && !ansLower.includes("deficit") && !ansLower.includes("top up") && !ansLower.includes("more coin")) {
-        finalAnswer += `\n\nNote: This project requires ${coins} Coins ($${coins * PEACH_COIN_USD_RATE} USD). You currently have ${availableCoins} Coins in your wallet (${deficitCoins} more needed).`;
+      let answerCopy = "";
+      if (hasEnough) {
+        answerCopy = `Great news—you have enough Peach Coins in your wallet to start this project right away (${coins} Coins needed, you currently have ${availableCoins} Coins available)! Below are 3 vetted specialists with verified portfolio matches ready to begin. Click **Select & Review Brief** on your preferred creative to proceed.`;
+      } else {
+        answerCopy = `This project scope requires ${coins} Coins ($${coins * PEACH_COIN_USD_RATE} USD) and you currently have ${availableCoins} Coins in your wallet (${deficitCoins} more needed to hire).`;
         if (hasSubscription) {
-          finalAnswer += ` As an active ${subscriptionPlan || "Peach Network"} member, you can top up the extra ${deficitCoins} Coins at your member rate right now or wait for your next monthly coin drop.`;
+          answerCopy += ` As an active ${subscriptionPlan || "Peach Network"} member, you can top up the extra ${deficitCoins} Coins at your member rate right now, or wait until your next monthly coin drop.`;
         } else {
-          finalAnswer += ` Peach Network monthly subscriptions give you recurring monthly coin allowances and rollover protection. If you don't want to subscribe, that's completely okay—you can just do a quick one-time top up right here!`;
+          answerCopy += ` Did you know? Peach Network monthly memberships give you recurring coin allowances, rollover protection, and member discounts. If you don't want to subscribe, that's completely okay—you can just do a quick one-time top up right here!`;
         }
-      } else if (hasEnough && !ansLower.includes("enough") && !ansLower.includes("great news")) {
-        finalAnswer += `\n\nGreat news—you have enough Peach Coins in your wallet to start this project right away (${coins} Coins needed, you have ${availableCoins} Coins available)!`;
       }
 
+      const matchedCreatives = buildMatchedCreatives(scopeData, parsed?.topCreativeIds || []);
+
       return NextResponse.json({
-        mode: "recommendation",
-        headline: parsed.headline || "Definitive Agency Recommendation",
-        answer: finalAnswer,
+        mode: "matched_creatives",
+        headline: "3 Vetted Creatives Ready for Your Project",
+        answer: answerCopy,
         diagnosticQuestions: null,
         scope: {
           title: scopeData.title,
@@ -912,11 +1888,85 @@ Output strictly valid JSON matching the schema in the system prompt.`;
           hasSubscription,
           subscriptionPlan,
         },
-        matchedCreatives: matchedCreatives.slice(0, 3),
+        matchedCreatives,
+        uploadedImageUrls,
       });
     }
 
-    // Process Diagnostic Mode
+    // Stage 3: Price Quote Mode (Quotes single package, NO creatives yet)
+    if (parsed.scope || parsed.mode === "price_quote" || parsed.mode === "recommendation") {
+      const scopeData = parsed.scope;
+      const coins = Math.max(1, Number(scopeData.coins) || 10);
+      const hasEnough = availableCoins >= coins;
+      const deficitCoins = Math.max(0, coins - availableCoins);
+
+      const shortQuoteIntro = `Here is your **${scopeData.title}** plan (${coins} Coins / $${(coins * PEACH_COIN_USD_RATE).toLocaleString()}) ready to launch below.`;
+      const answerCopy = shortQuoteIntro;
+
+      const projectPlan =
+        parsed.projectPlan && Array.isArray(parsed.projectPlan.recommendedItems) && parsed.projectPlan.recommendedItems.length > 0
+          ? {
+              ...parsed.projectPlan,
+              clientBudgetCoins: parsed.projectPlan.clientBudgetCoins ?? clientBudgetCoins,
+            }
+          : buildLiveProjectPlan({
+              goalSummary: `${scopeData.title} for ${clientBusinessName}`,
+              primaryItems: [
+                {
+                  id: "plan-main",
+                  service: scopeData.category || "Design",
+                  serviceKey: scopeData.serviceKey || "website_design",
+                  package: scopeData.title,
+                  category: scopeData.category || "Design",
+                  coins,
+                  usd: scopeData.usdAmount || coins * PEACH_COIN_USD_RATE,
+                  estimatedTurnaround: scopeData.estimatedTurnaround || "5–7 Business Days",
+                  reason: scopeData.reason || "Matched based on your project requirements.",
+                  deliverables: Array.isArray(scopeData.deliverables) ? scopeData.deliverables : [],
+                  requiredFromBusiness: Array.isArray(scopeData.requiredFromBusiness)
+                    ? scopeData.requiredFromBusiness
+                    : [],
+                  status: "needed",
+                },
+              ],
+              availableCoins,
+              clientBudgetCoins,
+              brandReadiness,
+            });
+
+      return NextResponse.json({
+        mode: "price_quote",
+        headline: parsed.headline || "Definitive Agency Recommendation & Price Quote",
+        answer: answerCopy,
+        diagnosticQuestions: null,
+        scope: {
+          title: scopeData.title,
+          category: scopeData.category || "Design",
+          serviceKey: scopeData.serviceKey || "website_design",
+          coins,
+          usdAmount: scopeData.usdAmount || coins * PEACH_COIN_USD_RATE,
+          deliverables: scopeData.deliverables,
+          requiredFromBusiness: scopeData.requiredFromBusiness,
+          estimatedTurnaround: scopeData.estimatedTurnaround,
+          revisionRounds: 3,
+          reason: scopeData.reason,
+        },
+        projectPlan,
+        findCreativesPrompt: "Want me to find 3 vetted creatives for this project?",
+        walletStatus: {
+          hasEnough,
+          requiredCoins: coins,
+          availableCoins,
+          deficitCoins,
+          hasSubscription,
+          subscriptionPlan,
+        },
+        matchedCreatives: [], // NO CREATIVES SHOWN YET! Must click "Yes, Find My Creatives →"
+        uploadedImageUrls,
+      });
+    }
+
+    // Stage 2: Diagnostic Mode (Asks 2-3 questions)
     return NextResponse.json({
       mode: "diagnostic",
       headline: parsed.headline || "Let's diagnose your project requirements",
@@ -924,6 +1974,7 @@ Output strictly valid JSON matching the schema in the system prompt.`;
       diagnosticQuestions: Array.isArray(parsed.diagnosticQuestions) ? parsed.diagnosticQuestions : [],
       scope: null,
       matchedCreatives: [],
+      uploadedImageUrls,
     });
   } catch (err: any) {
     console.error("Peach Match route error:", err?.message || err);
@@ -951,6 +2002,7 @@ Output strictly valid JSON matching the schema in the system prompt.`;
         ],
         scope: null,
         matchedCreatives: [],
+        uploadedImageUrls: [],
       },
       { status: 200 }
     );

@@ -75,23 +75,22 @@ export function DisputeModal({
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-2.5 text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">
-          <ShieldAlert className="w-4 h-4 text-amber-600" />
-          <span>Peach Escrow Protection</span>
+        <div className="flex items-center gap-2.5 text-xs font-bold text-[#D9532F] uppercase tracking-wider mb-1">
+          <span>Peach Project Protection</span>
         </div>
 
-        <h2 className="text-xl font-extrabold text-stone-950 tracking-tight">
+        <h2 className="text-xl font-extrabold text-[#17251E] tracking-tight">
           Submit Project Dispute
         </h2>
-        <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+        <p className="text-sm text-[#3C4A42] mt-1 leading-relaxed">
           Active projects cannot be directly cancelled once underway. Your case is submitted directly to the
-          Peach Admin review dashboard for resolution. Coins remain protected in escrow.
+          Peach Admin review dashboard for resolution. Coins Reserved for Active Projects stay protected.
         </p>
 
-        <div className="bg-[#FAF8F5] border border-stone-200 rounded-xl p-3 my-3.5 text-xs text-stone-700 space-y-1">
-          <div className="font-bold text-stone-900 truncate">Project: {projectTitle}</div>
-          <div className="text-stone-600">
-            Escrow Commitment: <strong className="text-stone-900 tabular-nums">{coinAmount} Coins</strong> ($
+        <div className="bg-[#FFF8F3] border border-[#D6CFC7] rounded-xl p-3 my-3.5 text-sm text-[#3C4A42] space-y-1">
+          <div className="font-bold text-[#17251E] truncate">Project: {projectTitle}</div>
+          <div>
+            Reserved Project Coins: <strong className="text-[#17251E] tabular-nums">{coinAmount} Coins</strong> ($
             {(coinAmount * 50).toLocaleString()} USD)
           </div>
         </div>

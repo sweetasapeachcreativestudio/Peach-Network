@@ -37,7 +37,7 @@ const FAQ_ITEMS: FAQItem[] = [
         </p>
         <p>
           Coins function as predictable, standardized creative credits. When you initiate a project,
-          the exact coin quote is placed into protected escrow and only released once you review and
+          the exact coin quote is reserved under Peach Project Protection and only released once you review and
           approve completed milestones. There are no surprise hourly overages, hidden platform fees, or quote markups.
         </p>
       </div>
@@ -131,7 +131,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     id: "contracts-and-signatures",
     category: "escrow",
-    categoryLabel: "Escrow & Ownership",
+    categoryLabel: "Protection & Ownership",
     question: "How do digital contracts and dual signatures work before work begins?",
     answer: (
       <div className="space-y-2 text-xs sm:text-sm text-stone-600 leading-relaxed">
@@ -140,7 +140,7 @@ const FAQ_ITEMS: FAQItem[] = [
         </p>
         <p>
           When you select a matched creative, Peach Network automatically generates a binding <strong className="text-stone-900 font-bold">Creative Brief Sheet &amp; Commercial Contract</strong>.
-          It lays out the exact deliverables, required client assets, turnaround timeline, revision structure, and escrow amount.
+          It lays out the exact deliverables, required client assets, turnaround timeline, revision structure, and Coin commitment.
         </p>
         <p>
           Both you and the designer review and digitally sign the contract inside your project workspace. Once dual signatures are locked,
@@ -152,7 +152,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     id: "ownership-and-vault",
     category: "escrow",
-    categoryLabel: "Escrow & Ownership",
+    categoryLabel: "Protection & Ownership",
     question: "Do I own 100% of the completed assets and website?",
     answer: (
       <div className="space-y-2 text-xs sm:text-sm text-stone-600 leading-relaxed">
@@ -269,7 +269,7 @@ export function BusinessFAQSection() {
           { key: "pricing", label: "Pricing & Coins" },
           { key: "catalog", label: "Services & Scope" },
           { key: "scoping", label: "Scoping & Matching" },
-          { key: "escrow", label: "Escrow & Ownership" },
+          { key: "escrow", label: "Protection & Ownership" },
         ].map((tab) => {
           const isActive = activeTab === tab.key;
           return (
